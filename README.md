@@ -1,160 +1,127 @@
+
+Readme · MD
 # MuniPrioritise
-
-**Equity-Aware Municipal Service Request Management App**
-
-A mobile application for South African municipalities to manage service delivery requests across water, electricity, roads, refuse collection, and sanitation. The system uses a hybrid prioritisation algorithm that balances operational efficiency with socioeconomic equity, weighting historically underserved areas using SAMPI-derived indicators.
-
-Built as a group capstone project for ITDMA3-22 — Research Design and Methodology, Eduvos.
-
----
-
-## Tech Stack
-
-| Layer | Technology |
+ 
+Equity-aware municipal service request management for South African municipalities. Hybrid prioritisation algorithm balances operational efficiency against ward-level socioeconomic need (SAMPI), benchmarked against FCFS, Greedy, and Genetic Algorithm baselines.
+ 
+Capstone project — ITDMA3-22 (Research Design & Methodology) and ITMDA3-34 (Project: Mobile Application and Web Services), Eduvos.
+ 
+## Team
+ 
+| Role | Member |
 |---|---|
-| Mobile App | React Native + Expo |
-| Web Dashboard | React + Vite + Tailwind CSS |
-| Backend API | Node.js + Express |
-| Database | PostgreSQL + PostGIS |
-| Algorithm Service | Python + FastAPI |
-| Authentication | JWT + bcrypt |
-| Maps (mobile) | react-native-maps |
-| Maps (dashboard) | React Leaflet + OpenStreetMap |
-| Hosting | Render (backend + algorithm), Vercel (dashboard) |
-
----
-
+| Algorithm Lead | Handre |
+| Backend Developer | Jordan |
+| Mobile Developer 1 | Michael |
+| Mobile Developer 2 | Jan |
+| Frontend/QA Lead | Tristan |
+ 
 ## Project Structure
-
+ 
 ```
 muniprioritise/
-├── mobile/          # React Native + Expo (resident + worker app)
-├── dashboard/       # React + Vite + Tailwind (supervisor web dashboard)
-├── backend/         # Node.js + Express (REST API)
-├── algorithm/       # Python + FastAPI (prioritisation microservice)
-├── docs/            # API contracts, architecture diagrams, documentation
-└── database/        # SQL migration files and seed data
+├── mobile/              # React Native + Expo (resident and worker apps)
+├── dashboard/           # React + Vite + Tailwind
+├── backend/              # Node.js + Express API
+├── algorithm/            # Python + FastAPI microservice (DEAP genetic algorithm)
+├── database/             # SQL migrations and seed files
+└── docs/                 # API contracts, architecture diagrams, build plan
 ```
-
----
-
+ 
 ## Prerequisites
-
-Make sure you have the following installed before running any service:
-
-- [Node.js 20 LTS](https://nodejs.org/)
-- [Python 3.11+](https://www.python.org/)
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (for PostgreSQL)
-- [Expo Go](https://expo.dev/client) on your phone, or an Android/iOS emulator
-- Git
-
----
-
-## Running the Project Locally
-
-### 1. Clone the repo
-
+ 
+- Node.js 20 LTS
+- Python 3.11+
+- Docker + Docker Compose
+- Expo Go app (for testing mobile on device) or Android emulator
+## Quick Start
+ 
+### 1. Clone and configure environment
+ 
 ```bash
-git clone https://github.com/muniprioritise/muniprioritise.git
-cd muniprioritise
-```
-
-### 2. Set up environment variables
-
-```bash
+git clone https://github.com/muniprioritise/MuniPrioritise.git
+cd MuniPrioritise
 cp .env.example .env
 ```
-
-Open `.env` and fill in your local values. See `.env.example` for descriptions of each variable.
-
-### 3. Start the database
-
+ 
+Fill in `.env` with your local values (DB credentials, JWT secret, API base URLs). Ask Handre for shared secrets if any are missing.
+ 
+### 2. Start the database
+ 
 ```bash
 docker-compose up -d
 ```
-
-This starts a PostgreSQL + PostGIS instance on port 5432. Make sure Docker Desktop is running first.
-
-### 4. Start the backend API
-
+ 
+This starts PostgreSQL 15 with PostGIS 3.3 and pgAdmin. Seed ward data (SAMPI scores) loads automatically on first run. Check pgAdmin at `http://localhost:5050` to confirm.
+ 
+### 3. Backend (Node.js + Express)
+ 
 ```bash
 cd backend
 npm install
 npm run dev
 ```
-
-Runs on `http://localhost:3000`
-
-### 5. Start the algorithm service
-
+ 
+Runs on `http://localhost:3000`. Confirm with `GET /health`.
+ 
+### 4. Algorithm service (Python + FastAPI)
+ 
 ```bash
 cd algorithm
 python -m venv venv
-source venv/bin/activate        # Mac/Linux
-# venv\Scripts\activate         # Windows
+source venv/bin/activate        # Windows: venv\Scripts\activate
 pip install -r requirements.txt
-uvicorn main:app --reload
+uvicorn main:app --reload --port 8000
 ```
-
-Runs on `http://localhost:8000`
-
-### 6. Start the mobile app
-
-```bash
-cd mobile
-npm install
-npx expo start
-```
-
-Scan the QR code with Expo Go, or press `a` for Android emulator / `i` for iOS simulator.
-
-### 7. Start the dashboard
-
+ 
+Runs on `http://localhost:8000`. Confirm with `GET /health`.
+ 
+### 5. Dashboard (React + Vite)
+ 
 ```bash
 cd dashboard
 npm install
 npm run dev
 ```
-
-Runs on `http://localhost:5173`
-
----
-
-## Team
-
-| Role | Responsibility |
-|---|---|
-| Project Lead / Algorithm Researcher | Algorithm design, benchmarking, research writing |
-| Mobile Developer — Resident App | React Native resident-facing screens |
-| Mobile Developer — Worker App | React Native worker-facing screens |
-| Backend Developer | Node.js API, database, authentication |
-| Frontend / Integration / QA Lead | Web dashboard, system integration, testing |
-
----
-
-## Branching Strategy
-
-This project uses GitFlow:
-
-- `main` — stable, submission-ready code only
-- `develop` — integration branch, all features merge here
-- `feature/description` — individual feature branches, branched off develop
-- `hotfix/description` — urgent fixes to main only
-
-All changes go through a Pull Request. No direct pushes to `main` or `develop`.
-
----
-
+ 
+Runs on `http://localhost:5173`.
+ 
+### 6. Mobile (Expo)
+ 
+```bash
+cd mobile
+npm install
+npx expo start
+```
+ 
+Scan the QR code with Expo Go, or press `a` for Android emulator. Update the API base URL in `app.config.js` to point at your local backend (or the Render-hosted one — check `.env.example`).
+ 
+## You're set up when
+ 
+- All four services run locally without errors
+- A "hello world" request travels: mobile app → backend → database → response shown in app
+- `GET /health` returns 200 on both backend and algorithm service
+If backend isn't ready yet and you're blocked, use `json-server` with a mock `db.json` — several sprint issues already note this fallback. Don't wait idle on a blocked dependency; flag it and work around it.
+ 
+## Branching & Contributing
+ 
+We use GitFlow:
+ 
+- `main` — production-ready, protected, no direct pushes
+- `develop` — integration branch, all feature branches merge here via PR
+- `feature/xxx` — your work branch, e.g. `feature/p1-05-resident-submit-screen`
+- `hotfix/xxx` — urgent fixes only
+**Workflow:**
+1. Branch off `develop`: `git checkout -b feature/p1-05-resident-submit-screen`
+2. Commit and push your branch
+3. Open a PR into `develop` using the PR template — fill it in, don't skip it
+4. Wait for review before merging. Don't push directly to `develop` or `main`.
+## Project Board
+ 
+All remaining work is tracked as GitHub Issues on the Projects board, organised by phase (P0–P4). Each issue has an assignee, labels, milestone, and a due date. Check your assigned issues and the due date before starting — some have notes on how to work around blocked dependencies (e.g. mocking an API that isn't live yet).
+ 
 ## Documentation
-
-- [API Contracts](./docs/api-contracts.md) — full endpoint reference
-- [Algorithm Design](./docs/algorithm.md) — hybrid algorithm explanation and equity weighting
-- [Database Schema](./docs/schema.sql) — full PostgreSQL schema
-
----
-
-## Notes
-
-- No real municipal data is used. All data is synthetic, based on publicly available StatsSA / SAMPI 2022 datasets.
-- This is a research prototype. It is not deployed to a live municipality.
-- All submissions go through Turnitin. Do not use AI tools to generate proposal or dissertation content.
+ 
+- [`docs/api-contracts.md`](docs/api-contracts.md) — every endpoint shape, defined before building
+- [`docs/MuniPrioritise_Build_Plan.md`](docs/MuniPrioritise_Build_Plan.md) — full phase-by-phase build plan
+- [`docs/ALGORITHM.md`](docs/ALGORITHM.md) — hybrid algorithm design (added in Phase 4)
