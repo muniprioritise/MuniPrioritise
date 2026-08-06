@@ -6,6 +6,8 @@ const { Pool } = require('pg');
 const app = express();
 const port = process.env.PORT || 3000;
 
+const { body, validationResult } = require('express-validator');
+
 app.use(cors());
 app.use(express.json());
 
@@ -29,20 +31,33 @@ app.get('/api/reports', async (req, res) => {
 });
 
 // POST /api/reports 
-app.post('/api/reports', async (req, res) => {
-  const { category, description, severity, lat, lng } = req.body;
-  try {
-    const result = await pool.query(
-      'INSERT INTO reports (category, description, severity, lat, lng) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-      [category, description, severity, lat, lng]
-    );
-    res.status(201).json(result.rows[0]);
-  } catch (err) {
-    console.error('Error saving report:', err);
-    res.status(500).json({ error: 'Failed to save report' });
-  }
-});
+app.post(
+  '/api/reports',
+  [
+    body('category')
+      .isIn(['water', 'electricity', 'roads', 'refuse', 'sanitation'])
+      .withMessage('Invalid category. Must be water, electricity, roads, refuse, or sanitation.'),
+    body('description').notEmpty().withMessage('Description is required'),
+    body('severity').isInt({ min: 1, max: 3 }).withMessage('Severity must be an integer between 1 and 3'),
+    body('lat').isNumeric().withMessage('Latitude must be a valid number'),
+    body('lng').isNumeric().withMessage('Longitude must be a valid number')
+  ],
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
 
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
-});
+    const { category, description, severity, lat, lng } = req.body;
+    try {
+      const result = await pool.query(
+        'INSERT INTO reports (category, description, severity, lat, lng) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+        [category, description, severity, lat, lng]
+      );
+      res.status(201).json(result.rows[0]);
+    } catch (err) {
+      console.error('Error saving report:', err);
+      res.status(500).json({ error: 'Failed to save report' });
+    }
+  }
+);
