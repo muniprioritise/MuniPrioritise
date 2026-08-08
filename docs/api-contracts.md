@@ -4,9 +4,7 @@
 > Before building any API call in mobile or dashboard, check here first.
 > Do not invent endpoint shapes — if something is missing, add it here and notify the team.
 
-All endpoints are prefixed with `/api/v1`.
-
-Base URL (local): `http://localhost:3000/api/v1`
+Base URL (local): `http://localhost:3000`
 
 ---
 
