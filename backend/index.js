@@ -74,7 +74,7 @@ app.get('/api/jobs', async (req, res) => {
     ];
 
     try {
-      const algoResponse = await fetch('https://muniprioritise.onrender.com/prioritise/fcfs', {
+      const algoResponse = await fetch(`${process.env.ALGORITHM_SERVICE_URL}/prioritise/fcfs`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ reports: pendingReports, workers })
