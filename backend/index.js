@@ -69,8 +69,8 @@ app.get('/api/jobs', async (req, res) => {
     const pendingReports = reportsResult.rows;
 
     const workers = [
-      { id: 'worker-1', lat: -33.9260, lng: 18.4260, available: true' },
-      { id: 'worker-2', lat: -33.9300, lng: 18.4300, available: true' }
+      { id: 'worker-1', lat: -33.9260, lng: 18.4260, available: true },
+      { id: 'worker-2', lat: -33.9300, lng: 18.4300, available: true }
     ];
 
     try {
