@@ -61,3 +61,47 @@ app.post(
     }
   }
 );
+
+// GET /api/jobs 
+app.get('/api/jobs', async (req, res) => {
+  try {
+    const reportsResult = await pool.query("SELECT * FROM reports WHERE status = 'pending' ORDER BY created_at ASC");
+    const pendingReports = reportsResult.rows;
+
+    const workers = [
+      { id: 'worker-1', lat: -33.9260, lng: 18.4260, available: true },
+      { id: 'worker-2', lat: -33.9300, lng: 18.4300, available: true }
+    ];
+
+    try {
+      const algoResponse = await fetch(`${process.env.ALGORITHM_SERVICE_URL}/prioritise/fcfs`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reports: pendingReports, workers })
+      });
+
+      if (!algoResponse.ok) {
+        throw new Error(`Algorithm service returned ${algoResponse.status}`);
+      }
+
+      const assignedJobs = await algoResponse.json();
+      return res.status(200).json(assignedJobs);
+      
+    } catch (algoErr) {
+      console.error('Algorithm service unavailable. Falling back to raw reports:', algoErr.message);
+      
+      return res.status(200).json({
+        fallback: true,
+        message: 'Algorithm service down. Returning unassigned pending reports.',
+        data: pendingReports
+      });
+    }
+  } catch (dbErr) {
+    console.error('Error fetching jobs:', dbErr);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
+});
