@@ -32,8 +32,7 @@
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 76
         }
-      ],
-      "expo-image"
+      ]
     ],
     "experiments": {
       "typedRoutes": false,
