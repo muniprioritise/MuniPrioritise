@@ -142,45 +142,38 @@ app.post(
   }
 );
 
-// GET /api/jobs 
-app.get('/api/jobs', async (req, res) => {
-  try {
-    const reportsResult = await pool.query("SELECT * FROM reports WHERE status = 'pending' ORDER BY created_at ASC");
-    const pendingReports = reportsResult.rows;
-
-    const workers = [
-      { id: 'worker-1', lat: -33.9260, lng: 18.4260, available: true },
-      { id: 'worker-2', lat: -33.9300, lng: 18.4300, available: true }
-    ];
-
-    try {
-      const algoResponse = await fetch(`${process.env.ALGORITHM_SERVICE_URL}/prioritise/fcfs`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reports: pendingReports, workers })
-      });
-
-      if (!algoResponse.ok) {
-        throw new Error(`Algorithm service returned ${algoResponse.status}`);
-      }
-
-      const assignedJobs = await algoResponse.json();
-      return res.status(200).json(assignedJobs);
-      
-    } catch (algoErr) {
-      console.error('Algorithm service unavailable. Falling back to raw reports:', algoErr.message);
-      
-      return res.status(200).json({
-        fallback: true,
-        message: 'Algorithm service down. Returning unassigned pending reports.',
-        data: pendingReports
-      });
+// POST /api/auth/register
+app.post(
+  '/api/auth/register',
+  [
+    body('email').isEmail().withMessage('Valid email is required'),
+    body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
+    body('role').isIn(['resident', 'worker', 'supervisor']).withMessage('Role must be resident, worker or supervisor'),
+    body('full_name').notEmpty().withMessage('Full name is required'),
+    body('phone').optional().isString()
+  ],
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
     }
-  } catch (dbErr) {
-    console.error('Error fetching jobs:', dbErr);
-    res.status(500).json({ error: 'Internal server error' });
+    const { email, password, role, full_name, phone } = req.body;
+    try {
+      const passwordHash = await bcrypt.hash(password, 12);
+      const result = await pool.query(
+        'INSERT INTO users (email, password_hash, role, full_name, phone) VALUES ($1, $2, $3, $4, $5) RETURNING id, email, role, full_name, phone, created_at',
+        [email, passwordHash, role, full_name, phone || null]
+      );
+      res.status(201).json(result.rows[0]);
+    } catch (err) {
+      if (err.code === '23505') {
+        return res.status(409).json({ error: 'Email already in use' });
+      }
+      console.error('Registration error:', err);
+      res.status(500).json({ error: 'Internal server error' });
+    }
   }
-});
+);
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
