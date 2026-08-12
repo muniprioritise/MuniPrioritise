@@ -1,4 +1,10 @@
 require('dotenv').config();
+
+if (!process.env.JWT_SECRET) {
+  console.error('ERROR: JWT_SECRET environment variable is missing.');
+  process.exit(1);
+}
+
 const express = require('express');
 const cors = require('cors');
 const { Pool } = require('pg');
@@ -62,42 +68,49 @@ app.post(
 );
 
 // POST /api/auth/login
-app.post('/api/auth/login', async (req, res) => {
-  const { email, password } = req.body;
-
-  if (!email || !password) {
-    return res.status(400).json({ error: 'Email and password are required' });
-  }
-
-  try {
-    const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
-    const user = result.rows[0];
-
-    if (!user) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+app.post(
+  '/api/auth/login',
+  [
+    body('email').isEmail().withMessage('Valid email is required'),
+    body('password').notEmpty().withMessage('Password is required')
+  ],
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
     }
 
-    const isMatch = await bcrypt.compare(password, user.password_hash);
-    if (!isMatch) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+    const { email, password } = req.body;
+
+    try {
+      const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+      const user = result.rows[0];
+
+      if (!user) {
+        return res.status(401).json({ error: 'Invalid credentials' });
+      }
+
+      const isMatch = await bcrypt.compare(password, user.password_hash);
+      if (!isMatch) {
+        return res.status(401).json({ error: 'Invalid credentials' });
+      }
+
+      const token = jwt.sign(
+        { id: user.id, email: user.email, role: user.role },
+        process.env.JWT_SECRET,
+        { expiresIn: '7d' }
+      );
+
+      res.status(200).json({
+        message: 'Login successful',
+        token,
+        user: { id: user.id, email: user.email, role: user.role, full_name: user.full_name }
+      });
+    } catch (err) {
+      console.error('Login error:', err);
+      res.status(500).json({ error: 'Internal server error' });
     }
-
-    const token = jwt.sign(
-      { id: user.id, email: user.email, role: user.role },
-      process.env.JWT_SECRET,
-      { expiresIn: '7d' }
-    );
-
-    res.status(200).json({
-      message: 'Login successful',
-      token,
-      user: { id: user.id, email: user.email, role: user.role, full_name: user.full_name }
-    });
-  } catch (err) {
-    console.error('Login error:', err);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
+  });
 
 // GET /api/reports 
 app.get('/api/reports', async (req, res) => {
