@@ -1,8 +1,8 @@
 import { mockJobs } from "@/data/mockJobs";
 import type { Job } from "@/types/job";
 
-const USE_MOCK_JOBS = true;
-const API_BASE_URL = "http://10.0.2.2:3000";
+const USE_MOCK_JOBS = false;
+const API_BASE_URL = "https://muniprioritise-backend.onrender.com";;
 
 const CATEGORY_LABELS: Record<string, string> = {
   water: "Water",
