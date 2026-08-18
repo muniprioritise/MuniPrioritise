@@ -1,4 +1,10 @@
 require('dotenv').config();
+
+if (!process.env.JWT_SECRET) {
+  console.error('ERROR: JWT_SECRET environment variable is missing.');
+  process.exit(1);
+}
+
 const express = require('express');
 const cors = require('cors');
 const { Pool } = require('pg');
@@ -7,6 +13,10 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 const { body, validationResult } = require('express-validator');
+
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const { verifyToken, requireRole } = require('./middleware/auth');
 
 app.use(cors());
 app.use(express.json());
@@ -19,7 +29,86 @@ app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok', message: 'Backend is live' });
 });
 
-// GET /api/reports 
+// POST /api/auth/register
+app.post(
+  '/api/auth/register',
+  [
+    body('email').isEmail().withMessage('Valid email is required'),
+    body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
+    body('role').isIn(['resident', 'worker', 'supervisor']).withMessage('Role must be resident, worker or supervisor'),
+    body('full_name').notEmpty().withMessage('Full name is required'),
+    body('phone').optional().isString()
+  ],
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    const { email, password, role, full_name, phone } = req.body;
+    try {
+      const passwordHash = await bcrypt.hash(password, 12);
+      const result = await pool.query(
+        'INSERT INTO users (email, password_hash, role, full_name, phone) VALUES ($1, $2, $3, $4, $5) RETURNING id, email, role, full_name, phone, created_at',
+        [email, passwordHash, role, full_name, phone || null]
+      );
+      res.status(201).json(result.rows[0]);
+    } catch (err) {
+      if (err.code === '23505') {
+        return res.status(409).json({ error: 'Email already in use' });
+      }
+      console.error('Registration error:', err);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  }
+);
+
+// POST /api/auth/login
+app.post(
+  '/api/auth/login',
+  [
+    body('email').isEmail().withMessage('Valid email is required'),
+    body('password').notEmpty().withMessage('Password is required')
+  ],
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { email, password } = req.body;
+
+    try {
+      const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+      const user = result.rows[0];
+
+      if (!user) {
+        return res.status(401).json({ error: 'Invalid credentials' });
+      }
+
+      const isMatch = await bcrypt.compare(password, user.password_hash);
+      if (!isMatch) {
+        return res.status(401).json({ error: 'Invalid credentials' });
+      }
+
+      const token = jwt.sign(
+        { id: user.id, email: user.email, role: user.role },
+        process.env.JWT_SECRET,
+        { expiresIn: '7d' }
+      );
+
+      res.status(200).json({
+        message: 'Login successful',
+        token,
+        user: { id: user.id, email: user.email, role: user.role, full_name: user.full_name }
+      });
+    } catch (err) {
+      console.error('Login error:', err);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  }
+);
+
+// GET /api/reports
 app.get('/api/reports', async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM reports ORDER BY created_at DESC');
@@ -30,7 +119,7 @@ app.get('/api/reports', async (req, res) => {
   }
 });
 
-// POST /api/reports 
+// POST /api/reports
 app.post(
   '/api/reports',
   [
@@ -62,7 +151,7 @@ app.post(
   }
 );
 
-// GET /api/jobs 
+// GET /api/jobs
 app.get('/api/jobs', async (req, res) => {
   try {
     const reportsResult = await pool.query("SELECT * FROM reports WHERE status = 'pending' ORDER BY created_at ASC");
@@ -86,10 +175,9 @@ app.get('/api/jobs', async (req, res) => {
 
       const assignedJobs = await algoResponse.json();
       return res.status(200).json(assignedJobs);
-      
+
     } catch (algoErr) {
       console.error('Algorithm service unavailable. Falling back to raw reports:', algoErr.message);
-      
       return res.status(200).json({
         fallback: true,
         message: 'Algorithm service down. Returning unassigned pending reports.',
