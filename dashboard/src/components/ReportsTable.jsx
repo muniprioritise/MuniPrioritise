@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || '';
 const reportsUrl = apiBaseUrl
-  ? `${apiBaseUrl.replace(/\/api\/v1\/?$/, '')}/api/reports`
+  ? `${apiBaseUrl}/reports`
   : '/api/reports';
 
 function ReportsTable() {
