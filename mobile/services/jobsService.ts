@@ -35,7 +35,9 @@ function mapReportToJob(report: Record<string, unknown>): Job {
     id: String(report.id ?? ""),
     category: mapCategory(report.category),
     severity: mapSeverity(report.severity),
-    address: String(report.location ?? "Location unavailable"),
+    address: report.lat && report.lng
+      ? `${report.lat}, ${report.lng}`
+      : "Location unavailable",
     ward: String(report.ward_id ?? "Ward unavailable"),
     submittedAt: String(
       report.created_at ?? new Date().toISOString()
