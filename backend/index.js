@@ -309,6 +309,204 @@ app.get('/api/jobs', verifyToken, async (req, res) => {
   }
 });
 
+// GET /api/workers/assigned
+app.get('/api/workers/assigned', verifyToken, requireRole(['worker']), async (req, res) => {
+  try {
+    const workerId = req.user.id;
+    const result = await pool.query(
+      `SELECT j.*, r.category, r.description, r.lat, r.lng, r.status as report_status
+       FROM jobs j
+       JOIN reports r ON j.report_id = r.id
+       WHERE j.worker_id = $1 AND j.status IN ('assigned', 'accepted')
+       ORDER BY j.score DESC NULLS LAST, j.created_at DESC`,
+      [workerId]
+    );
+    res.status(200).json(result.rows);
+  } catch (err) {
+    console.error('Error fetching assigned jobs:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// PATCH /api/jobs/:id/accept
+app.patch('/api/jobs/:id/accept', verifyToken, requireRole(['worker']), async (req, res) => {
+  try {
+    const jobId = req.params.id;
+    const workerId = req.user.id;
+    
+    const jobResult = await pool.query(
+      `UPDATE jobs SET status = 'accepted', updated_at = CURRENT_TIMESTAMP
+       WHERE id = $1 AND worker_id = $2 AND status = 'assigned'
+       RETURNING *`,
+      [jobId, workerId]
+    );
+    
+    if (jobResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Job not found or already accepted' });
+    }
+
+    await pool.query(
+      `UPDATE reports SET status = 'in_progress', updated_at = CURRENT_TIMESTAMP WHERE id = $1`,
+      [jobResult.rows[0].report_id]
+    );
+
+    res.status(200).json(jobResult.rows[0]);
+  } catch (err) {
+    console.error('Error accepting job:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// PATCH /api/jobs/:id/resolve 
+app.patch('/api/jobs/:id/resolve', verifyToken, requireRole(['worker']), upload.array('evidence', 5), async (req, res) => {
+  try {
+    const jobId = req.params.id;
+    const workerId = req.user.id;
+    const evidenceUrls = req.files ? req.files.map(file => `/uploads/${file.filename}`) : [];
+
+    if (evidenceUrls.length === 0) {
+      return res.status(400).json({ error: 'Evidence photos are required to resolve a job' });
+    }
+
+    const jobResult = await pool.query(
+      `UPDATE jobs SET status = 'completed', updated_at = CURRENT_TIMESTAMP
+       WHERE id = $1 AND worker_id = $2 AND status = 'accepted'
+       RETURNING *`,
+      [jobId, workerId]
+    );
+
+    if (jobResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Job not found or not accepted yet' });
+    }
+
+    const reportId = jobResult.rows[0].report_id;
+    const report = await pool.query('SELECT worker_evidence FROM reports WHERE id = $1', [reportId]);
+    const existingEvidence = report.rows[0].worker_evidence || [];
+    const updatedEvidence = [...existingEvidence, ...evidenceUrls];
+
+    await pool.query(
+      `UPDATE reports SET status = 'resolved', worker_evidence = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2`,
+      [updatedEvidence, reportId]
+    );
+
+    res.status(200).json(jobResult.rows[0]);
+  } catch (err) {
+    console.error('Error resolving job:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// PATCH /api/jobs/:id/escalate
+app.patch('/api/jobs/:id/escalate', verifyToken, requireRole(['worker']), async (req, res) => {
+  try {
+    const jobId = req.params.id;
+    const workerId = req.user.id;
+    const { reason } = req.body;
+
+    const jobResult = await pool.query(
+      `UPDATE jobs SET status = 'escalated', updated_at = CURRENT_TIMESTAMP
+       WHERE id = $1 AND worker_id = $2
+       RETURNING *`,
+      [jobId, workerId]
+    );
+
+    if (jobResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Job not found' });
+    }
+
+    await pool.query(
+      `INSERT INTO audit_logs (supervisor_id, action, entity_type, entity_id, reason)
+       VALUES (NULL, 'ESCALATE_JOB', 'job', $1, $2)`,
+      [jobId, reason || 'Worker escalated without providing a reason']
+    );
+
+    res.status(200).json(jobResult.rows[0]);
+  } catch (err) {
+    console.error('Error escalating job:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// POST /api/supervisor/override
+app.post('/api/supervisor/override', verifyToken, requireRole(['supervisor']), async (req, res) => {
+  try {
+    const { job_id, new_worker_id, new_score, reason } = req.body;
+    const supervisorId = req.user.id;
+
+    const jobQuery = await pool.query('SELECT * FROM jobs WHERE id = $1', [job_id]);
+    if (jobQuery.rows.length === 0) return res.status(404).json({ error: 'Job not found' });
+    const oldJob = jobQuery.rows[0];
+
+    const updatedJob = await pool.query(
+      `UPDATE jobs SET worker_id = COALESCE($1, worker_id), score = COALESCE($2, score), assigned_by = 'supervisor', updated_at = CURRENT_TIMESTAMP WHERE id = $3 RETURNING *`,
+      [new_worker_id, new_score, job_id]
+    );
+
+    await pool.query(
+      `INSERT INTO audit_logs (supervisor_id, action, entity_type, entity_id, old_value, new_value, reason)
+       VALUES ($1, 'OVERRIDE_JOB', 'job', $2, $3, $4, $5)`,
+      [supervisorId, job_id, oldJob, updatedJob.rows[0], reason || 'Manual supervisor override']
+    );
+
+    res.status(200).json(updatedJob.rows[0]);
+  } catch (err) {
+    console.error('Error overriding job:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// GET /api/supervisor/overview
+app.get('/api/supervisor/overview', verifyToken, requireRole(['supervisor']), async (req, res) => {
+  try {
+    const totalReports = await pool.query('SELECT COUNT(*) FROM reports');
+    const pendingReports = await pool.query("SELECT COUNT(*) FROM reports WHERE status = 'pending'");
+    const resolvedReports = await pool.query("SELECT COUNT(*) FROM reports WHERE status = 'resolved'");
+    const avgRating = await pool.query('SELECT AVG(resolution_rating) FROM reports WHERE resolution_rating IS NOT NULL');
+
+    res.status(200).json({
+      total_reports: parseInt(totalReports.rows[0].count),
+      pending_reports: parseInt(pendingReports.rows[0].count),
+      resolved_reports: parseInt(resolvedReports.rows[0].count),
+      average_rating: parseFloat(avgRating.rows[0].avg) || 0
+    });
+  } catch (err) {
+    console.error('Error fetching overview:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// GET /api/supervisor/analytics
+app.get('/api/supervisor/analytics', verifyToken, requireRole(['supervisor']), async (req, res) => {
+  try {
+    const categoryDist = await pool.query('SELECT category, COUNT(*) as count FROM reports GROUP BY category');
+    const statusDist = await pool.query('SELECT status, COUNT(*) as count FROM reports GROUP BY status');
+    
+    res.status(200).json({
+      by_category: categoryDist.rows,
+      by_status: statusDist.rows
+    });
+  } catch (err) {
+    console.error('Error fetching analytics:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// GET /api/supervisor/audit
+app.get('/api/supervisor/audit', verifyToken, requireRole(['supervisor']), async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT a.*, u.full_name as supervisor_name, u.email as supervisor_email 
+       FROM audit_logs a 
+       LEFT JOIN users u ON a.supervisor_id = u.id 
+       ORDER BY a.created_at DESC LIMIT 100`
+    );
+    res.status(200).json(result.rows);
+  } catch (err) {
+    console.error('Error fetching audit logs:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
