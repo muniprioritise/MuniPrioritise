@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS users (
     full_name VARCHAR(255),
     phone VARCHAR(20),
     role VARCHAR(50) NOT NULL CHECK (role IN ('resident', 'worker', 'supervisor')),
+    expo_push_token VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
