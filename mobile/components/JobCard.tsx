@@ -1,9 +1,15 @@
-import { StyleSheet, Text, View } from "react-native";
+import {
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 
 import type { Job, JobSeverity } from "@/types/job";
 
 interface JobCardProps {
   job: Job;
+  onPress: () => void;
 }
 
 function getRelativeTime(isoDate: string): string {
@@ -14,41 +20,57 @@ function getRelativeTime(isoDate: string): string {
   }
 
   const diffMs = Date.now() - submitted;
-  const diffMinutes = Math.floor(diffMs / (60 * 1000));
+  const diffMinutes = Math.floor(diffMs / 60000);
 
   if (diffMinutes < 1) return "Just now";
+
   if (diffMinutes < 60) {
-    return `${diffMinutes} minute${diffMinutes === 1 ? "" : "s"} ago`;
+    return `${diffMinutes} minute${
+      diffMinutes === 1 ? "" : "s"
+    } ago`;
   }
 
   const diffHours = Math.floor(diffMinutes / 60);
+
   if (diffHours < 24) {
-    return `${diffHours} hour${diffHours === 1 ? "" : "s"} ago`;
+    return `${diffHours} hour${
+      diffHours === 1 ? "" : "s"
+    } ago`;
   }
 
   const diffDays = Math.floor(diffHours / 24);
-  return `${diffDays} day${diffDays === 1 ? "" : "s"} ago`;
+
+  return `${diffDays} day${
+    diffDays === 1 ? "" : "s"
+  } ago`;
 }
 
 const SEVERITY_STYLES: Record<
   JobSeverity,
-  { backgroundColor: string; textColor: string; label: string }
+  {
+    backgroundColor: string;
+    textColor: string;
+    label: string;
+  }
 > = {
   low: {
     backgroundColor: "#E3F2E3",
     textColor: "#1E7A1E",
     label: "LOW",
   },
+
   medium: {
     backgroundColor: "#FFF4D9",
     textColor: "#8A6100",
     label: "MEDIUM",
   },
+
   high: {
     backgroundColor: "#FFE3D1",
     textColor: "#B5460A",
     label: "HIGH",
   },
+
   critical: {
     backgroundColor: "#FBDADA",
     textColor: "#A61212",
@@ -56,27 +78,69 @@ const SEVERITY_STYLES: Record<
   },
 };
 
-export default function JobCard({ job }: JobCardProps) {
-  const severityStyle = SEVERITY_STYLES[job.severity];
+export default function JobCard({
+  job,
+  onPress,
+}: JobCardProps) {
+  const severityStyle =
+    SEVERITY_STYLES[job.severity];
 
   return (
-    <View style={styles.card}>
+    <Pressable
+      onPress={onPress}
+      style={({ pressed }) => [
+        styles.card,
+        pressed && styles.cardPressed,
+      ]}
+    >
       <View style={styles.headerRow}>
-        <Text style={styles.category}>{job.category}</Text>
+        <Text style={styles.category}>
+          {job.category}
+        </Text>
+
         <View
-          style={[styles.badge, { backgroundColor: severityStyle.backgroundColor }]}
+          style={[
+            styles.badge,
+            {
+              backgroundColor:
+                severityStyle.backgroundColor,
+            },
+          ]}
         >
-          <Text style={[styles.badgeText, { color: severityStyle.textColor }]}>
+          <Text
+            style={[
+              styles.badgeText,
+              {
+                color: severityStyle.textColor,
+              },
+            ]}
+          >
             {severityStyle.label}
           </Text>
         </View>
       </View>
 
-      <Text style={styles.address}>{job.address}</Text>
-      <Text style={styles.ward}>{job.ward}</Text>
+      <Text style={styles.address}>
+        {job.address}
+      </Text>
 
-      <Text style={styles.time}>{getRelativeTime(job.submittedAt)}</Text>
-    </View>
+      <Text style={styles.ward}>
+        {job.ward}
+      </Text>
+
+      <View style={styles.bottomRow}>
+        <Text style={styles.time}>
+          {getRelativeTime(job.submittedAt)}
+        </Text>
+
+        {job.priorityScore !== undefined && (
+          <Text style={styles.priority}>
+            Priority{" "}
+            {Math.round(job.priorityScore * 100)}%
+          </Text>
+        )}
+      </View>
+    </Pressable>
   );
 }
 
@@ -88,44 +152,69 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     marginVertical: 6,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
     shadowOpacity: 0.08,
     shadowRadius: 4,
     elevation: 2,
   },
+
+  cardPressed: {
+    opacity: 0.65,
+  },
+
   headerRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 8,
   },
+
   category: {
     fontSize: 16,
     fontWeight: "600",
     color: "#1A1A1A",
   },
+
   badge: {
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 999,
   },
+
   badgeText: {
     fontSize: 11,
     fontWeight: "700",
     letterSpacing: 0.5,
   },
+
   address: {
     fontSize: 14,
     color: "#3A3A3A",
     marginBottom: 2,
   },
+
   ward: {
     fontSize: 13,
     color: "#6B6B6B",
     marginBottom: 8,
   },
+
+  bottomRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+
   time: {
     fontSize: 12,
     color: "#9A9A9A",
+  },
+
+  priority: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: "#3A6EA5",
   },
 });
