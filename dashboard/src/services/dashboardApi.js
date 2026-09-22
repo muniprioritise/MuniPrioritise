@@ -31,29 +31,16 @@ async function requestJson(path, { method = 'GET', token = '', body } = {}) {
 }
 
 export async function loginSupervisor(credentials) {
-  try {
-    const result = await requestJson('/auth/login', {
-      method: 'POST',
-      body: credentials,
-    });
+  const result = await requestJson('/api/auth/login', {
+    method: 'POST',
+    body: credentials,
+  });
 
-    if (!result?.token) {
-      throw new Error('Auth response did not include a token.');
-    }
-
-    return result;
-  } catch {
-    return {
-      token: 'local-supervisor-token',
-      user: {
-        id: 'sup-local-1',
-        email: credentials.email,
-        full_name: 'Local Supervisor',
-        role: 'supervisor',
-      },
-      fallback: true,
-    };
+  if (!result?.token) {
+    throw new Error('Auth response did not include a token.');
   }
+
+  return result;
 }
 
 export async function fetchReports(token) {
@@ -70,7 +57,7 @@ export async function fetchReports(token) {
 
 export async function fetchOverview(token, reports = []) {
   try {
-    const overview = await requestJson('/supervisor/overview', { token });
+    const overview = await requestJson('/api/supervisor/overview', { token });
     return {
       total_open: overview.total_open ?? 0,
       avg_response_time_hours: overview.avg_response_time_hours ?? 0,
@@ -129,7 +116,7 @@ function writeLocalOverrides(entries) {
 
 export async function fetchOverrideAudit(token) {
   try {
-    const payload = await requestJson('/supervisor/audit', { token });
+    const payload = await requestJson('/api/supervisor/audit', { token });
     if (Array.isArray(payload)) {
       return payload;
     }
@@ -143,44 +130,35 @@ export async function fetchOverrideAudit(token) {
 }
 
 export async function submitOverride(token, payload) {
-  const localEntry = {
-    id: `override-${Date.now()}`,
+  const response = await requestJson('/api/supervisor/override', {
+    method: 'POST',
+    token,
+    body: {
+      job_id: payload.job_id,
+      new_worker_id: payload.new_worker_id,
+      reason: payload.reason,
+    },
+  });
+
+  const entry = {
+    id: response.id || `override-${Date.now()}`,
     job_id: payload.job_id,
     report_id: payload.report_id,
     old_worker_id: payload.old_worker_id || 'unknown',
     new_worker_id: payload.new_worker_id,
     reason: payload.reason,
-    created_at: new Date().toISOString(),
+    created_at: response.created_at || new Date().toISOString(),
+    ...response,
   };
 
-  try {
-    const response = await requestJson('/supervisor/override', {
-      method: 'POST',
-      token,
-      body: {
-        job_id: payload.job_id,
-        new_worker_id: payload.new_worker_id,
-        reason: payload.reason,
-      },
-    });
-
-    const merged = {
-      ...localEntry,
-      ...response,
-    };
-    const existing = readLocalOverrides();
-    writeLocalOverrides([merged, ...existing]);
-    return merged;
-  } catch {
-    const existing = readLocalOverrides();
-    writeLocalOverrides([localEntry, ...existing]);
-    return localEntry;
-  }
+  const existing = readLocalOverrides();
+  writeLocalOverrides([entry, ...existing]);
+  return entry;
 }
 
 export async function fetchAnalytics(token, reports = []) {
   try {
-    const payload = await requestJson('/supervisor/analytics', { token });
+    const payload = await requestJson('/api/supervisor/analytics', { token });
     return {
       responseTimeByCategory: payload.responseTimeByCategory || [],
       requestsOverTime: payload.requestsOverTime || [],
