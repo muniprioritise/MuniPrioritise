@@ -76,22 +76,28 @@ app.post(
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
+
     const { email, password } = req.body;
+
     try {
       const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
       const user = result.rows[0];
+
       if (!user) {
         return res.status(401).json({ error: 'Invalid credentials' });
       }
+
       const isMatch = await bcrypt.compare(password, user.password_hash);
       if (!isMatch) {
         return res.status(401).json({ error: 'Invalid credentials' });
       }
+
       const token = jwt.sign(
         { id: user.id, email: user.email, role: user.role },
         process.env.JWT_SECRET,
         { expiresIn: '7d' }
       );
+
       res.status(200).json({
         message: 'Login successful',
         token,
@@ -104,7 +110,7 @@ app.post(
   }
 );
 
-// GET /api/reports 
+// GET /api/reports
 app.get('/api/reports', verifyToken, async (req, res) => {
   try {
     const { status, category, ward, startDate, endDate } = req.query;
@@ -128,7 +134,7 @@ app.get('/api/reports', verifyToken, async (req, res) => {
   }
 });
 
-// POST /api/reports 
+// POST /api/reports
 app.post(
   '/api/reports',
   verifyToken,
@@ -170,7 +176,7 @@ app.patch(
   async (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
-    
+
     const validStatuses = ['pending', 'in_progress', 'resolved', 'rejected'];
     if (!validStatuses.includes(status)) {
         return res.status(400).json({ error: 'Invalid status' });
@@ -191,6 +197,10 @@ app.patch(
 );
 
 // POST /api/reports/:id/evidence (worker uploads completion photos)
+// Writes to the dedicated `evidence` table (report_id, worker_id, photo_urls,
+// notes, uploaded_at) rather than a column on `reports` — keeps a proper
+// per-submission record instead of overwriting a single array, and matches
+// the schema already defined in database/init/01_init.sql.
 app.post(
   '/api/reports/:id/evidence',
   verifyToken,
@@ -198,24 +208,32 @@ app.post(
   upload.array('evidence', 5),
   async (req, res) => {
     const { id } = req.params;
+    const { notes } = req.body;
     const evidenceUrls = req.files ? req.files.map(file => `/uploads/${file.filename}`) : [];
+    const workerId = req.user.id;
 
     if (evidenceUrls.length === 0) {
       return res.status(400).json({ error: 'No evidence photos uploaded' });
     }
 
     try {
-      const report = await pool.query('SELECT worker_evidence FROM reports WHERE id = $1', [id]);
+      const report = await pool.query('SELECT id FROM reports WHERE id = $1', [id]);
       if (report.rows.length === 0) return res.status(404).json({ error: 'Report not found' });
 
-      const existingEvidence = report.rows[0].worker_evidence || [];
-      const updatedEvidence = [...existingEvidence, ...evidenceUrls];
-
-      const result = await pool.query(
-        'UPDATE reports SET worker_evidence = $1, status = $2, updated_at = CURRENT_TIMESTAMP WHERE id = $3 RETURNING *',
-        [updatedEvidence, 'resolved', id]
+      const evidenceResult = await pool.query(
+        'INSERT INTO evidence (report_id, worker_id, photo_urls, notes) VALUES ($1, $2, $3, $4) RETURNING *',
+        [id, workerId, evidenceUrls, notes || null]
       );
-      res.status(200).json(result.rows[0]);
+
+      const reportResult = await pool.query(
+        'UPDATE reports SET status = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2 RETURNING *',
+        ['resolved', id]
+      );
+
+      res.status(200).json({
+        evidence: evidenceResult.rows[0],
+        report: reportResult.rows[0]
+      });
     } catch (err) {
       console.error('Error uploading evidence:', err);
       res.status(500).json({ error: 'Internal server error' });
@@ -255,7 +273,7 @@ app.patch(
   }
 );
 
-// GET /api/jobs 
+// GET /api/jobs
 app.get('/api/jobs', verifyToken, async (req, res) => {
   try {
     const reportsResult = await pool.query("SELECT * FROM reports WHERE status = 'pending' ORDER BY created_at ASC");
@@ -296,7 +314,6 @@ app.get('/api/jobs', verifyToken, async (req, res) => {
       });
     } catch (algoErr) {
       console.error('Algorithm service unavailable. Falling back to raw reports:', algoErr.message);
-      
       return res.status(200).json({
         fallback: true,
         message: 'Algorithm service down. Returning unassigned pending reports.',
