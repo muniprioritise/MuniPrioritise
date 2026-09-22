@@ -8,10 +8,8 @@ if (!process.env.JWT_SECRET) {
 const express = require('express');
 const cors = require('cors');
 const { Pool } = require('pg');
-
 const app = express();
 const port = process.env.PORT || 3000;
-
 const { body, validationResult } = require('express-validator');
 
 const bcrypt = require('bcrypt');
@@ -20,11 +18,9 @@ const { verifyToken, requireRole } = require('./middleware/auth');
 
 app.use(cors());
 app.use(express.json());
-
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
-
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok', message: 'Backend is live' });
 });
@@ -136,7 +132,6 @@ app.post(
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
-
     const { category, description, severity, lat, lng } = req.body;
     try {
       const result = await pool.query(
@@ -157,25 +152,42 @@ app.get('/api/jobs', async (req, res) => {
     const reportsResult = await pool.query("SELECT * FROM reports WHERE status = 'pending' ORDER BY created_at ASC");
     const pendingReports = reportsResult.rows;
 
+    // Algorithm service requires a non-null ward_id string on every report.
+    // Reports submitted without one (e.g. mobile Phase 1 thin slice) default here
+    // so a single missing ward_id doesn't 422 the whole batch.
+    const reportsForAlgorithm = pendingReports.map(r => ({
+      ...r,
+      ward_id: r.ward_id ?? 'CPT-001'
+    }));
+
     const workers = [
       { id: 'worker-1', lat: -33.9260, lng: 18.4260, available: true },
       { id: 'worker-2', lat: -33.9300, lng: 18.4300, available: true }
     ];
-
     try {
       const algoResponse = await fetch(`${process.env.ALGORITHM_SERVICE_URL}/prioritise/fcfs`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reports: pendingReports, workers })
+        body: JSON.stringify({ reports: reportsForAlgorithm, workers })
       });
-
       if (!algoResponse.ok) {
         throw new Error(`Algorithm service returned ${algoResponse.status}`);
       }
-
-      const assignedJobs = await algoResponse.json();
-      return res.status(200).json(assignedJobs);
-
+      const algoResult = await algoResponse.json();
+      const reportsById = Object.fromEntries(
+        pendingReports.map(r => [r.id, r])
+      );
+      const jobs = algoResult.assignments.map(a => ({
+        report_id: a.report_id,
+        worker_id: a.worker_id,
+        score: a.score,
+        report: reportsById[a.report_id]
+      }));
+      return res.status(200).json({
+        algorithm: algoResult.algorithm,
+        jobs,
+        metrics: algoResult.metrics
+      });
     } catch (algoErr) {
       console.error('Algorithm service unavailable. Falling back to raw reports:', algoErr.message);
       return res.status(200).json({
@@ -189,7 +201,6 @@ app.get('/api/jobs', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
-
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
