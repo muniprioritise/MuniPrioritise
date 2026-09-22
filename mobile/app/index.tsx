@@ -17,6 +17,8 @@ const HARDCODED_LOCATION = {
   longitude: 18.4241,
 };
 
+const HARDCODED_SEVERITY = 3;
+
 export default function ReportScreen() {
   const [category, setCategory] = useState<string | null>(null);
   const [description, setDescription] = useState<string>("");
@@ -33,10 +35,11 @@ export default function ReportScreen() {
     }
 
     const payload = {
-      category,
+      category: category.toLowerCase(),
       description: description.trim(),
-      location: HARDCODED_LOCATION,
-      createdAt: new Date().toISOString(),
+      severity: HARDCODED_SEVERITY,
+      lat: HARDCODED_LOCATION.latitude,
+      lng: HARDCODED_LOCATION.longitude,
     };
 
     try {

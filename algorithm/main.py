@@ -13,7 +13,6 @@ app = FastAPI()
 creator.create("FitnessMin", base.Fitness, weights=(-1.0,))
 creator.create("Individual", list, fitness=creator.FitnessMin)
 
-
 # Schemas below must match docs/api-contracts.md. Update that file if these change.
 
 class Report(BaseModel):
