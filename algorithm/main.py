@@ -254,3 +254,12 @@ def prioritise_genetic(payload: PrioritiseRequest):
         assignments=assignments,
         metrics=Metrics(processing_time_ms=round(processing_time_ms, 3)),
     )
+
+
+@app.post("/prioritise/compare")
+def prioritise_compare(payload: PrioritiseRequest):
+    return {
+        "fcfs": prioritise_fcfs(payload),
+        "greedy": prioritise_greedy(payload),
+        "genetic": prioritise_genetic(payload),
+    }
