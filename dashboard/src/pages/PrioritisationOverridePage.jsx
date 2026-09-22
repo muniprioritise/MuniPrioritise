@@ -14,6 +14,7 @@ function PrioritisationOverridePage() {
   const [audit, setAudit] = useState([]);
   const [reasonByJob, setReasonByJob] = useState({});
   const [newWorkerByJob, setNewWorkerByJob] = useState({});
+  const [errorByJob, setErrorByJob] = useState({});
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -64,27 +65,36 @@ function PrioritisationOverridePage() {
       return;
     }
 
-    const entry = await submitOverride(token, {
-      job_id: job.id,
-      report_id: job.report_id,
-      old_worker_id: job.worker_id,
-      new_worker_id: newWorkerId,
-      reason,
-    });
+    setErrorByJob((current) => ({ ...current, [job.id]: '' }));
 
-    setQueue((current) =>
-      current.map((item) =>
-        item.id === job.id
-          ? {
-              ...item,
-              worker_id: newWorkerId,
-            }
-          : item,
-      ),
-    );
+    try {
+      const entry = await submitOverride(token, {
+        job_id: job.id,
+        report_id: job.report_id,
+        old_worker_id: job.worker_id,
+        new_worker_id: newWorkerId,
+        reason,
+      });
 
-    setAudit((current) => [entry, ...current]);
-    setReasonByJob((current) => ({ ...current, [job.id]: '' }));
+      setQueue((current) =>
+        current.map((item) =>
+          item.id === job.id
+            ? {
+                ...item,
+                worker_id: newWorkerId,
+              }
+            : item,
+        ),
+      );
+
+      setAudit((current) => [entry, ...current]);
+      setReasonByJob((current) => ({ ...current, [job.id]: '' }));
+    } catch (requestError) {
+      setErrorByJob((current) => ({
+        ...current,
+        [job.id]: requestError.message || 'Override failed. Try again.',
+      }));
+    }
   };
 
   if (isLoading) {
@@ -151,6 +161,9 @@ function PrioritisationOverridePage() {
                         }))
                       }
                     />
+                    {errorByJob[job.id] && (
+                      <p className="form-error">{errorByJob[job.id]}</p>
+                    )}
                   </td>
                   <td>
                     <button
