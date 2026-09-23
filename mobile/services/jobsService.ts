@@ -222,31 +222,42 @@ export async function escalateJob(
   return response.data;
 }
 
-export async function uploadEvidence(
-  reportId: string,
-  imageUri: string,
+// PATCH /jobs/:id/resolve — the single, atomic resolve action.
+// Backend does evidence insert + report status update + status_events
+// insert as one unit, keyed off the job id (not the report id).
+// Accepts up to 5 photos under the "evidence" field (upload.array('evidence', 5)).
+export async function resolveJob(
+  jobId: string,
+  imageUris: string[],
   notes: string
 ) {
   const formData = new FormData();
 
   formData.append("notes", notes);
 
-  const filename =
-    imageUri.split("/").pop() ??
-    "evidence.jpg";
+  imageUris.forEach((uri, index) => {
+    const filename =
+      uri.split("/").pop() ??
+      `evidence-${index}.jpg`;
 
-  formData.append(
-    "photo",
+    formData.append(
+      "evidence",
+      {
+        uri,
+        name: filename,
+        type: "image/jpeg",
+      } as any
+    );
+  });
+
+  const response = await api.patch(
+    `/jobs/${jobId}/resolve`,
+    formData,
     {
-      uri: imageUri,
-      name: filename,
-      type: "image/jpeg",
-    } as any
-  );
-
-  const response = await api.post(
-    `/reports/${reportId}/evidence`,
-    formData
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }
   );
 
   return response.data;
