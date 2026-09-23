@@ -7,8 +7,11 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { logout } from "@/services/authService";
+
 export default function SupervisorScreen() {
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await logout();
     router.replace("/login");
   };
 
