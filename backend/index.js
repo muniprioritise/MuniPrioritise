@@ -280,10 +280,18 @@ app.get('/api/jobs', verifyToken, async (req, res) => {
       ward_id: r.ward_id ?? 'CPT-001'
     }));
 
-    const workers = [
-      { id: 'worker-1', lat: -33.9260, lng: 18.4260, available: true },
-      { id: 'worker-2', lat: -33.9300, lng: 18.4300, available: true }
-    ];
+    // Stub: no worker location/availability tracking exists yet, so every
+    // worker-role user is treated as available at a fixed coordinate. Real
+    // ids are pulled from users so job_assignments.worker_id (a UUID FK) has
+    // something valid to reference — a hardcoded placeholder string like
+    // 'worker-1' would violate the foreign key the moment this tries to insert.
+    const workersResult = await pool.query("SELECT id FROM users WHERE role = 'worker'");
+    const workers = workersResult.rows.map((w, i) => ({
+      id: w.id,
+      lat: -33.9260 + (i * 0.004),
+      lng: 18.4260 + (i * 0.004),
+      available: true
+    }));
     try {
       const algoResponse = await fetch(`${process.env.ALGORITHM_SERVICE_URL}/prioritise/fcfs`, {
         method: 'POST',
