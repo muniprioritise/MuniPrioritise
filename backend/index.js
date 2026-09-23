@@ -192,7 +192,7 @@ app.patch(
 
 // POST /api/reports/:id/evidence (worker uploads completion photos)
 // Writes to the dedicated `evidence` table (report_id, worker_id, photo_urls,
-// notes, uploaded_at) 
+// notes, uploaded_at) rather than a nonexistent reports.worker_evidence column.
 app.post(
   '/api/reports/:id/evidence',
   verifyToken,
@@ -267,7 +267,9 @@ app.patch(
 
 // GET /api/jobs
 // Now persists each computed assignment into job_assignments (upsert on
-// report_id) instead of only returning a computed-on-the-fly response.
+// report_id) instead of only returning a computed-on-the-fly response. This
+// is what gives accept/resolve/escalate/override a real row with a real id
+// to act on — previously nothing in the codebase wrote to this table at all.
 app.get('/api/jobs', verifyToken, async (req, res) => {
   try {
     const reportsResult = await pool.query("SELECT * FROM reports WHERE status = 'pending' ORDER BY created_at ASC");
@@ -343,6 +345,10 @@ app.get('/api/jobs', verifyToken, async (req, res) => {
 });
 
 // GET /api/workers/assigned
+// Rewritten against job_assignments (the real table) instead of the
+// nonexistent `jobs` table. "Assigned or accepted, not yet resolved or
+// escalated" is derived from the timestamp columns rather than a stored
+// status string, so it can't drift out of sync with them.
 app.get('/api/workers/assigned', verifyToken, requireRole(['worker']), async (req, res) => {
   try {
     const workerId = req.user.id;
@@ -498,6 +504,11 @@ app.patch('/api/jobs/:id/escalate', verifyToken, requireRole(['worker']), async 
 });
 
 // POST /api/supervisor/override
+// job_assignments already has override_by for exactly this purpose (NULL =
+// algorithm-assigned, set = supervisor overrode). The worker reassignment
+// itself is logged via status_events' job_id/old_worker_id/new_worker_id
+// columns rather than old_status/new_status, which are for report status
+// transitions specifically.
 app.post('/api/supervisor/override', verifyToken, requireRole(['supervisor']), async (req, res) => {
   try {
     const { job_id, new_worker_id, new_score, reason } = req.body;
@@ -520,12 +531,15 @@ app.post('/api/supervisor/override', verifyToken, requireRole(['supervisor']), a
     );
 
     await pool.query(
-      `INSERT INTO status_events (report_id, changed_by, old_status, new_status, notes)
-       VALUES ($1, $2, NULL, NULL, $3)`,
+      `INSERT INTO status_events (report_id, changed_by, job_id, old_worker_id, new_worker_id, notes)
+       VALUES ($1, $2, $3, $4, $5, $6)`,
       [
         oldJob.report_id,
         supervisorId,
-        `Supervisor override: worker ${oldJob.worker_id} -> ${updatedJob.rows[0].worker_id}. Reason: ${overrideReason}`
+        job_id,
+        oldJob.worker_id,
+        updatedJob.rows[0].worker_id,
+        overrideReason
       ]
     );
 
@@ -573,6 +587,8 @@ app.get('/api/supervisor/analytics', verifyToken, requireRole(['supervisor']), a
 });
 
 // GET /api/supervisor/audit
+// Rewritten against status_events (existed in canon, never written to)
+// instead of the nonexistent audit_logs table.
 app.get('/api/supervisor/audit', verifyToken, requireRole(['supervisor']), async (req, res) => {
   try {
     const result = await pool.query(
