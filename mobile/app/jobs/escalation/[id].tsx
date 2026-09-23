@@ -14,10 +14,7 @@ import {
 
 import { useState } from "react";
 
-import {
-  escalateJob,
-  updateReportStatus,
-} from "@/services/jobsService";
+import { escalateJob } from "@/services/jobsService";
 
 export default function EscalationScreen() {
   const params =
@@ -46,14 +43,11 @@ export default function EscalationScreen() {
       try {
         setSubmitting(true);
 
+        // Backend's /jobs/:id/escalate already updates the report's
+        // status and inserts the status_events row server-side —
+        // no separate updateReportStatus call needed.
         await escalateJob(
           params.jobId,
-          notes.trim()
-        );
-
-        await updateReportStatus(
-          params.id,
-          "escalated",
           notes.trim()
         );
 
