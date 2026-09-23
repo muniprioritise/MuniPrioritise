@@ -12,12 +12,11 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-type UserRole = "worker" | "supervisor";
+import { login } from "@/services/authService";
 
 export default function LoginScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState<UserRole>("worker");
   const [loggingIn, setLoggingIn] = useState(false);
 
   const handleLogin = async () => {
@@ -43,33 +42,33 @@ export default function LoginScreen() {
     try {
       setLoggingIn(true);
 
-      /*
-       * DEMO AUTHENTICATION
-       *
-       * The supplied API contract does not currently define
-       * a login/authentication endpoint.
-       *
-       * Replace this section later with the real API login
-       * request and JWT/token storage when the backend team
-       * provides the authentication contract.
-       */
+      const user = await login(cleanEmail, cleanPassword);
 
-      await new Promise((resolve) =>
-        setTimeout(resolve, 500)
-      );
-
-      if (role === "worker") {
+      if (user.role === "worker") {
         router.replace("/jobs");
         return;
       }
 
-      router.replace("/supervisor");
-    } catch (error) {
+      if (user.role === "supervisor") {
+        router.replace("/supervisor");
+        return;
+      }
+
+      // A resident account exists but this is the staff app.
+      Alert.alert(
+        "Wrong app",
+        "This account isn't a worker or supervisor account. Use the resident app instead."
+      );
+    } catch (error: any) {
       console.error("Login failed:", error);
+
+      const status = error?.response?.status;
 
       Alert.alert(
         "Login failed",
-        "Unable to sign in. Please try again."
+        status === 401
+          ? "Incorrect email or password."
+          : "Unable to sign in. Please try again."
       );
     } finally {
       setLoggingIn(false);
@@ -100,56 +99,6 @@ export default function LoginScreen() {
               Sign in as a municipal worker or
               supervisor.
             </Text>
-          </View>
-
-          <Text style={styles.label}>
-            Role
-          </Text>
-
-          <View style={styles.roleContainer}>
-            <TouchableOpacity
-              style={[
-                styles.roleButton,
-                role === "worker" &&
-                  styles.roleButtonSelected,
-              ]}
-              activeOpacity={0.8}
-              onPress={() =>
-                setRole("worker")
-              }
-            >
-              <Text
-                style={[
-                  styles.roleText,
-                  role === "worker" &&
-                    styles.roleTextSelected,
-                ]}
-              >
-                Worker
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[
-                styles.roleButton,
-                role === "supervisor" &&
-                  styles.roleButtonSelected,
-              ]}
-              activeOpacity={0.8}
-              onPress={() =>
-                setRole("supervisor")
-              }
-            >
-              <Text
-                style={[
-                  styles.roleText,
-                  role === "supervisor" &&
-                    styles.roleTextSelected,
-                ]}
-              >
-                Supervisor
-              </Text>
-            </TouchableOpacity>
           </View>
 
           <Text style={styles.label}>
@@ -191,19 +140,9 @@ export default function LoginScreen() {
             <Text style={styles.loginButtonText}>
               {loggingIn
                 ? "Signing in..."
-                : `Login as ${
-                    role === "worker"
-                      ? "Worker"
-                      : "Supervisor"
-                  }`}
+                : "Login"}
             </Text>
           </TouchableOpacity>
-
-          <Text style={styles.demoText}>
-            Demo authentication is enabled until
-            the backend authentication API is
-            available.
-          </Text>
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -257,37 +196,6 @@ const styles = StyleSheet.create({
     marginBottom: 7,
   },
 
-  roleContainer: {
-    flexDirection: "row",
-    gap: 10,
-    marginBottom: 22,
-  },
-
-  roleButton: {
-    flex: 1,
-    paddingVertical: 13,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: "#C7CBD1",
-    backgroundColor: "#FFFFFF",
-    alignItems: "center",
-  },
-
-  roleButtonSelected: {
-    backgroundColor: "#3A6EA5",
-    borderColor: "#3A6EA5",
-  },
-
-  roleText: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: "#333333",
-  },
-
-  roleTextSelected: {
-    color: "#FFFFFF",
-  },
-
   input: {
     backgroundColor: "#FFFFFF",
     borderWidth: 1,
@@ -315,13 +223,5 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontSize: 16,
     fontWeight: "700",
-  },
-
-  demoText: {
-    marginTop: 18,
-    fontSize: 12,
-    lineHeight: 17,
-    color: "#7A7A7A",
-    textAlign: "center",
   },
 });
