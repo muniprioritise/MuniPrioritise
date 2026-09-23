@@ -76,22 +76,28 @@ app.post(
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
+
     const { email, password } = req.body;
+
     try {
       const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
       const user = result.rows[0];
+
       if (!user) {
         return res.status(401).json({ error: 'Invalid credentials' });
       }
+
       const isMatch = await bcrypt.compare(password, user.password_hash);
       if (!isMatch) {
         return res.status(401).json({ error: 'Invalid credentials' });
       }
+
       const token = jwt.sign(
         { id: user.id, email: user.email, role: user.role },
         process.env.JWT_SECRET,
         { expiresIn: '7d' }
       );
+
       res.status(200).json({
         message: 'Login successful',
         token,
@@ -191,8 +197,7 @@ app.patch(
 );
 
 // POST /api/reports/:id/evidence (worker uploads completion photos)
-// Writes to the dedicated `evidence` table (report_id, worker_id, photo_urls,
-// notes, uploaded_at) rather than a nonexistent reports.worker_evidence column.
+// Writes to the evidence table, not a column on reports.
 app.post(
   '/api/reports/:id/evidence',
   verifyToken,
@@ -266,10 +271,8 @@ app.patch(
 );
 
 // GET /api/jobs
-// Now persists each computed assignment into job_assignments (upsert on
-// report_id) instead of only returning a computed-on-the-fly response. This
-// is what gives accept/resolve/escalate/override a real row with a real id
-// to act on — previously nothing in the codebase wrote to this table at all.
+// Persists each assignment into job_assignments (upsert on report_id) so
+// accept/resolve/escalate/override have a real row to act on.
 app.get('/api/jobs', verifyToken, async (req, res) => {
   try {
     const reportsResult = await pool.query("SELECT * FROM reports WHERE status = 'pending' ORDER BY created_at ASC");
@@ -280,11 +283,7 @@ app.get('/api/jobs', verifyToken, async (req, res) => {
       ward_id: r.ward_id ?? 'CPT-001'
     }));
 
-    // Stub: no worker location/availability tracking exists yet, so every
-    // worker-role user is treated as available at a fixed coordinate. Real
-    // ids are pulled from users so job_assignments.worker_id (a UUID FK) has
-    // something valid to reference — a hardcoded placeholder string like
-    // 'worker-1' would violate the foreign key the moment this tries to insert.
+    // Stub until worker location/availability tracking exists.
     const workersResult = await pool.query("SELECT id FROM users WHERE role = 'worker'");
     const workers = workersResult.rows.map((w, i) => ({
       id: w.id,
@@ -306,9 +305,6 @@ app.get('/api/jobs', verifyToken, async (req, res) => {
         pendingReports.map(r => [r.id, r])
       );
 
-      // Sequential upsert — dataset size here is small (pending reports per
-      // request), so this is simpler than Promise.all and avoids exhausting
-      // the pool's connection limit if the pending queue ever gets large.
       const persistedJobs = [];
       for (const a of algoResult.assignments) {
         const upserted = await pool.query(
@@ -339,7 +335,6 @@ app.get('/api/jobs', verifyToken, async (req, res) => {
       });
     } catch (algoErr) {
       console.error('Algorithm service unavailable. Falling back to raw reports:', algoErr.message);
-
       return res.status(200).json({
         fallback: true,
         message: 'Algorithm service down. Returning unassigned pending reports.',
@@ -353,10 +348,6 @@ app.get('/api/jobs', verifyToken, async (req, res) => {
 });
 
 // GET /api/workers/assigned
-// Rewritten against job_assignments (the real table) instead of the
-// nonexistent `jobs` table. "Assigned or accepted, not yet resolved or
-// escalated" is derived from the timestamp columns rather than a stored
-// status string, so it can't drift out of sync with them.
 app.get('/api/workers/assigned', verifyToken, requireRole(['worker']), async (req, res) => {
   try {
     const workerId = req.user.id;
@@ -512,11 +503,6 @@ app.patch('/api/jobs/:id/escalate', verifyToken, requireRole(['worker']), async 
 });
 
 // POST /api/supervisor/override
-// job_assignments already has override_by for exactly this purpose (NULL =
-// algorithm-assigned, set = supervisor overrode). The worker reassignment
-// itself is logged via status_events' job_id/old_worker_id/new_worker_id
-// columns rather than old_status/new_status, which are for report status
-// transitions specifically.
 app.post('/api/supervisor/override', verifyToken, requireRole(['supervisor']), async (req, res) => {
   try {
     const { job_id, new_worker_id, new_score, reason } = req.body;
@@ -595,8 +581,6 @@ app.get('/api/supervisor/analytics', verifyToken, requireRole(['supervisor']), a
 });
 
 // GET /api/supervisor/audit
-// Rewritten against status_events (existed in canon, never written to)
-// instead of the nonexistent audit_logs table.
 app.get('/api/supervisor/audit', verifyToken, requireRole(['supervisor']), async (req, res) => {
   try {
     const result = await pool.query(
