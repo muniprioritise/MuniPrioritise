@@ -18,10 +18,9 @@ import * as ImagePicker from "expo-image-picker";
 
 import { useState } from "react";
 
-import {
-  updateReportStatus,
-  uploadEvidence,
-} from "@/services/jobsService";
+import { resolveJob } from "@/services/jobsService";
+
+const MAX_PHOTOS = 5;
 
 export default function EvidenceScreen() {
   const params =
@@ -30,10 +29,8 @@ export default function EvidenceScreen() {
       jobId: string;
     }>();
 
-  const [imageUri, setImageUri] =
-    useState<string | null>(
-      null
-    );
+  const [imageUris, setImageUris] =
+    useState<string[]>([]);
 
   const [notes, setNotes] =
     useState("");
@@ -41,7 +38,29 @@ export default function EvidenceScreen() {
   const [submitting, setSubmitting] =
     useState(false);
 
+  const addImages = (uris: string[]) => {
+    setImageUris((current) => {
+      const combined = [...current, ...uris];
+      return combined.slice(0, MAX_PHOTOS);
+    });
+  };
+
+  const removeImage = (uri: string) => {
+    setImageUris((current) =>
+      current.filter((existing) => existing !== uri)
+    );
+  };
+
   const pickImage = async () => {
+    if (imageUris.length >= MAX_PHOTOS) {
+      Alert.alert(
+        "Limit reached",
+        `You can attach up to ${MAX_PHOTOS} photos.`
+      );
+
+      return;
+    }
+
     const permission =
       await ImagePicker.requestMediaLibraryPermissionsAsync();
 
@@ -62,19 +81,31 @@ export default function EvidenceScreen() {
           mediaTypes:
             ["images"],
           quality: 0.8,
+          allowsMultipleSelection: true,
+          selectionLimit:
+            MAX_PHOTOS - imageUris.length,
         }
       );
 
     if (
       !result.canceled
     ) {
-      setImageUri(
-        result.assets[0].uri
+      addImages(
+        result.assets.map((asset) => asset.uri)
       );
     }
   };
 
   const takePhoto = async () => {
+    if (imageUris.length >= MAX_PHOTOS) {
+      Alert.alert(
+        "Limit reached",
+        `You can attach up to ${MAX_PHOTOS} photos.`
+      );
+
+      return;
+    }
+
     const permission =
       await ImagePicker.requestCameraPermissionsAsync();
 
@@ -99,18 +130,16 @@ export default function EvidenceScreen() {
     if (
       !result.canceled
     ) {
-      setImageUri(
-        result.assets[0].uri
-      );
+      addImages([result.assets[0].uri]);
     }
   };
 
   const submitEvidence =
     async () => {
-      if (!imageUri) {
+      if (imageUris.length === 0) {
         Alert.alert(
           "Photo required",
-          "Please provide completion evidence."
+          "Please provide at least one photo of completion evidence."
         );
 
         return;
@@ -128,15 +157,9 @@ export default function EvidenceScreen() {
       try {
         setSubmitting(true);
 
-        await uploadEvidence(
-          params.id,
-          imageUri,
-          notes.trim()
-        );
-
-        await updateReportStatus(
-          params.id,
-          "resolved",
+        await resolveJob(
+          params.jobId,
+          imageUris,
           notes.trim()
         );
 
@@ -188,19 +211,42 @@ export default function EvidenceScreen() {
           styles.subtitle
         }
       >
-        Add a photo and notes
+        Add up to {MAX_PHOTOS} photos and notes
         before resolving the job.
       </Text>
 
-      {imageUri ? (
-        <Image
-          source={{
-            uri: imageUri,
-          }}
-          style={
-            styles.image
+      {imageUris.length > 0 ? (
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.photoRow}
+          contentContainerStyle={
+            styles.photoRowContent
           }
-        />
+        >
+          {imageUris.map((uri) => (
+            <View
+              key={uri}
+              style={styles.photoWrapper}
+            >
+              <Image
+                source={{ uri }}
+                style={styles.photo}
+              />
+
+              <TouchableOpacity
+                style={styles.removeButton}
+                onPress={() => removeImage(uri)}
+              >
+                <Text
+                  style={styles.removeButtonText}
+                >
+                  ×
+                </Text>
+              </TouchableOpacity>
+            </View>
+          ))}
+        </ScrollView>
       ) : (
         <View
           style={
@@ -212,10 +258,14 @@ export default function EvidenceScreen() {
               styles.placeholderText
             }
           >
-            No photo selected
+            No photos selected
           </Text>
         </View>
       )}
+
+      <Text style={styles.photoCount}>
+        {imageUris.length} / {MAX_PHOTOS} photos
+      </Text>
 
       <View
         style={
@@ -325,11 +375,42 @@ const styles =
       marginBottom: 20,
     },
 
-    image: {
-      width: "100%",
-      height: 250,
+    photoRow: {
+      marginBottom: 6,
+    },
+
+    photoRowContent: {
+      gap: 10,
+      paddingRight: 4,
+    },
+
+    photoWrapper: {
+      position: "relative",
+    },
+
+    photo: {
+      width: 140,
+      height: 140,
       borderRadius: 12,
-      marginBottom: 15,
+    },
+
+    removeButton: {
+      position: "absolute",
+      top: 6,
+      right: 6,
+      width: 24,
+      height: 24,
+      borderRadius: 12,
+      backgroundColor: "rgba(0,0,0,0.6)",
+      alignItems: "center",
+      justifyContent: "center",
+    },
+
+    removeButtonText: {
+      color: "#FFFFFF",
+      fontSize: 16,
+      lineHeight: 16,
+      fontWeight: "700",
     },
 
     placeholder: {
@@ -340,11 +421,17 @@ const styles =
       justifyContent:
         "center",
       alignItems: "center",
-      marginBottom: 15,
+      marginBottom: 6,
     },
 
     placeholderText: {
       color: "#6B7280",
+    },
+
+    photoCount: {
+      fontSize: 12,
+      color: "#6B6B6B",
+      marginBottom: 14,
     },
 
     buttonRow: {

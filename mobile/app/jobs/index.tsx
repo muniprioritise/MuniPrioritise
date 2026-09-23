@@ -13,6 +13,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import JobCard from "@/components/JobCard";
 import { getJobs } from "@/services/jobsService";
+import { logout } from "@/services/authService";
 import type { Job } from "@/types/job";
 
 export default function JobsScreen() {
@@ -49,6 +50,11 @@ export default function JobsScreen() {
     setRefreshing(true);
     loadJobs();
   }, [loadJobs]);
+
+  const handleLogout = useCallback(async () => {
+    await logout();
+    router.replace("/login");
+  }, []);
 
   const handleJobPress = (job: Job) => {
     router.push({
@@ -131,14 +137,26 @@ export default function JobsScreen() {
       edges={["top", "left", "right"]}
     >
       <View style={styles.header}>
-        <Text style={styles.title}>
-          Worker Jobs
-        </Text>
+        <View style={styles.headerTextGroup}>
+          <Text style={styles.title}>
+            Worker Jobs
+          </Text>
 
-        <Text style={styles.subtitle}>
-          {jobs.length} job
-          {jobs.length === 1 ? "" : "s"} in your queue
-        </Text>
+          <Text style={styles.subtitle}>
+            {jobs.length} job
+            {jobs.length === 1 ? "" : "s"} in your queue
+          </Text>
+        </View>
+
+        <TouchableOpacity
+          style={styles.logoutButton}
+          onPress={handleLogout}
+          activeOpacity={0.8}
+        >
+          <Text style={styles.logoutButtonText}>
+            Log Out
+          </Text>
+        </TouchableOpacity>
       </View>
 
       <FlatList
@@ -192,9 +210,16 @@ const styles = StyleSheet.create({
   },
 
   header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
     paddingHorizontal: 16,
     paddingTop: 16,
     paddingBottom: 10,
+  },
+
+  headerTextGroup: {
+    flexShrink: 1,
   },
 
   title: {
@@ -207,6 +232,21 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: "#6B6B6B",
     marginTop: 4,
+  },
+
+  logoutButton: {
+    borderWidth: 1,
+    borderColor: "#A61212",
+    borderRadius: 8,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    marginTop: 2,
+  },
+
+  logoutButtonText: {
+    color: "#A61212",
+    fontSize: 13,
+    fontWeight: "700",
   },
 
   listContent: {
