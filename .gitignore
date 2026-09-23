@@ -110,4 +110,6 @@ docker-compose.override.yml
 # Logs
 # ========================
 logs/
-*.logbackend/uploads/
+*.log
+
+backend/uploads/
