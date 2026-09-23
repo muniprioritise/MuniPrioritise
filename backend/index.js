@@ -31,6 +31,31 @@ app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok', message: 'Backend is live' });
 });
 
+async function notifyResidentOfStatusChange(reportId, newStatus) {
+  try {
+    const result = await pool.query(
+      'SELECT u.expo_push_token FROM users u JOIN reports r ON u.id = r.user_id WHERE r.id = $1',
+      [reportId]
+    );
+    const token = result.rows[0]?.expo_push_token;
+
+    if (token) {
+      const formattedStatus = newStatus.replace(/_/g, ' ');
+      await fetch('https://exp.host/--/api/v2/push/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          to: token,
+          title: 'MuniPrioritise Update',
+          body: `Your report status has changed to: ${formattedStatus}`
+        })
+      });
+    }
+  } catch (err) {
+    console.error('Failed to send push notification:', err);
+  }
+}
+
 // POST /api/auth/register
 app.post(
   '/api/auth/register',
@@ -77,8 +102,7 @@ app.post(
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { email, password } = req.body;
-
+    const { email, password, expo_push_token } = req.body;
     try {
       const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
       const user = result.rows[0];
@@ -90,6 +114,10 @@ app.post(
       const isMatch = await bcrypt.compare(password, user.password_hash);
       if (!isMatch) {
         return res.status(401).json({ error: 'Invalid credentials' });
+      }
+
+      if (expo_push_token) {
+        await pool.query('UPDATE users SET expo_push_token = $1 WHERE id = $2', [expo_push_token, user.id]);
       }
 
       const token = jwt.sign(
@@ -188,6 +216,7 @@ app.patch(
         [status, id]
       );
       if (result.rows.length === 0) return res.status(404).json({ error: 'Report not found' });
+      await notifyResidentOfStatusChange(id, status);
       res.status(200).json(result.rows[0]);
     } catch (err) {
       console.error('Error updating status:', err);
@@ -400,6 +429,7 @@ app.patch('/api/jobs/:id/accept', verifyToken, requireRole(['worker']), async (r
       [job.report_id, workerId, oldStatus]
     );
 
+    await notifyResidentOfStatusChange(job.report_id, 'in_progress');
     res.status(200).json(job);
   } catch (err) {
     console.error('Error accepting job:', err);
@@ -452,6 +482,7 @@ app.patch('/api/jobs/:id/resolve', verifyToken, requireRole(['worker']), upload.
       [job.report_id, workerId, oldStatus]
     );
 
+    await notifyResidentOfStatusChange(job.report_id, 'resolved');
     res.status(200).json(job);
   } catch (err) {
     console.error('Error resolving job:', err);
