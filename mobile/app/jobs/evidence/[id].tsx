@@ -26,6 +26,7 @@ export default function EvidenceScreen() {
   const params =
     useLocalSearchParams<{
       id: string;
+      jobId: string;
     }>();
 
   const [imageUris, setImageUris] =
@@ -157,7 +158,7 @@ export default function EvidenceScreen() {
         setSubmitting(true);
 
         await resolveJob(
-          params.id,
+          params.jobId,
           imageUris,
           notes.trim()
         );
