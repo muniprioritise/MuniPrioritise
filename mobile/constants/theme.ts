@@ -11,4 +11,4 @@ export const Colors = {
     backgroundElement: "#1E1E1E",
     tint: "#3A6EA5",
   },
-};
+}; 
