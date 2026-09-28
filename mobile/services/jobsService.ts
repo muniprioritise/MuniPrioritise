@@ -215,7 +215,7 @@ export async function escalateJob(
   const response = await api.patch(
     `/jobs/${jobId}/escalate`,
     {
-      notes,
+      reason: notes,
     }
   );
 
@@ -262,3 +262,4 @@ export async function resolveJob(
 
   return response.data;
 }
+
