@@ -579,15 +579,40 @@ app.post('/api/supervisor/override', verifyToken, requireRole(['supervisor']), a
 app.get('/api/supervisor/overview', verifyToken, requireRole(['supervisor']), async (req, res) => {
   try {
     const totalReports = await pool.query('SELECT COUNT(*) FROM reports');
-    const pendingReports = await pool.query("SELECT COUNT(*) FROM reports WHERE status = 'pending'");
-    const resolvedReports = await pool.query("SELECT COUNT(*) FROM reports WHERE status = 'resolved'");
-    const avgRating = await pool.query('SELECT AVG(resolution_rating) FROM reports WHERE resolution_rating IS NOT NULL');
+    const openReports = await pool.query(
+      "SELECT COUNT(*) FROM reports WHERE status != 'resolved'"
+    );
+    const resolvedReports = await pool.query(
+      "SELECT COUNT(*) FROM reports WHERE status = 'resolved'"
+    );
+
+    // Average hours from creation to last update, resolved reports only.
+    // Mirrors computeOverviewMetrics() in dashboard/src/utils/dashboardData.js.
+    const avgResponse = await pool.query(
+      `SELECT AVG(EXTRACT(EPOCH FROM (updated_at - created_at)) / 3600.0) AS avg_hours
+       FROM reports
+       WHERE status = 'resolved'`
+    );
+
+    const total = parseInt(totalReports.rows[0].count, 10);
+    const resolvedCount = parseInt(resolvedReports.rows[0].count, 10);
+    const resolutionRatePercent = total > 0 ? (resolvedCount / total) * 100 : 0;
+
+    // Equity score: average ward sampi_score across currently OPEN reports.
+    const equityResult = await pool.query(
+      `SELECT AVG(w.sampi_score) AS equity_score
+       FROM reports r
+       JOIN wards w ON r.ward_id = w.id
+       WHERE r.status != 'resolved' AND w.sampi_score IS NOT NULL`
+    );
 
     res.status(200).json({
-      total_reports: parseInt(totalReports.rows[0].count),
-      pending_reports: parseInt(pendingReports.rows[0].count),
-      resolved_reports: parseInt(resolvedReports.rows[0].count),
-      average_rating: parseFloat(avgRating.rows[0].avg) || 0
+      total_open: parseInt(openReports.rows[0].count, 10),
+      avg_response_time_hours: Number(
+        parseFloat(avgResponse.rows[0].avg_hours || 0).toFixed(1)
+      ),
+      resolution_rate_percent: Number(resolutionRatePercent.toFixed(1)),
+      equity_score: Number(parseFloat(equityResult.rows[0].equity_score || 0).toFixed(2)),
     });
   } catch (err) {
     console.error('Error fetching overview:', err);
@@ -598,12 +623,47 @@ app.get('/api/supervisor/overview', verifyToken, requireRole(['supervisor']), as
 // GET /api/supervisor/analytics
 app.get('/api/supervisor/analytics', verifyToken, requireRole(['supervisor']), async (req, res) => {
   try {
-    const categoryDist = await pool.query('SELECT category, COUNT(*) as count FROM reports GROUP BY category');
-    const statusDist = await pool.query('SELECT status, COUNT(*) as count FROM reports GROUP BY status');
+    const responseTimeByCategory = await pool.query(
+      `SELECT
+         category,
+         ROUND(AVG(EXTRACT(EPOCH FROM (updated_at - created_at)) / 3600.0)::numeric, 1) AS avg_response_hours
+       FROM reports
+       WHERE status = 'resolved'
+       GROUP BY category
+       ORDER BY category`
+    );
+
+    const requestsOverTime = await pool.query(
+      `SELECT
+         TO_CHAR(created_at, 'YYYY-MM-DD') AS date,
+         COUNT(*) AS requests
+       FROM reports
+       GROUP BY TO_CHAR(created_at, 'YYYY-MM-DD')
+       ORDER BY date`
+    );
+
+    const equityByWard = await pool.query(
+      `SELECT
+         w.id AS ward,
+         w.sampi_score AS equity_score
+       FROM wards w
+       WHERE w.sampi_score IS NOT NULL
+       ORDER BY w.id`
+    );
 
     res.status(200).json({
-      by_category: categoryDist.rows,
-      by_status: statusDist.rows
+      responseTimeByCategory: responseTimeByCategory.rows.map((row) => ({
+        category: row.category,
+        avg_response_hours: Number(row.avg_response_hours || 0),
+      })),
+      requestsOverTime: requestsOverTime.rows.map((row) => ({
+        date: row.date,
+        requests: parseInt(row.requests, 10),
+      })),
+      equityByWard: equityByWard.rows.map((row) => ({
+        ward: row.ward,
+        equity_score: Number(row.equity_score),
+      })),
     });
   } catch (err) {
     console.error('Error fetching analytics:', err);
