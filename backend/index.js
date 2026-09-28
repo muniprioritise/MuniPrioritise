@@ -162,6 +162,90 @@ app.get('/api/reports', verifyToken, async (req, res) => {
   }
 });
 
+// GET /api/reports/mine (a resident's own reports only)
+// Must stay above /api/reports/:id, or "mine" would be read as an id.
+app.get('/api/reports/mine', verifyToken, async (req, res) => {
+  try {
+    const result = await pool.query(
+      'SELECT * FROM reports WHERE user_id = $1 ORDER BY created_at DESC',
+      [req.user.id]
+    );
+    res.status(200).json(result.rows);
+  } catch (err) {
+    console.error('Error fetching own reports:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// GET /api/reports/nearby?lat=&lng=&radiusKm=
+// Bounding-box search. Returns no user ids or photos, so it is safe to show
+// other residents' reports on the map.
+app.get('/api/reports/nearby', verifyToken, async (req, res) => {
+  const lat = parseFloat(req.query.lat);
+  const lng = parseFloat(req.query.lng);
+  const radiusKm = Math.min(parseFloat(req.query.radiusKm) || 5, 50);
+
+  if (Number.isNaN(lat) || Number.isNaN(lng)) {
+    return res.status(400).json({ error: 'lat and lng must be valid numbers' });
+  }
+
+  const latDelta = radiusKm / 111;
+  const lngDelta = radiusKm / (111 * Math.max(Math.cos((lat * Math.PI) / 180), 0.01));
+
+  try {
+    const result = await pool.query(
+      `SELECT id, category, description, severity, status, lat, lng, created_at
+       FROM reports
+       WHERE lat BETWEEN $1 AND $2 AND lng BETWEEN $3 AND $4
+       ORDER BY created_at DESC
+       LIMIT 200`,
+      [lat - latDelta, lat + latDelta, lng - lngDelta, lng + lngDelta]
+    );
+    res.status(200).json(result.rows);
+  } catch (err) {
+    console.error('Error fetching nearby reports:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// GET /api/reports/:id (owner or staff), with the status timeline
+app.get('/api/reports/:id', verifyToken, async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const reportResult = await pool.query('SELECT * FROM reports WHERE id = $1', [id]);
+    if (reportResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Report not found' });
+    }
+
+    const report = reportResult.rows[0];
+    const isOwner = report.user_id === req.user.id;
+    const isStaff = ['worker', 'supervisor'].includes(req.user.role);
+
+    if (!isOwner && !isStaff) {
+      return res.status(403).json({ error: 'Not allowed to view this report' });
+    }
+
+    // Supervisor reassignments are logged with no new_status; skip those.
+    const events = await pool.query(
+      `SELECT new_status, notes, occurred_at
+       FROM status_events
+       WHERE report_id = $1 AND new_status IS NOT NULL
+       ORDER BY occurred_at ASC`,
+      [id]
+    );
+
+    res.status(200).json({ ...report, status_events: events.rows });
+  } catch (err) {
+    // A malformed id is a bad lookup, not a server fault.
+    if (err.code === '22P02') {
+      return res.status(404).json({ error: 'Report not found' });
+    }
+    console.error('Error fetching report:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // POST /api/reports
 app.post(
   '/api/reports',
@@ -170,7 +254,7 @@ app.post(
   [
     body('category').isIn(['water', 'electricity', 'roads', 'refuse', 'sanitation']).withMessage('Invalid category'),
     body('description').notEmpty().withMessage('Description is required'),
-    body('severity').isInt({ min: 1, max: 3 }).withMessage('Severity must be an integer between 1 and 3'),
+    body('severity').isInt({ min: 1, max: 5 }).withMessage('Severity must be an integer between 1 and 5'),
     body('lat').isNumeric().withMessage('Latitude must be a valid number'),
     body('lng').isNumeric().withMessage('Longitude must be a valid number')
   ],
@@ -579,15 +663,40 @@ app.post('/api/supervisor/override', verifyToken, requireRole(['supervisor']), a
 app.get('/api/supervisor/overview', verifyToken, requireRole(['supervisor']), async (req, res) => {
   try {
     const totalReports = await pool.query('SELECT COUNT(*) FROM reports');
-    const pendingReports = await pool.query("SELECT COUNT(*) FROM reports WHERE status = 'pending'");
-    const resolvedReports = await pool.query("SELECT COUNT(*) FROM reports WHERE status = 'resolved'");
-    const avgRating = await pool.query('SELECT AVG(resolution_rating) FROM reports WHERE resolution_rating IS NOT NULL');
+    const openReports = await pool.query(
+      "SELECT COUNT(*) FROM reports WHERE status != 'resolved'"
+    );
+    const resolvedReports = await pool.query(
+      "SELECT COUNT(*) FROM reports WHERE status = 'resolved'"
+    );
+
+    // Average hours from creation to last update, resolved reports only.
+    // Mirrors computeOverviewMetrics() in dashboard/src/utils/dashboardData.js.
+    const avgResponse = await pool.query(
+      `SELECT AVG(EXTRACT(EPOCH FROM (updated_at - created_at)) / 3600.0) AS avg_hours
+       FROM reports
+       WHERE status = 'resolved'`
+    );
+
+    const total = parseInt(totalReports.rows[0].count, 10);
+    const resolvedCount = parseInt(resolvedReports.rows[0].count, 10);
+    const resolutionRatePercent = total > 0 ? (resolvedCount / total) * 100 : 0;
+
+    // Equity score: average ward sampi_score across currently OPEN reports.
+    const equityResult = await pool.query(
+      `SELECT AVG(w.sampi_score) AS equity_score
+       FROM reports r
+       JOIN wards w ON r.ward_id = w.id
+       WHERE r.status != 'resolved' AND w.sampi_score IS NOT NULL`
+    );
 
     res.status(200).json({
-      total_reports: parseInt(totalReports.rows[0].count),
-      pending_reports: parseInt(pendingReports.rows[0].count),
-      resolved_reports: parseInt(resolvedReports.rows[0].count),
-      average_rating: parseFloat(avgRating.rows[0].avg) || 0
+      total_open: parseInt(openReports.rows[0].count, 10),
+      avg_response_time_hours: Number(
+        parseFloat(avgResponse.rows[0].avg_hours || 0).toFixed(1)
+      ),
+      resolution_rate_percent: Number(resolutionRatePercent.toFixed(1)),
+      equity_score: Number(parseFloat(equityResult.rows[0].equity_score || 0).toFixed(2)),
     });
   } catch (err) {
     console.error('Error fetching overview:', err);
@@ -598,12 +707,47 @@ app.get('/api/supervisor/overview', verifyToken, requireRole(['supervisor']), as
 // GET /api/supervisor/analytics
 app.get('/api/supervisor/analytics', verifyToken, requireRole(['supervisor']), async (req, res) => {
   try {
-    const categoryDist = await pool.query('SELECT category, COUNT(*) as count FROM reports GROUP BY category');
-    const statusDist = await pool.query('SELECT status, COUNT(*) as count FROM reports GROUP BY status');
+    const responseTimeByCategory = await pool.query(
+      `SELECT
+         category,
+         ROUND(AVG(EXTRACT(EPOCH FROM (updated_at - created_at)) / 3600.0)::numeric, 1) AS avg_response_hours
+       FROM reports
+       WHERE status = 'resolved'
+       GROUP BY category
+       ORDER BY category`
+    );
+
+    const requestsOverTime = await pool.query(
+      `SELECT
+         TO_CHAR(created_at, 'YYYY-MM-DD') AS date,
+         COUNT(*) AS requests
+       FROM reports
+       GROUP BY TO_CHAR(created_at, 'YYYY-MM-DD')
+       ORDER BY date`
+    );
+
+    const equityByWard = await pool.query(
+      `SELECT
+         w.id AS ward,
+         w.sampi_score AS equity_score
+       FROM wards w
+       WHERE w.sampi_score IS NOT NULL
+       ORDER BY w.id`
+    );
 
     res.status(200).json({
-      by_category: categoryDist.rows,
-      by_status: statusDist.rows
+      responseTimeByCategory: responseTimeByCategory.rows.map((row) => ({
+        category: row.category,
+        avg_response_hours: Number(row.avg_response_hours || 0),
+      })),
+      requestsOverTime: requestsOverTime.rows.map((row) => ({
+        date: row.date,
+        requests: parseInt(row.requests, 10),
+      })),
+      equityByWard: equityByWard.rows.map((row) => ({
+        ward: row.ward,
+        equity_score: Number(row.equity_score),
+      })),
     });
   } catch (err) {
     console.error('Error fetching analytics:', err);
