@@ -162,6 +162,90 @@ app.get('/api/reports', verifyToken, async (req, res) => {
   }
 });
 
+// GET /api/reports/mine (a resident's own reports only)
+// Must stay above /api/reports/:id, or "mine" would be read as an id.
+app.get('/api/reports/mine', verifyToken, async (req, res) => {
+  try {
+    const result = await pool.query(
+      'SELECT * FROM reports WHERE user_id = $1 ORDER BY created_at DESC',
+      [req.user.id]
+    );
+    res.status(200).json(result.rows);
+  } catch (err) {
+    console.error('Error fetching own reports:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// GET /api/reports/nearby?lat=&lng=&radiusKm=
+// Bounding-box search. Returns no user ids or photos, so it is safe to show
+// other residents' reports on the map.
+app.get('/api/reports/nearby', verifyToken, async (req, res) => {
+  const lat = parseFloat(req.query.lat);
+  const lng = parseFloat(req.query.lng);
+  const radiusKm = Math.min(parseFloat(req.query.radiusKm) || 5, 50);
+
+  if (Number.isNaN(lat) || Number.isNaN(lng)) {
+    return res.status(400).json({ error: 'lat and lng must be valid numbers' });
+  }
+
+  const latDelta = radiusKm / 111;
+  const lngDelta = radiusKm / (111 * Math.max(Math.cos((lat * Math.PI) / 180), 0.01));
+
+  try {
+    const result = await pool.query(
+      `SELECT id, category, description, severity, status, lat, lng, created_at
+       FROM reports
+       WHERE lat BETWEEN $1 AND $2 AND lng BETWEEN $3 AND $4
+       ORDER BY created_at DESC
+       LIMIT 200`,
+      [lat - latDelta, lat + latDelta, lng - lngDelta, lng + lngDelta]
+    );
+    res.status(200).json(result.rows);
+  } catch (err) {
+    console.error('Error fetching nearby reports:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// GET /api/reports/:id (owner or staff), with the status timeline
+app.get('/api/reports/:id', verifyToken, async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const reportResult = await pool.query('SELECT * FROM reports WHERE id = $1', [id]);
+    if (reportResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Report not found' });
+    }
+
+    const report = reportResult.rows[0];
+    const isOwner = report.user_id === req.user.id;
+    const isStaff = ['worker', 'supervisor'].includes(req.user.role);
+
+    if (!isOwner && !isStaff) {
+      return res.status(403).json({ error: 'Not allowed to view this report' });
+    }
+
+    // Supervisor reassignments are logged with no new_status; skip those.
+    const events = await pool.query(
+      `SELECT new_status, notes, occurred_at
+       FROM status_events
+       WHERE report_id = $1 AND new_status IS NOT NULL
+       ORDER BY occurred_at ASC`,
+      [id]
+    );
+
+    res.status(200).json({ ...report, status_events: events.rows });
+  } catch (err) {
+    // A malformed id is a bad lookup, not a server fault.
+    if (err.code === '22P02') {
+      return res.status(404).json({ error: 'Report not found' });
+    }
+    console.error('Error fetching report:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // POST /api/reports
 app.post(
   '/api/reports',
@@ -170,7 +254,7 @@ app.post(
   [
     body('category').isIn(['water', 'electricity', 'roads', 'refuse', 'sanitation']).withMessage('Invalid category'),
     body('description').notEmpty().withMessage('Description is required'),
-    body('severity').isInt({ min: 1, max: 3 }).withMessage('Severity must be an integer between 1 and 3'),
+    body('severity').isInt({ min: 1, max: 5 }).withMessage('Severity must be an integer between 1 and 5'),
     body('lat').isNumeric().withMessage('Latitude must be a valid number'),
     body('lng').isNumeric().withMessage('Longitude must be a valid number')
   ],
