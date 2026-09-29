@@ -246,6 +246,29 @@ app.get('/api/reports/:id', verifyToken, async (req, res) => {
   }
 });
 
+// GET /api/notifications (status changes on the caller's own reports)
+// Derived from status_events, so the list matches the pushes residents get.
+// Escalations are a worker-side detail and never pushed, so they are excluded.
+app.get('/api/notifications', verifyToken, async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT se.id, se.report_id, se.new_status, se.occurred_at, r.category
+       FROM status_events se
+       JOIN reports r ON r.id = se.report_id
+       WHERE r.user_id = $1
+         AND se.new_status IS NOT NULL
+         AND se.new_status <> 'escalated'
+       ORDER BY se.occurred_at DESC
+       LIMIT 50`,
+      [req.user.id]
+    );
+    res.status(200).json(result.rows);
+  } catch (err) {
+    console.error('Error fetching notifications:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // POST /api/reports
 app.post(
   '/api/reports',
