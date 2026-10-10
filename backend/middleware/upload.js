@@ -28,7 +28,9 @@ const storage = multer.diskStorage({
 
 function fileFilter(req, file, cb) {
   if (!ALLOWED_MIME_TYPES.includes(file.mimetype)) {
-    return cb(new Error('Only JPEG, PNG, WEBP, or HEIC images are allowed'));
+    const err = new Error('Only JPEG, PNG, WEBP, or HEIC images are allowed');
+    err.code = 'INVALID_FILE_TYPE';
+    return cb(err);
   }
   cb(null, true);
 }

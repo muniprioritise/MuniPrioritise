@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import jsPDF from 'jspdf';
 import { useAuth } from '../context/AuthContext.jsx';
 import { fetchAnalytics, fetchOverview, fetchReports } from '../services/dashboardApi.js';
-import { formatDateTime } from '../utils/dashboardData.js';
+import { formatDateTime, shortId } from '../utils/dashboardData.js';
 
 function ReportsPage() {
   const { token } = useAuth();
@@ -79,7 +79,7 @@ function ReportsPage() {
     lineY += 7;
 
     topRows.forEach((report) => {
-      const line = `${report.id} | ${report.category} | sev ${report.severity} | ${report.status} | ${report.ward_id}`;
+      const line = `${shortId(report.id)} | ${report.category} | sev ${report.severity} | ${report.status} | ${report.ward_id}`;
       doc.text(line, 14, lineY);
       lineY += 6;
       if (lineY > 280) {
@@ -127,7 +127,7 @@ function ReportsPage() {
             <tbody>
               {topRows.map((report) => (
                 <tr key={report.id}>
-                  <td>{report.id}</td>
+                  <td title={report.id}>{shortId(report.id)}</td>
                   <td>{report.category}</td>
                   <td>{report.status}</td>
                   <td>{report.ward_id}</td>

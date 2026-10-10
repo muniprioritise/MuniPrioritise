@@ -31,6 +31,24 @@ app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok', message: 'Backend is live' });
 });
 
+// A report is assigned to the nearest ward centroid, so a resident cannot
+// choose a more deprived ward to jump the queue. Beyond this distance from
+// every ward the report gets no ward (null) instead of a misleading one.
+// Keep in sync with the 25 in database/migrations/003_ward_centroids.sql.
+const MAX_WARD_DISTANCE_KM = 25;
+
+async function findNearestWardId(lat, lng) {
+  const result = await pool.query(
+    `SELECT id FROM wards
+     WHERE lat IS NOT NULL AND lng IS NOT NULL
+       AND 111.0 * sqrt(power($1::float8 - lat, 2) + power(($2::float8 - lng) * cos(radians($1::float8)), 2)) <= $3
+     ORDER BY 111.0 * sqrt(power($1::float8 - lat, 2) + power(($2::float8 - lng) * cos(radians($1::float8)), 2))
+     LIMIT 1`,
+    [lat, lng, MAX_WARD_DISTANCE_KM]
+  );
+  return result.rows[0]?.id ?? null;
+}
+
 async function notifyResidentOfStatusChange(reportId, newStatus) {
   try {
     const result = await pool.query(
@@ -139,6 +157,7 @@ app.post(
 );
 
 // GET /api/reports
+// Staff see every report. Residents only ever see their own.
 app.get('/api/reports', verifyToken, async (req, res) => {
   try {
     const { status, category, ward, startDate, endDate } = req.query;
@@ -146,6 +165,7 @@ app.get('/api/reports', verifyToken, async (req, res) => {
     const values = [];
     let count = 1;
 
+    if (req.user.role === 'resident') { query += ` AND user_id = $${count++}`; values.push(req.user.id); }
     if (status) { query += ` AND status = $${count++}`; values.push(status); }
     if (category) { query += ` AND category = $${count++}`; values.push(category); }
     if (ward) { query += ` AND ward_id = $${count++}`; values.push(ward); }
@@ -291,9 +311,10 @@ app.post(
     const userId = req.user.id;
 
     try {
+      const wardId = await findNearestWardId(Number(lat), Number(lng));
       const result = await pool.query(
-        'INSERT INTO reports (user_id, category, description, severity, lat, lng, photo_urls) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
-        [userId, category, description, severity, lat, lng, photoUrls]
+        'INSERT INTO reports (user_id, category, description, severity, lat, lng, ward_id, photo_urls) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *',
+        [userId, category, description, severity, lat, lng, wardId, photoUrls]
       );
       res.status(201).json(result.rows[0]);
     } catch (err) {
@@ -304,28 +325,53 @@ app.post(
 );
 
 // PATCH /api/reports/:id/status (worker updates status)
+// Allowed values match the reports.status CHECK constraint in the database.
+// ('rejected' used to be accepted here, which made Postgres reject the update
+// and the caller got a 500.)
 app.patch(
   '/api/reports/:id/status',
   verifyToken,
   requireRole(['worker', 'supervisor']),
   async (req, res) => {
     const { id } = req.params;
-    const { status } = req.body;
+    const { status, notes } = req.body;
 
-    const validStatuses = ['pending', 'in_progress', 'resolved', 'rejected'];
+    const validStatuses = ['pending', 'assigned', 'in_progress', 'resolved', 'escalated'];
     if (!validStatuses.includes(status)) {
-        return res.status(400).json({ error: 'Invalid status' });
+        return res.status(400).json({ error: `Invalid status. Use one of: ${validStatuses.join(', ')}` });
     }
 
     try {
+      const current = await pool.query('SELECT status FROM reports WHERE id = $1', [id]);
+      if (current.rows.length === 0) return res.status(404).json({ error: 'Report not found' });
+
+      const oldStatus = current.rows[0].status;
+
+      // Already in that status (e.g. the mobile app re-sends in_progress right
+      // after accepting a job): nothing to change, log or push.
+      if (oldStatus === status) {
+        const same = await pool.query('SELECT * FROM reports WHERE id = $1', [id]);
+        return res.status(200).json(same.rows[0]);
+      }
+
       const result = await pool.query(
         'UPDATE reports SET status = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2 RETURNING *',
         [status, id]
       );
-      if (result.rows.length === 0) return res.status(404).json({ error: 'Report not found' });
+
+      // Keep the timeline, notifications list and audit log in step with the change.
+      await pool.query(
+        `INSERT INTO status_events (report_id, changed_by, old_status, new_status, notes)
+         VALUES ($1, $2, $3, $4, $5)`,
+        [id, req.user.id, oldStatus, status, notes || null]
+      );
+
       await notifyResidentOfStatusChange(id, status);
       res.status(200).json(result.rows[0]);
     } catch (err) {
+      if (err.code === '22P02') {
+        return res.status(404).json({ error: 'Report not found' });
+      }
       console.error('Error updating status:', err);
       res.status(500).json({ error: 'Internal server error' });
     }
@@ -388,18 +434,26 @@ app.patch(
     }
 
     try {
-      const report = await pool.query('SELECT user_id FROM reports WHERE id = $1', [id]);
+      const report = await pool.query('SELECT user_id, status FROM reports WHERE id = $1', [id]);
       if (report.rows.length === 0) return res.status(404).json({ error: 'Report not found' });
       if (report.rows[0].user_id !== userId) {
         return res.status(403).json({ error: 'Unauthorized to rate this report' });
       }
+      if (report.rows[0].status !== 'resolved') {
+        return res.status(400).json({ error: 'Only resolved reports can be rated' });
+      }
 
+      // updated_at is deliberately left alone: it marks when the report was
+      // resolved, and the response-time metrics must not move when someone rates.
       const result = await pool.query(
-        'UPDATE reports SET resolution_rating = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2 RETURNING *',
+        'UPDATE reports SET resolution_rating = $1 WHERE id = $2 RETURNING *',
         [rating, id]
       );
       res.status(200).json(result.rows[0]);
     } catch (err) {
+      if (err.code === '22P02') {
+        return res.status(404).json({ error: 'Report not found' });
+      }
       console.error('Error submitting rating:', err);
       res.status(500).json({ error: 'Internal server error' });
     }
@@ -409,14 +463,26 @@ app.patch(
 // GET /api/jobs
 // Persists each assignment into job_assignments (upsert on report_id) so
 // accept/resolve/escalate/override have a real row to act on.
-app.get('/api/jobs', verifyToken, async (req, res) => {
+// Staff only: residents have no use for the queue and this call writes to the DB.
+app.get('/api/jobs', verifyToken, requireRole(['worker', 'supervisor']), async (req, res) => {
   try {
-    const reportsResult = await pool.query("SELECT * FROM reports WHERE status = 'pending' ORDER BY created_at ASC");
+    const reportsResult = await pool.query(
+      `SELECT r.*, w.sampi_score
+       FROM reports r
+       LEFT JOIN wards w ON w.id = r.ward_id
+       WHERE r.status = 'pending'
+       ORDER BY r.created_at ASC`
+    );
     const pendingReports = reportsResult.rows;
 
+    // A report with no ward is sent as 'UNASSIGNED' with no equity weight. It
+    // used to be relabelled CPT-001 (SAMPI 0.78), which gave every unlocated
+    // report a high equity score. equity_weight is the ward's SAMPI score (the
+    // algorithm's Q term); the hybrid endpoint will read it.
     const reportsForAlgorithm = pendingReports.map(r => ({
       ...r,
-      ward_id: r.ward_id ?? 'CPT-001'
+      ward_id: r.ward_id ?? 'UNASSIGNED',
+      equity_weight: r.sampi_score != null ? Number(r.sampi_score) : null
     }));
 
     // Stub until worker location/availability tracking exists.
@@ -443,6 +509,10 @@ app.get('/api/jobs', verifyToken, async (req, res) => {
 
       const persistedJobs = [];
       for (const a of algoResult.assignments) {
+        // A supervisor override (override_by set) is final: re-running the
+        // algorithm must not move the job back. The WHERE below makes Postgres
+        // skip the update for those rows, so RETURNING gives nothing and we
+        // read the stored (overridden) row instead.
         const upserted = await pool.query(
           `INSERT INTO job_assignments (report_id, worker_id, algorithm_used, priority_score)
            VALUES ($1, $2, $3, $4)
@@ -451,10 +521,15 @@ app.get('/api/jobs', verifyToken, async (req, res) => {
              algorithm_used = EXCLUDED.algorithm_used,
              priority_score = EXCLUDED.priority_score,
              assigned_at = NOW()
+           WHERE job_assignments.override_by IS NULL
            RETURNING *`,
           [a.report_id, a.worker_id, algoResult.algorithm, a.score]
         );
-        const job = upserted.rows[0];
+        let job = upserted.rows[0];
+        if (!job) {
+          const existing = await pool.query('SELECT * FROM job_assignments WHERE report_id = $1', [a.report_id]);
+          job = existing.rows[0];
+        }
         persistedJobs.push({
           id: job.id,
           report_id: job.report_id,
@@ -488,11 +563,12 @@ app.get('/api/workers/assigned', verifyToken, requireRole(['worker']), async (re
   try {
     const workerId = req.user.id;
     const result = await pool.query(
-      `SELECT ja.*, r.category, r.description, r.lat, r.lng, r.status as report_status
+      `SELECT ja.*, r.category, r.description, r.severity, r.lat, r.lng, r.ward_id,
+              r.photo_urls, r.created_at AS report_created_at, r.status AS report_status
        FROM job_assignments ja
        JOIN reports r ON ja.report_id = r.id
        WHERE ja.worker_id = $1 AND ja.resolved_at IS NULL AND ja.escalated_at IS NULL
-       ORDER BY ja.priority_score DESC NULLS LAST, ja.assigned_at DESC`,
+       ORDER BY ja.priority_score DESC NULLS LAST, r.created_at ASC`,
       [workerId]
     );
     res.status(200).json(result.rows);
@@ -651,6 +727,13 @@ app.post('/api/supervisor/override', verifyToken, requireRole(['supervisor']), a
     if (jobQuery.rows.length === 0) return res.status(404).json({ error: 'Job not found' });
     const oldJob = jobQuery.rows[0];
 
+    if (new_worker_id) {
+      const worker = await pool.query("SELECT id FROM users WHERE id = $1 AND role = 'worker'", [new_worker_id]);
+      if (worker.rows.length === 0) {
+        return res.status(400).json({ error: 'new_worker_id must be the id of an existing worker' });
+      }
+    }
+
     const updatedJob = await pool.query(
       `UPDATE job_assignments
        SET worker_id = COALESCE($1, worker_id),
@@ -677,7 +760,32 @@ app.post('/api/supervisor/override', verifyToken, requireRole(['supervisor']), a
 
     res.status(200).json(updatedJob.rows[0]);
   } catch (err) {
+    // Malformed ids (not UUIDs) are a bad request, not a server fault.
+    if (err.code === '22P02') {
+      return res.status(400).json({ error: 'job_id and new_worker_id must be valid ids' });
+    }
     console.error('Error overriding job:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Time a report was resolved: the first 'resolved' entry in status_events,
+// or updated_at when there is none. Expects the reports table aliased as r.
+// (updated_at alone is wrong: anything that touches the row later moves it.)
+const RESOLVED_AT_SQL = `COALESCE(
+  (SELECT MIN(se.occurred_at) FROM status_events se
+   WHERE se.report_id = r.id AND se.new_status = 'resolved'),
+  r.updated_at)`;
+
+// GET /api/supervisor/workers (feeds the override dropdown on the dashboard)
+app.get('/api/supervisor/workers', verifyToken, requireRole(['supervisor']), async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT id, full_name, email FROM users WHERE role = 'worker' ORDER BY full_name, email`
+    );
+    res.status(200).json(result.rows);
+  } catch (err) {
+    console.error('Error fetching workers:', err);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
@@ -693,12 +801,13 @@ app.get('/api/supervisor/overview', verifyToken, requireRole(['supervisor']), as
       "SELECT COUNT(*) FROM reports WHERE status = 'resolved'"
     );
 
-    // Average hours from creation to last update, resolved reports only.
-    // Mirrors computeOverviewMetrics() in dashboard/src/utils/dashboardData.js.
+    // Average hours from creation to resolution, resolved reports only.
+    // Resolution time comes from the status_events log, falling back to
+    // updated_at for reports resolved before events were logged.
     const avgResponse = await pool.query(
-      `SELECT AVG(EXTRACT(EPOCH FROM (updated_at - created_at)) / 3600.0) AS avg_hours
-       FROM reports
-       WHERE status = 'resolved'`
+      `SELECT AVG(EXTRACT(EPOCH FROM (${RESOLVED_AT_SQL} - r.created_at)) / 3600.0) AS avg_hours
+       FROM reports r
+       WHERE r.status = 'resolved'`
     );
 
     const total = parseInt(totalReports.rows[0].count, 10);
@@ -732,12 +841,12 @@ app.get('/api/supervisor/analytics', verifyToken, requireRole(['supervisor']), a
   try {
     const responseTimeByCategory = await pool.query(
       `SELECT
-         category,
-         ROUND(AVG(EXTRACT(EPOCH FROM (updated_at - created_at)) / 3600.0)::numeric, 1) AS avg_response_hours
-       FROM reports
-       WHERE status = 'resolved'
-       GROUP BY category
-       ORDER BY category`
+         r.category,
+         ROUND(AVG(EXTRACT(EPOCH FROM (${RESOLVED_AT_SQL} - r.created_at)) / 3600.0)::numeric, 1) AS avg_response_hours
+       FROM reports r
+       WHERE r.status = 'resolved'
+       GROUP BY r.category
+       ORDER BY r.category`
     );
 
     const requestsOverTime = await pool.query(
@@ -792,6 +901,20 @@ app.get('/api/supervisor/audit', verifyToken, requireRole(['supervisor']), async
     console.error('Error fetching audit logs:', err);
     res.status(500).json({ error: 'Internal server error' });
   }
+});
+
+// Error handler. Without it, a rejected upload (wrong file type, file too
+// large) came back as an HTML 500 page instead of a JSON 400.
+app.use((err, req, res, next) => {
+  if (err.name === 'MulterError') {
+    const message = err.code === 'LIMIT_FILE_SIZE' ? 'Each photo must be 5MB or smaller' : err.message;
+    return res.status(400).json({ error: message });
+  }
+  if (err.code === 'INVALID_FILE_TYPE') {
+    return res.status(400).json({ error: err.message });
+  }
+  console.error('Unhandled error:', err);
+  res.status(500).json({ error: 'Internal server error' });
 });
 
 app.listen(port, () => {

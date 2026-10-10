@@ -4,14 +4,16 @@ import {
   fetchOverrideAudit,
   fetchQueue,
   fetchReports,
+  fetchWorkers,
   submitOverride,
 } from '../services/dashboardApi.js';
-import { formatDateTime } from '../utils/dashboardData.js';
+import { formatDateTime, shortId } from '../utils/dashboardData.js';
 
 function PrioritisationOverridePage() {
   const { token } = useAuth();
   const [queue, setQueue] = useState([]);
   const [audit, setAudit] = useState([]);
+  const [workers, setWorkers] = useState([]);
   const [reasonByJob, setReasonByJob] = useState({});
   const [newWorkerByJob, setNewWorkerByJob] = useState({});
   const [errorByJob, setErrorByJob] = useState({});
@@ -26,15 +28,17 @@ function PrioritisationOverridePage() {
       setIsLoading(true);
       try {
         const reports = await fetchReports(token);
-        const [queueData, auditData] = await Promise.all([
+        const [queueData, auditData, workerData] = await Promise.all([
           fetchQueue(token, reports),
           fetchOverrideAudit(token),
+          fetchWorkers(token),
         ]);
         if (!mounted) {
           return;
         }
         setQueue(queueData);
         setAudit(auditData);
+        setWorkers(workerData);
       } catch (requestError) {
         if (mounted) {
           setError(requestError.message || 'Unable to load override queue.');
@@ -52,10 +56,16 @@ function PrioritisationOverridePage() {
     };
   }, [token]);
 
-  const workerOptions = useMemo(
-    () => ['worker-1', 'worker-2', 'worker-3', 'worker-4', 'worker-5'],
-    [],
+  // Worker ids are UUIDs, so show the person's name wherever we have it.
+  const workerNames = useMemo(
+    () =>
+      Object.fromEntries(
+        workers.map((worker) => [worker.id, worker.full_name || worker.email || shortId(worker.id)]),
+      ),
+    [workers],
   );
+
+  const workerLabel = (id) => (id ? workerNames[id] || shortId(id) : 'unassigned');
 
   const onOverride = async (job) => {
     const reason = reasonByJob[job.id]?.trim();
@@ -89,6 +99,7 @@ function PrioritisationOverridePage() {
 
       setAudit((current) => [entry, ...current]);
       setReasonByJob((current) => ({ ...current, [job.id]: '' }));
+      setNewWorkerByJob((current) => ({ ...current, [job.id]: '' }));
     } catch (requestError) {
       setErrorByJob((current) => ({
         ...current,
@@ -113,8 +124,9 @@ function PrioritisationOverridePage() {
           <table className="data-table">
             <thead>
               <tr>
-                <th>Job</th>
+                <th>Request</th>
                 <th>Category</th>
+                <th>Severity</th>
                 <th>Priority</th>
                 <th>Current worker</th>
                 <th>Reassign to</th>
@@ -125,10 +137,11 @@ function PrioritisationOverridePage() {
             <tbody>
               {queue.map((job) => (
                 <tr key={job.id}>
-                  <td>{job.report_id}</td>
+                  <td title={job.report_id}>{shortId(job.report_id)}</td>
                   <td>{job.report?.category || 'unknown'}</td>
-                  <td>{job.priority_score ?? '-'}</td>
-                  <td>{job.worker_id || 'unassigned'}</td>
+                  <td>{job.report?.severity ?? '-'}</td>
+                  <td>{Number.isFinite(job.priority_score) ? job.priority_score.toFixed(2) : '-'}</td>
+                  <td>{workerLabel(job.worker_id)}</td>
                   <td>
                     <select
                       className="select-input"
@@ -141,11 +154,13 @@ function PrioritisationOverridePage() {
                       }
                     >
                       <option value="">Choose worker</option>
-                      {workerOptions.map((worker) => (
-                        <option key={worker} value={worker}>
-                          {worker}
-                        </option>
-                      ))}
+                      {workers
+                        .filter((worker) => worker.id !== job.worker_id)
+                        .map((worker) => (
+                          <option key={worker.id} value={worker.id}>
+                            {workerLabel(worker.id)}
+                          </option>
+                        ))}
                     </select>
                   </td>
                   <td>
@@ -179,6 +194,7 @@ function PrioritisationOverridePage() {
               ))}
             </tbody>
           </table>
+          {!queue.length && <p className="panel-message">No pending requests in the queue.</p>}
         </div>
       </article>
 
@@ -189,7 +205,7 @@ function PrioritisationOverridePage() {
             <thead>
               <tr>
                 <th>Timestamp</th>
-                <th>Job</th>
+                <th>Request</th>
                 <th>From</th>
                 <th>To</th>
                 <th>Reason</th>
@@ -199,9 +215,9 @@ function PrioritisationOverridePage() {
               {audit.map((entry) => (
                 <tr key={entry.id || `${entry.job_id}-${entry.created_at}`}>
                   <td>{formatDateTime(entry.created_at)}</td>
-                  <td>{entry.job_id}</td>
-                  <td>{entry.old_worker_id || 'unknown'}</td>
-                  <td>{entry.new_worker_id}</td>
+                  <td title={entry.report_id}>{shortId(entry.report_id || entry.job_id)}</td>
+                  <td>{workerLabel(entry.old_worker_id)}</td>
+                  <td>{workerLabel(entry.new_worker_id)}</td>
                   <td>{entry.reason}</td>
                 </tr>
               ))}

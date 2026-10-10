@@ -9,7 +9,7 @@ export const CATEGORY_COLORS = {
   sanitation: '#6b2f6b',
 };
 
-// Real seed wards from database/init/01_init.sql — sampi_score is the
+// Seed wards from database/seed/wards.json (synthetic) — sampi_score is the
 // normalised (0-1) ward deprivation index, same value used as Q in the
 // hybrid algorithm (Final score = (1 - alpha) * E + (alpha * Q)).
 // Keep this in sync with the DB seed if wards are added/changed there.
@@ -17,11 +17,30 @@ export const WARD_SAMPI = {
   'CPT-001': 0.7823,
   'CPT-002': 0.6541,
   'CPT-003': 0.3102,
-  'JHB-001': 0.7491,
-  'JHB-002': 0.1203,
+  'CPT-004': 0.712,
+  'CPT-005': 0.745,
+  'CPT-006': 0.69,
+  'CPT-007': 0.63,
+  'CPT-008': 0.59,
+  'CPT-009': 0.45,
+  'CPT-010': 0.56,
+  'CPT-011': 0.24,
+  'CPT-012': 0.18,
+  'CPT-013': 0.35,
+  'CPT-014': 0.33,
+  'CPT-015': 0.15,
+  'CPT-016': 0.12,
+  'CPT-017': 0.2,
+  'CPT-018': 0.42,
+  'CPT-019': 0.51,
+  'CPT-020': 0.54,
 };
 
-const REAL_WARD_IDS = Object.keys(WARD_SAMPI);
+// Long ids (UUIDs) are shortened for display. Full ids stay in CSV exports.
+export function shortId(id) {
+  const text = String(id ?? '');
+  return text.length > 12 ? text.slice(0, 8) : text;
+}
 
 function getWardSampi(wardId) {
   return WARD_SAMPI[wardId] ?? null;
@@ -54,9 +73,10 @@ function parseDate(value) {
 export function normalizeReport(report, index = 0) {
   const created = report.created_at || report.createdAt || new Date().toISOString();
   const updated = report.updated_at || report.updatedAt || created;
-  // Fall back to a real seed ward (not a fictional CPT-00N) so ward_id always
-  // resolves to a known sampi_score.
-  const ward = report.ward_id || report.wardId || REAL_WARD_IDS[index % REAL_WARD_IDS.length];
+  // A report with no ward stays "Unassigned". This used to be replaced with a
+  // ward picked by position in the list, which put real reports into wards
+  // they were never in and made the equity charts show invented numbers.
+  const ward = report.ward_id || report.wardId || 'Unassigned';
   const safeCategory = categories.includes(report.category) ? report.category : categories[index % categories.length];
   const safeStatus = statuses.includes(report.status) ? report.status : 'pending';
 

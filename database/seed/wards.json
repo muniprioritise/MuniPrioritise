@@ -1,0 +1,205 @@
+{
+  "_note": "SYNTHETIC. Centroids are approximate suburb centres; sampi_score and population are invented for the prototype and benchmark, scaled to the 0.12-0.78 range in issue P3-03. They are not published StatsSA values.",
+  "wards": [
+    {
+      "id": "CPT-001",
+      "municipality": "City of Cape Town",
+      "name": "Khayelitsha Ward 1",
+      "area": "Khayelitsha",
+      "lat": -34.04,
+      "lng": 18.67,
+      "sampi_score": 0.7823,
+      "population": 42000
+    },
+    {
+      "id": "CPT-002",
+      "municipality": "City of Cape Town",
+      "name": "Mitchells Plain Ward 2",
+      "area": "Mitchells Plain",
+      "lat": -34.05,
+      "lng": 18.62,
+      "sampi_score": 0.6541,
+      "population": 38000
+    },
+    {
+      "id": "CPT-003",
+      "municipality": "City of Cape Town",
+      "name": "Bellville Ward 3",
+      "area": "Bellville",
+      "lat": -33.9,
+      "lng": 18.63,
+      "sampi_score": 0.3102,
+      "population": 21000
+    },
+    {
+      "id": "CPT-004",
+      "municipality": "City of Cape Town",
+      "name": "Gugulethu Ward 4",
+      "area": "Gugulethu",
+      "lat": -33.98,
+      "lng": 18.57,
+      "sampi_score": 0.712,
+      "population": 36000
+    },
+    {
+      "id": "CPT-005",
+      "municipality": "City of Cape Town",
+      "name": "Nyanga Ward 5",
+      "area": "Nyanga",
+      "lat": -33.9917,
+      "lng": 18.5833,
+      "sampi_score": 0.745,
+      "population": 33000
+    },
+    {
+      "id": "CPT-006",
+      "municipality": "City of Cape Town",
+      "name": "Philippi Ward 6",
+      "area": "Philippi",
+      "lat": -34.0,
+      "lng": 18.6,
+      "sampi_score": 0.69,
+      "population": 40000
+    },
+    {
+      "id": "CPT-007",
+      "municipality": "City of Cape Town",
+      "name": "Delft Ward 7",
+      "area": "Delft",
+      "lat": -33.97,
+      "lng": 18.64,
+      "sampi_score": 0.63,
+      "population": 35000
+    },
+    {
+      "id": "CPT-008",
+      "municipality": "City of Cape Town",
+      "name": "Langa Ward 8",
+      "area": "Langa",
+      "lat": -33.94,
+      "lng": 18.53,
+      "sampi_score": 0.59,
+      "population": 24000
+    },
+    {
+      "id": "CPT-009",
+      "municipality": "City of Cape Town",
+      "name": "Athlone Ward 9",
+      "area": "Athlone",
+      "lat": -33.96,
+      "lng": 18.5,
+      "sampi_score": 0.45,
+      "population": 27000
+    },
+    {
+      "id": "CPT-010",
+      "municipality": "City of Cape Town",
+      "name": "Mannenberg Ward 10",
+      "area": "Mannenberg",
+      "lat": -34.0,
+      "lng": 18.55,
+      "sampi_score": 0.56,
+      "population": 22000
+    },
+    {
+      "id": "CPT-011",
+      "municipality": "City of Cape Town",
+      "name": "Milnerton Ward 11",
+      "area": "Milnerton",
+      "lat": -33.9,
+      "lng": 18.49,
+      "sampi_score": 0.24,
+      "population": 26000
+    },
+    {
+      "id": "CPT-012",
+      "municipality": "City of Cape Town",
+      "name": "Durbanville Ward 12",
+      "area": "Durbanville",
+      "lat": -33.83,
+      "lng": 18.65,
+      "sampi_score": 0.18,
+      "population": 23000
+    },
+    {
+      "id": "CPT-013",
+      "municipality": "City of Cape Town",
+      "name": "Parow Ward 13",
+      "area": "Parow",
+      "lat": -33.904,
+      "lng": 18.56,
+      "sampi_score": 0.35,
+      "population": 25000
+    },
+    {
+      "id": "CPT-014",
+      "municipality": "City of Cape Town",
+      "name": "Goodwood Ward 14",
+      "area": "Goodwood",
+      "lat": -33.907,
+      "lng": 18.546,
+      "sampi_score": 0.33,
+      "population": 20000
+    },
+    {
+      "id": "CPT-015",
+      "municipality": "City of Cape Town",
+      "name": "Claremont Ward 15",
+      "area": "Claremont",
+      "lat": -33.985,
+      "lng": 18.465,
+      "sampi_score": 0.15,
+      "population": 19000
+    },
+    {
+      "id": "CPT-016",
+      "municipality": "City of Cape Town",
+      "name": "Sea Point Ward 16",
+      "area": "Sea Point",
+      "lat": -33.92,
+      "lng": 18.385,
+      "sampi_score": 0.12,
+      "population": 17000
+    },
+    {
+      "id": "CPT-017",
+      "municipality": "City of Cape Town",
+      "name": "Cape Town CBD Ward 17",
+      "area": "Cape Town CBD",
+      "lat": -33.925,
+      "lng": 18.424,
+      "sampi_score": 0.2,
+      "population": 16000
+    },
+    {
+      "id": "CPT-018",
+      "municipality": "City of Cape Town",
+      "name": "Woodstock Ward 18",
+      "area": "Woodstock",
+      "lat": -33.93,
+      "lng": 18.45,
+      "sampi_score": 0.42,
+      "population": 18000
+    },
+    {
+      "id": "CPT-019",
+      "municipality": "City of Cape Town",
+      "name": "Elsies River Ward 19",
+      "area": "Elsies River",
+      "lat": -33.92,
+      "lng": 18.58,
+      "sampi_score": 0.51,
+      "population": 30000
+    },
+    {
+      "id": "CPT-020",
+      "municipality": "City of Cape Town",
+      "name": "Kraaifontein Ward 20",
+      "area": "Kraaifontein",
+      "lat": -33.84,
+      "lng": 18.72,
+      "sampi_score": 0.54,
+      "population": 34000
+    }
+  ]
+}

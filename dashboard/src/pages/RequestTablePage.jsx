@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useAuth } from '../context/AuthContext.jsx';
 import { fetchReports } from '../services/dashboardApi.js';
-import { formatDateTime, toCsv } from '../utils/dashboardData.js';
+import { formatDateTime, shortId, toCsv } from '../utils/dashboardData.js';
 
 const tableColumns = [
   { key: 'id', label: 'ID' },
@@ -166,7 +166,7 @@ function RequestTablePage() {
             <tbody>
               {filtered.map((report) => (
                 <tr key={report.id}>
-                  <td>{report.id}</td>
+                  <td title={report.id}>{shortId(report.id)}</td>
                   <td>{report.category}</td>
                   <td>{report.severity}</td>
                   <td>{report.status}</td>

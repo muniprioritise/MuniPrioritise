@@ -1,0 +1,5230 @@
+{
+ "_note": "SYNTHETIC benchmark dataset (issue P3-03). Regenerate with database/seed/generate_benchmark_dataset.py.",
+ "seed": 42,
+ "wards": [
+  {
+   "id": "CPT-001",
+   "name": "Khayelitsha Ward 1",
+   "lat": -34.04,
+   "lng": 18.67,
+   "sampi_score": 0.7823,
+   "population": 42000
+  },
+  {
+   "id": "CPT-002",
+   "name": "Mitchells Plain Ward 2",
+   "lat": -34.05,
+   "lng": 18.62,
+   "sampi_score": 0.6541,
+   "population": 38000
+  },
+  {
+   "id": "CPT-003",
+   "name": "Bellville Ward 3",
+   "lat": -33.9,
+   "lng": 18.63,
+   "sampi_score": 0.3102,
+   "population": 21000
+  },
+  {
+   "id": "CPT-004",
+   "name": "Gugulethu Ward 4",
+   "lat": -33.98,
+   "lng": 18.57,
+   "sampi_score": 0.712,
+   "population": 36000
+  },
+  {
+   "id": "CPT-005",
+   "name": "Nyanga Ward 5",
+   "lat": -33.9917,
+   "lng": 18.5833,
+   "sampi_score": 0.745,
+   "population": 33000
+  },
+  {
+   "id": "CPT-006",
+   "name": "Philippi Ward 6",
+   "lat": -34.0,
+   "lng": 18.6,
+   "sampi_score": 0.69,
+   "population": 40000
+  },
+  {
+   "id": "CPT-007",
+   "name": "Delft Ward 7",
+   "lat": -33.97,
+   "lng": 18.64,
+   "sampi_score": 0.63,
+   "population": 35000
+  },
+  {
+   "id": "CPT-008",
+   "name": "Langa Ward 8",
+   "lat": -33.94,
+   "lng": 18.53,
+   "sampi_score": 0.59,
+   "population": 24000
+  },
+  {
+   "id": "CPT-009",
+   "name": "Athlone Ward 9",
+   "lat": -33.96,
+   "lng": 18.5,
+   "sampi_score": 0.45,
+   "population": 27000
+  },
+  {
+   "id": "CPT-010",
+   "name": "Mannenberg Ward 10",
+   "lat": -34.0,
+   "lng": 18.55,
+   "sampi_score": 0.56,
+   "population": 22000
+  },
+  {
+   "id": "CPT-011",
+   "name": "Milnerton Ward 11",
+   "lat": -33.9,
+   "lng": 18.49,
+   "sampi_score": 0.24,
+   "population": 26000
+  },
+  {
+   "id": "CPT-012",
+   "name": "Durbanville Ward 12",
+   "lat": -33.83,
+   "lng": 18.65,
+   "sampi_score": 0.18,
+   "population": 23000
+  },
+  {
+   "id": "CPT-013",
+   "name": "Parow Ward 13",
+   "lat": -33.904,
+   "lng": 18.56,
+   "sampi_score": 0.35,
+   "population": 25000
+  },
+  {
+   "id": "CPT-014",
+   "name": "Goodwood Ward 14",
+   "lat": -33.907,
+   "lng": 18.546,
+   "sampi_score": 0.33,
+   "population": 20000
+  },
+  {
+   "id": "CPT-015",
+   "name": "Claremont Ward 15",
+   "lat": -33.985,
+   "lng": 18.465,
+   "sampi_score": 0.15,
+   "population": 19000
+  },
+  {
+   "id": "CPT-016",
+   "name": "Sea Point Ward 16",
+   "lat": -33.92,
+   "lng": 18.385,
+   "sampi_score": 0.12,
+   "population": 17000
+  },
+  {
+   "id": "CPT-017",
+   "name": "Cape Town CBD Ward 17",
+   "lat": -33.925,
+   "lng": 18.424,
+   "sampi_score": 0.2,
+   "population": 16000
+  },
+  {
+   "id": "CPT-018",
+   "name": "Woodstock Ward 18",
+   "lat": -33.93,
+   "lng": 18.45,
+   "sampi_score": 0.42,
+   "population": 18000
+  },
+  {
+   "id": "CPT-019",
+   "name": "Elsies River Ward 19",
+   "lat": -33.92,
+   "lng": 18.58,
+   "sampi_score": 0.51,
+   "population": 30000
+  },
+  {
+   "id": "CPT-020",
+   "name": "Kraaifontein Ward 20",
+   "lat": -33.84,
+   "lng": 18.72,
+   "sampi_score": 0.54,
+   "population": 34000
+  }
+ ],
+ "reports": [
+  {
+   "id": "r001",
+   "category": "electricity",
+   "severity": 2,
+   "created_at": "2026-10-01T00:26:01Z",
+   "lat": -33.994618,
+   "lng": 18.613606,
+   "ward_id": "CPT-006",
+   "equity_weight": 0.69
+  },
+  {
+   "id": "r002",
+   "category": "refuse",
+   "severity": 2,
+   "created_at": "2026-10-01T02:47:40Z",
+   "lat": -33.937167,
+   "lng": 18.380375,
+   "ward_id": "CPT-016",
+   "equity_weight": 0.12
+  },
+  {
+   "id": "r003",
+   "category": "electricity",
+   "severity": 5,
+   "created_at": "2026-10-01T03:12:01Z",
+   "lat": -33.96988,
+   "lng": 18.670965,
+   "ward_id": "CPT-007",
+   "equity_weight": 0.63
+  },
+  {
+   "id": "r004",
+   "category": "refuse",
+   "severity": 4,
+   "created_at": "2026-10-01T05:58:06Z",
+   "lat": -33.925237,
+   "lng": 18.435015,
+   "ward_id": "CPT-017",
+   "equity_weight": 0.2
+  },
+  {
+   "id": "r005",
+   "category": "sanitation",
+   "severity": 2,
+   "created_at": "2026-10-01T05:59:02Z",
+   "lat": -34.006195,
+   "lng": 18.576248,
+   "ward_id": "CPT-005",
+   "equity_weight": 0.745
+  },
+  {
+   "id": "r006",
+   "category": "electricity",
+   "severity": 4,
+   "created_at": "2026-10-01T06:13:44Z",
+   "lat": -34.031816,
+   "lng": 18.514275,
+   "ward_id": "CPT-010",
+   "equity_weight": 0.56
+  },
+  {
+   "id": "r007",
+   "category": "electricity",
+   "severity": 2,
+   "created_at": "2026-10-01T07:01:31Z",
+   "lat": -33.831768,
+   "lng": 18.762458,
+   "ward_id": "CPT-020",
+   "equity_weight": 0.54
+  },
+  {
+   "id": "r008",
+   "category": "water",
+   "severity": 4,
+   "created_at": "2026-10-01T07:05:03Z",
+   "lat": -33.882672,
+   "lng": 18.36642,
+   "ward_id": "CPT-016",
+   "equity_weight": 0.12
+  },
+  {
+   "id": "r009",
+   "category": "water",
+   "severity": 4,
+   "created_at": "2026-10-01T07:08:22Z",
+   "lat": -33.991134,
+   "lng": 18.580837,
+   "ward_id": "CPT-005",
+   "equity_weight": 0.745
+  },
+  {
+   "id": "r010",
+   "category": "water",
+   "severity": 3,
+   "created_at": "2026-10-01T07:23:02Z",
+   "lat": -33.982435,
+   "lng": 18.620453,
+   "ward_id": "CPT-007",
+   "equity_weight": 0.63
+  },
+  {
+   "id": "r011",
+   "category": "sanitation",
+   "severity": 2,
+   "created_at": "2026-10-01T07:29:15Z",
+   "lat": -33.948952,
+   "lng": 18.531526,
+   "ward_id": "CPT-008",
+   "equity_weight": 0.59
+  },
+  {
+   "id": "r012",
+   "category": "electricity",
+   "severity": 2,
+   "created_at": "2026-10-01T07:37:31Z",
+   "lat": -33.962445,
+   "lng": 18.478662,
+   "ward_id": "CPT-009",
+   "equity_weight": 0.45
+  },
+  {
+   "id": "r013",
+   "category": "electricity",
+   "severity": 3,
+   "created_at": "2026-10-01T07:50:04Z",
+   "lat": -34.034713,
+   "lng": 18.548543,
+   "ward_id": "CPT-010",
+   "equity_weight": 0.56
+  },
+  {
+   "id": "r014",
+   "category": "roads",
+   "severity": 3,
+   "created_at": "2026-10-01T08:14:20Z",
+   "lat": -33.931107,
+   "lng": 18.503336,
+   "ward_id": "CPT-008",
+   "equity_weight": 0.59
+  },
+  {
+   "id": "r015",
+   "category": "sanitation",
+   "severity": 4,
+   "created_at": "2026-10-01T08:15:50Z",
+   "lat": -34.006469,
+   "lng": 18.602072,
+   "ward_id": "CPT-006",
+   "equity_weight": 0.69
+  },
+  {
+   "id": "r016",
+   "category": "sanitation",
+   "severity": 3,
+   "created_at": "2026-10-01T08:16:06Z",
+   "lat": -33.807658,
+   "lng": 18.707408,
+   "ward_id": "CPT-020",
+   "equity_weight": 0.54
+  },
+  {
+   "id": "r017",
+   "category": "water",
+   "severity": 2,
+   "created_at": "2026-10-01T08:31:20Z",
+   "lat": -33.967938,
+   "lng": 18.627055,
+   "ward_id": "CPT-007",
+   "equity_weight": 0.63
+  },
+  {
+   "id": "r018",
+   "category": "water",
+   "severity": 2,
+   "created_at": "2026-10-01T08:51:55Z",
+   "lat": -34.039092,
+   "lng": 18.661513,
+   "ward_id": "CPT-001",
+   "equity_weight": 0.7823
+  },
+  {
+   "id": "r019",
+   "category": "refuse",
+   "severity": 4,
+   "created_at": "2026-10-01T08:53:09Z",
+   "lat": -33.890339,
+   "lng": 18.72969,
+   "ward_id": "CPT-020",
+   "equity_weight": 0.54
+  },
+  {
+   "id": "r020",
+   "category": "water",
+   "severity": 4,
+   "created_at": "2026-10-01T08:54:58Z",
+   "lat": -34.033304,
+   "lng": 18.644714,
+   "ward_id": "CPT-001",
+   "equity_weight": 0.7823
+  },
+  {
+   "id": "r021",
+   "category": "water",
+   "severity": 2,
+   "created_at": "2026-10-01T09:03:16Z",
+   "lat": -33.9677,
+   "lng": 18.57659,
+   "ward_id": "CPT-004",
+   "equity_weight": 0.712
+  },
+  {
+   "id": "r022",
+   "category": "roads",
+   "severity": 4,
+   "created_at": "2026-10-01T09:13:43Z",
+   "lat": -33.928478,
+   "lng": 18.598262,
+   "ward_id": "CPT-019",
+   "equity_weight": 0.51
+  },
+  {
+   "id": "r023",
+   "category": "electricity",
+   "severity": 2,
+   "created_at": "2026-10-01T09:14:42Z",
+   "lat": -33.919456,
+   "lng": 18.510399,
+   "ward_id": "CPT-011",
+   "equity_weight": 0.24
+  },
+  {
+   "id": "r024",
+   "category": "roads",
+   "severity": 3,
+   "created_at": "2026-10-01T09:18:29Z",
+   "lat": -33.905415,
+   "lng": 18.557431,
+   "ward_id": "CPT-013",
+   "equity_weight": 0.35
+  },
+  {
+   "id": "r025",
+   "category": "electricity",
+   "severity": 2,
+   "created_at": "2026-10-01T09:21:18Z",
+   "lat": -34.037251,
+   "lng": 18.586815,
+   "ward_id": "CPT-002",
+   "equity_weight": 0.6541
+  },
+  {
+   "id": "r026",
+   "category": "roads",
+   "severity": 3,
+   "created_at": "2026-10-01T09:25:13Z",
+   "lat": -34.024784,
+   "lng": 18.68523,
+   "ward_id": "CPT-001",
+   "equity_weight": 0.7823
+  },
+  {
+   "id": "r027",
+   "category": "refuse",
+   "severity": 4,
+   "created_at": "2026-10-01T09:44:34Z",
+   "lat": -33.952347,
+   "lng": 18.512497,
+   "ward_id": "CPT-009",
+   "equity_weight": 0.45
+  },
+  {
+   "id": "r028",
+   "category": "electricity",
+   "severity": 3,
+   "created_at": "2026-10-01T10:07:01Z",
+   "lat": -33.931112,
+   "lng": 18.42346,
+   "ward_id": "CPT-017",
+   "equity_weight": 0.2
+  },
+  {
+   "id": "r029",
+   "category": "electricity",
+   "severity": 4,
+   "created_at": "2026-10-01T10:13:42Z",
+   "lat": -33.975645,
+   "lng": 18.619911,
+   "ward_id": "CPT-007",
+   "equity_weight": 0.63
+  },
+  {
+   "id": "r030",
+   "category": "refuse",
+   "severity": 2,
+   "created_at": "2026-10-01T10:45:17Z",
+   "lat": -33.898077,
+   "lng": 18.444915,
+   "ward_id": "CPT-017",
+   "equity_weight": 0.2
+  },
+  {
+   "id": "r031",
+   "category": "electricity",
+   "severity": 3,
+   "created_at": "2026-10-01T11:12:41Z",
+   "lat": -34.033342,
+   "lng": 18.684146,
+   "ward_id": "CPT-001",
+   "equity_weight": 0.7823
+  },
+  {
+   "id": "r032",
+   "category": "water",
+   "severity": 2,
+   "created_at": "2026-10-01T11:15:37Z",
+   "lat": -33.978506,
+   "lng": 18.563455,
+   "ward_id": "CPT-004",
+   "equity_weight": 0.712
+  },
+  {
+   "id": "r033",
+   "category": "roads",
+   "severity": 5,
+   "created_at": "2026-10-01T11:17:08Z",
+   "lat": -33.842422,
+   "lng": 18.735031,
+   "ward_id": "CPT-020",
+   "equity_weight": 0.54
+  },
+  {
+   "id": "r034",
+   "category": "refuse",
+   "severity": 2,
+   "created_at": "2026-10-01T11:37:00Z",
+   "lat": -34.0411,
+   "lng": 18.545262,
+   "ward_id": "CPT-010",
+   "equity_weight": 0.56
+  },
+  {
+   "id": "r035",
+   "category": "refuse",
+   "severity": 2,
+   "created_at": "2026-10-01T11:39:11Z",
+   "lat": -34.030514,
+   "lng": 18.534088,
+   "ward_id": "CPT-010",
+   "equity_weight": 0.56
+  },
+  {
+   "id": "r036",
+   "category": "electricity",
+   "severity": 2,
+   "created_at": "2026-10-01T11:41:50Z",
+   "lat": -33.968495,
+   "lng": 18.44795,
+   "ward_id": "CPT-015",
+   "equity_weight": 0.15
+  },
+  {
+   "id": "r037",
+   "category": "refuse",
+   "severity": 3,
+   "created_at": "2026-10-01T11:45:30Z",
+   "lat": -34.051413,
+   "lng": 18.636734,
+   "ward_id": "CPT-002",
+   "equity_weight": 0.6541
+  },
+  {
+   "id": "r038",
+   "category": "refuse",
+   "severity": 2,
+   "created_at": "2026-10-01T11:50:36Z",
+   "lat": -34.045019,
+   "lng": 18.70093,
+   "ward_id": "CPT-001",
+   "equity_weight": 0.7823
+  },
+  {
+   "id": "r039",
+   "category": "electricity",
+   "severity": 2,
+   "created_at": "2026-10-01T12:36:58Z",
+   "lat": -34.062931,
+   "lng": 18.684439,
+   "ward_id": "CPT-001",
+   "equity_weight": 0.7823
+  },
+  {
+   "id": "r040",
+   "category": "water",
+   "severity": 2,
+   "created_at": "2026-10-01T12:55:11Z",
+   "lat": -34.014975,
+   "lng": 18.419692,
+   "ward_id": "CPT-015",
+   "equity_weight": 0.15
+  },
+  {
+   "id": "r041",
+   "category": "electricity",
+   "severity": 2,
+   "created_at": "2026-10-01T12:58:28Z",
+   "lat": -34.000526,
+   "lng": 18.692443,
+   "ward_id": "CPT-001",
+   "equity_weight": 0.7823
+  },
+  {
+   "id": "r042",
+   "category": "roads",
+   "severity": 1,
+   "created_at": "2026-10-01T13:13:58Z",
+   "lat": -33.894884,
+   "lng": 18.673418,
+   "ward_id": "CPT-003",
+   "equity_weight": 0.3102
+  },
+  {
+   "id": "r043",
+   "category": "roads",
+   "severity": 4,
+   "created_at": "2026-10-01T13:43:41Z",
+   "lat": -33.89402,
+   "lng": 18.632429,
+   "ward_id": "CPT-003",
+   "equity_weight": 0.3102
+  },
+  {
+   "id": "r044",
+   "category": "sanitation",
+   "severity": 4,
+   "created_at": "2026-10-01T14:04:13Z",
+   "lat": -33.895072,
+   "lng": 18.568292,
+   "ward_id": "CPT-013",
+   "equity_weight": 0.35
+  },
+  {
+   "id": "r045",
+   "category": "refuse",
+   "severity": 2,
+   "created_at": "2026-10-01T14:50:39Z",
+   "lat": -33.915349,
+   "lng": 18.521446,
+   "ward_id": "CPT-014",
+   "equity_weight": 0.33
+  },
+  {
+   "id": "r046",
+   "category": "refuse",
+   "severity": 2,
+   "created_at": "2026-10-01T14:53:57Z",
+   "lat": -34.069039,
+   "lng": 18.643352,
+   "ward_id": "CPT-002",
+   "equity_weight": 0.6541
+  },
+  {
+   "id": "r047",
+   "category": "electricity",
+   "severity": 3,
+   "created_at": "2026-10-01T15:09:44Z",
+   "lat": -33.960361,
+   "lng": 18.551138,
+   "ward_id": "CPT-004",
+   "equity_weight": 0.712
+  },
+  {
+   "id": "r048",
+   "category": "water",
+   "severity": 2,
+   "created_at": "2026-10-01T15:45:49Z",
+   "lat": -33.946813,
+   "lng": 18.584384,
+   "ward_id": "CPT-019",
+   "equity_weight": 0.51
+  },
+  {
+   "id": "r049",
+   "category": "electricity",
+   "severity": 4,
+   "created_at": "2026-10-01T16:09:20Z",
+   "lat": -33.814087,
+   "lng": 18.647973,
+   "ward_id": "CPT-012",
+   "equity_weight": 0.18
+  },
+  {
+   "id": "r050",
+   "category": "sanitation",
+   "severity": 3,
+   "created_at": "2026-10-01T16:38:55Z",
+   "lat": -33.889869,
+   "lng": 18.602639,
+   "ward_id": "CPT-003",
+   "equity_weight": 0.3102
+  },
+  {
+   "id": "r051",
+   "category": "refuse",
+   "severity": 2,
+   "created_at": "2026-10-01T16:42:43Z",
+   "lat": -33.933665,
+   "lng": 18.468238,
+   "ward_id": "CPT-018",
+   "equity_weight": 0.42
+  },
+  {
+   "id": "r052",
+   "category": "refuse",
+   "severity": 4,
+   "created_at": "2026-10-01T16:58:34Z",
+   "lat": -34.027751,
+   "lng": 18.656818,
+   "ward_id": "CPT-001",
+   "equity_weight": 0.7823
+  },
+  {
+   "id": "r053",
+   "category": "water",
+   "severity": 3,
+   "created_at": "2026-10-01T17:08:48Z",
+   "lat": -33.988529,
+   "lng": 18.673618,
+   "ward_id": "CPT-007",
+   "equity_weight": 0.63
+  },
+  {
+   "id": "r054",
+   "category": "water",
+   "severity": 4,
+   "created_at": "2026-10-01T18:04:45Z",
+   "lat": -33.802787,
+   "lng": 18.710573,
+   "ward_id": "CPT-020",
+   "equity_weight": 0.54
+  },
+  {
+   "id": "r055",
+   "category": "refuse",
+   "severity": 2,
+   "created_at": "2026-10-01T18:07:36Z",
+   "lat": -33.918045,
+   "lng": 18.545712,
+   "ward_id": "CPT-014",
+   "equity_weight": 0.33
+  },
+  {
+   "id": "r056",
+   "category": "refuse",
+   "severity": 4,
+   "created_at": "2026-10-01T18:09:54Z",
+   "lat": -33.926829,
+   "lng": 18.609734,
+   "ward_id": "CPT-019",
+   "equity_weight": 0.51
+  },
+  {
+   "id": "r057",
+   "category": "water",
+   "severity": 3,
+   "created_at": "2026-10-01T18:24:32Z",
+   "lat": -33.942764,
+   "lng": 18.432873,
+   "ward_id": "CPT-018",
+   "equity_weight": 0.42
+  },
+  {
+   "id": "r058",
+   "category": "electricity",
+   "severity": 5,
+   "created_at": "2026-10-01T18:52:39Z",
+   "lat": -33.89816,
+   "lng": 18.524143,
+   "ward_id": "CPT-014",
+   "equity_weight": 0.33
+  },
+  {
+   "id": "r059",
+   "category": "electricity",
+   "severity": 2,
+   "created_at": "2026-10-01T19:17:27Z",
+   "lat": -33.977032,
+   "lng": 18.534868,
+   "ward_id": "CPT-010",
+   "equity_weight": 0.56
+  },
+  {
+   "id": "r060",
+   "category": "water",
+   "severity": 3,
+   "created_at": "2026-10-01T19:27:43Z",
+   "lat": -33.856583,
+   "lng": 18.720768,
+   "ward_id": "CPT-020",
+   "equity_weight": 0.54
+  },
+  {
+   "id": "r061",
+   "category": "refuse",
+   "severity": 3,
+   "created_at": "2026-10-01T19:30:36Z",
+   "lat": -34.000992,
+   "lng": 18.622773,
+   "ward_id": "CPT-006",
+   "equity_weight": 0.69
+  },
+  {
+   "id": "r062",
+   "category": "electricity",
+   "severity": 1,
+   "created_at": "2026-10-01T20:13:11Z",
+   "lat": -34.024306,
+   "lng": 18.619948,
+   "ward_id": "CPT-002",
+   "equity_weight": 0.6541
+  },
+  {
+   "id": "r063",
+   "category": "refuse",
+   "severity": 2,
+   "created_at": "2026-10-01T21:50:32Z",
+   "lat": -33.88456,
+   "lng": 18.555611,
+   "ward_id": "CPT-013",
+   "equity_weight": 0.35
+  },
+  {
+   "id": "r064",
+   "category": "electricity",
+   "severity": 1,
+   "created_at": "2026-10-01T21:55:15Z",
+   "lat": -33.86468,
+   "lng": 18.50044,
+   "ward_id": "CPT-011",
+   "equity_weight": 0.24
+  },
+  {
+   "id": "r065",
+   "category": "water",
+   "severity": 3,
+   "created_at": "2026-10-01T22:20:36Z",
+   "lat": -33.973982,
+   "lng": 18.521349,
+   "ward_id": "CPT-009",
+   "equity_weight": 0.45
+  },
+  {
+   "id": "r066",
+   "category": "water",
+   "severity": 5,
+   "created_at": "2026-10-01T22:38:50Z",
+   "lat": -33.995513,
+   "lng": 18.667152,
+   "ward_id": "CPT-007",
+   "equity_weight": 0.63
+  },
+  {
+   "id": "r067",
+   "category": "roads",
+   "severity": 2,
+   "created_at": "2026-10-02T00:56:32Z",
+   "lat": -33.916908,
+   "lng": 18.674574,
+   "ward_id": "CPT-003",
+   "equity_weight": 0.3102
+  },
+  {
+   "id": "r068",
+   "category": "refuse",
+   "severity": 3,
+   "created_at": "2026-10-02T03:01:18Z",
+   "lat": -33.971505,
+   "lng": 18.600664,
+   "ward_id": "CPT-005",
+   "equity_weight": 0.745
+  },
+  {
+   "id": "r069",
+   "category": "refuse",
+   "severity": 2,
+   "created_at": "2026-10-02T03:07:41Z",
+   "lat": -33.996766,
+   "lng": 18.452211,
+   "ward_id": "CPT-015",
+   "equity_weight": 0.15
+  },
+  {
+   "id": "r070",
+   "category": "water",
+   "severity": 2,
+   "created_at": "2026-10-02T05:28:23Z",
+   "lat": -33.832683,
+   "lng": 18.770934,
+   "ward_id": "CPT-020",
+   "equity_weight": 0.54
+  },
+  {
+   "id": "r071",
+   "category": "water",
+   "severity": 4,
+   "created_at": "2026-10-02T05:36:50Z",
+   "lat": -33.907019,
+   "lng": 18.469754,
+   "ward_id": "CPT-011",
+   "equity_weight": 0.24
+  },
+  {
+   "id": "r072",
+   "category": "water",
+   "severity": 3,
+   "created_at": "2026-10-02T05:37:30Z",
+   "lat": -34.005495,
+   "lng": 18.596104,
+   "ward_id": "CPT-006",
+   "equity_weight": 0.69
+  },
+  {
+   "id": "r073",
+   "category": "electricity",
+   "severity": 3,
+   "created_at": "2026-10-02T05:47:05Z",
+   "lat": -33.96942,
+   "lng": 18.484422,
+   "ward_id": "CPT-009",
+   "equity_weight": 0.45
+  },
+  {
+   "id": "r074",
+   "category": "refuse",
+   "severity": 3,
+   "created_at": "2026-10-02T06:19:02Z",
+   "lat": -34.047408,
+   "lng": 18.658548,
+   "ward_id": "CPT-001",
+   "equity_weight": 0.7823
+  },
+  {
+   "id": "r075",
+   "category": "water",
+   "severity": 3,
+   "created_at": "2026-10-02T06:37:20Z",
+   "lat": -33.869966,
+   "lng": 18.522212,
+   "ward_id": "CPT-011",
+   "equity_weight": 0.24
+  },
+  {
+   "id": "r076",
+   "category": "sanitation",
+   "severity": 3,
+   "created_at": "2026-10-02T07:14:51Z",
+   "lat": -33.838834,
+   "lng": 18.599656,
+   "ward_id": "CPT-012",
+   "equity_weight": 0.18
+  },
+  {
+   "id": "r077",
+   "category": "roads",
+   "severity": 3,
+   "created_at": "2026-10-02T07:30:13Z",
+   "lat": -34.039775,
+   "lng": 18.653513,
+   "ward_id": "CPT-001",
+   "equity_weight": 0.7823
+  },
+  {
+   "id": "r078",
+   "category": "roads",
+   "severity": 3,
+   "created_at": "2026-10-02T07:47:13Z",
+   "lat": -33.833268,
+   "lng": 18.73833,
+   "ward_id": "CPT-020",
+   "equity_weight": 0.54
+  },
+  {
+   "id": "r079",
+   "category": "water",
+   "severity": 3,
+   "created_at": "2026-10-02T07:56:02Z",
+   "lat": -33.956418,
+   "lng": 18.565519,
+   "ward_id": "CPT-004",
+   "equity_weight": 0.712
+  },
+  {
+   "id": "r080",
+   "category": "water",
+   "severity": 3,
+   "created_at": "2026-10-02T08:01:21Z",
+   "lat": -33.994298,
+   "lng": 18.612211,
+   "ward_id": "CPT-006",
+   "equity_weight": 0.69
+  },
+  {
+   "id": "r081",
+   "category": "electricity",
+   "severity": 3,
+   "created_at": "2026-10-02T08:04:31Z",
+   "lat": -33.915822,
+   "lng": 18.403664,
+   "ward_id": "CPT-016",
+   "equity_weight": 0.12
+  },
+  {
+   "id": "r082",
+   "category": "electricity",
+   "severity": 3,
+   "created_at": "2026-10-02T08:14:57Z",
+   "lat": -33.930402,
+   "lng": 18.513671,
+   "ward_id": "CPT-008",
+   "equity_weight": 0.59
+  },
+  {
+   "id": "r083",
+   "category": "sanitation",
+   "severity": 3,
+   "created_at": "2026-10-02T08:33:00Z",
+   "lat": -34.009003,
+   "lng": 18.647369,
+   "ward_id": "CPT-001",
+   "equity_weight": 0.7823
+  },
+  {
+   "id": "r084",
+   "category": "roads",
+   "severity": 4,
+   "created_at": "2026-10-02T08:38:24Z",
+   "lat": -33.970533,
+   "lng": 18.592426,
+   "ward_id": "CPT-004",
+   "equity_weight": 0.712
+  },
+  {
+   "id": "r085",
+   "category": "roads",
+   "severity": 3,
+   "created_at": "2026-10-02T08:59:00Z",
+   "lat": -34.028319,
+   "lng": 18.563859,
+   "ward_id": "CPT-010",
+   "equity_weight": 0.56
+  },
+  {
+   "id": "r086",
+   "category": "water",
+   "severity": 5,
+   "created_at": "2026-10-02T08:59:11Z",
+   "lat": -33.968381,
+   "lng": 18.475159,
+   "ward_id": "CPT-015",
+   "equity_weight": 0.15
+  },
+  {
+   "id": "r087",
+   "category": "water",
+   "severity": 3,
+   "created_at": "2026-10-02T09:29:13Z",
+   "lat": -33.911245,
+   "lng": 18.365982,
+   "ward_id": "CPT-016",
+   "equity_weight": 0.12
+  },
+  {
+   "id": "r088",
+   "category": "water",
+   "severity": 4,
+   "created_at": "2026-10-02T09:31:06Z",
+   "lat": -33.912074,
+   "lng": 18.59279,
+   "ward_id": "CPT-019",
+   "equity_weight": 0.51
+  },
+  {
+   "id": "r089",
+   "category": "roads",
+   "severity": 5,
+   "created_at": "2026-10-02T10:13:20Z",
+   "lat": -34.003337,
+   "lng": 18.469809,
+   "ward_id": "CPT-015",
+   "equity_weight": 0.15
+  },
+  {
+   "id": "r090",
+   "category": "refuse",
+   "severity": 1,
+   "created_at": "2026-10-02T10:14:06Z",
+   "lat": -33.948158,
+   "lng": 18.663743,
+   "ward_id": "CPT-007",
+   "equity_weight": 0.63
+  },
+  {
+   "id": "r091",
+   "category": "roads",
+   "severity": 3,
+   "created_at": "2026-10-02T10:26:24Z",
+   "lat": -34.029036,
+   "lng": 18.673781,
+   "ward_id": "CPT-001",
+   "equity_weight": 0.7823
+  },
+  {
+   "id": "r092",
+   "category": "refuse",
+   "severity": 1,
+   "created_at": "2026-10-02T10:38:58Z",
+   "lat": -34.012681,
+   "lng": 18.643177,
+   "ward_id": "CPT-001",
+   "equity_weight": 0.7823
+  },
+  {
+   "id": "r093",
+   "category": "electricity",
+   "severity": 1,
+   "created_at": "2026-10-02T10:44:30Z",
+   "lat": -33.929998,
+   "lng": 18.371262,
+   "ward_id": "CPT-016",
+   "equity_weight": 0.12
+  },
+  {
+   "id": "r094",
+   "category": "refuse",
+   "severity": 3,
+   "created_at": "2026-10-02T11:22:56Z",
+   "lat": -34.004206,
+   "lng": 18.635507,
+   "ward_id": "CPT-006",
+   "equity_weight": 0.69
+  },
+  {
+   "id": "r095",
+   "category": "roads",
+   "severity": 4,
+   "created_at": "2026-10-02T11:26:19Z",
+   "lat": -34.065726,
+   "lng": 18.618598,
+   "ward_id": "CPT-002",
+   "equity_weight": 0.6541
+  },
+  {
+   "id": "r096",
+   "category": "refuse",
+   "severity": 2,
+   "created_at": "2026-10-02T11:26:31Z",
+   "lat": -34.002387,
+   "lng": 18.56505,
+   "ward_id": "CPT-010",
+   "equity_weight": 0.56
+  },
+  {
+   "id": "r097",
+   "category": "electricity",
+   "severity": 3,
+   "created_at": "2026-10-02T11:28:33Z",
+   "lat": -33.970956,
+   "lng": 18.642448,
+   "ward_id": "CPT-007",
+   "equity_weight": 0.63
+  },
+  {
+   "id": "r098",
+   "category": "water",
+   "severity": 3,
+   "created_at": "2026-10-02T11:34:26Z",
+   "lat": -33.917411,
+   "lng": 18.401096,
+   "ward_id": "CPT-016",
+   "equity_weight": 0.12
+  },
+  {
+   "id": "r099",
+   "category": "electricity",
+   "severity": 3,
+   "created_at": "2026-10-02T11:48:39Z",
+   "lat": -33.907642,
+   "lng": 18.458407,
+   "ward_id": "CPT-018",
+   "equity_weight": 0.42
+  },
+  {
+   "id": "r100",
+   "category": "roads",
+   "severity": 3,
+   "created_at": "2026-10-02T11:54:03Z",
+   "lat": -33.988622,
+   "lng": 18.639438,
+   "ward_id": "CPT-007",
+   "equity_weight": 0.63
+  },
+  {
+   "id": "r101",
+   "category": "water",
+   "severity": 1,
+   "created_at": "2026-10-02T12:08:27Z",
+   "lat": -34.018435,
+   "lng": 18.62938,
+   "ward_id": "CPT-006",
+   "equity_weight": 0.69
+  },
+  {
+   "id": "r102",
+   "category": "water",
+   "severity": 1,
+   "created_at": "2026-10-02T12:09:11Z",
+   "lat": -34.003696,
+   "lng": 18.656669,
+   "ward_id": "CPT-007",
+   "equity_weight": 0.63
+  },
+  {
+   "id": "r103",
+   "category": "refuse",
+   "severity": 4,
+   "created_at": "2026-10-02T12:16:01Z",
+   "lat": -33.967324,
+   "lng": 18.629149,
+   "ward_id": "CPT-007",
+   "equity_weight": 0.63
+  },
+  {
+   "id": "r104",
+   "category": "roads",
+   "severity": 1,
+   "created_at": "2026-10-02T12:23:48Z",
+   "lat": -34.058237,
+   "lng": 18.658033,
+   "ward_id": "CPT-001",
+   "equity_weight": 0.7823
+  },
+  {
+   "id": "r105",
+   "category": "electricity",
+   "severity": 3,
+   "created_at": "2026-10-02T12:43:21Z",
+   "lat": -33.919632,
+   "lng": 18.510575,
+   "ward_id": "CPT-008",
+   "equity_weight": 0.59
+  },
+  {
+   "id": "r106",
+   "category": "roads",
+   "severity": 3,
+   "created_at": "2026-10-02T12:51:37Z",
+   "lat": -33.854499,
+   "lng": 18.568238,
+   "ward_id": "CPT-013",
+   "equity_weight": 0.35
+  },
+  {
+   "id": "r107",
+   "category": "sanitation",
+   "severity": 3,
+   "created_at": "2026-10-02T13:02:24Z",
+   "lat": -33.962566,
+   "lng": 18.548246,
+   "ward_id": "CPT-004",
+   "equity_weight": 0.712
+  },
+  {
+   "id": "r108",
+   "category": "roads",
+   "severity": 4,
+   "created_at": "2026-10-02T13:14:24Z",
+   "lat": -33.98383,
+   "lng": 18.645124,
+   "ward_id": "CPT-007",
+   "equity_weight": 0.63
+  },
+  {
+   "id": "r109",
+   "category": "refuse",
+   "severity": 3,
+   "created_at": "2026-10-02T13:23:12Z",
+   "lat": -33.927816,
+   "lng": 18.40744,
+   "ward_id": "CPT-017",
+   "equity_weight": 0.2
+  },
+  {
+   "id": "r110",
+   "category": "water",
+   "severity": 3,
+   "created_at": "2026-10-02T13:36:04Z",
+   "lat": -33.982204,
+   "lng": 18.580746,
+   "ward_id": "CPT-004",
+   "equity_weight": 0.712
+  },
+  {
+   "id": "r111",
+   "category": "water",
+   "severity": 2,
+   "created_at": "2026-10-02T13:45:14Z",
+   "lat": -33.928242,
+   "lng": 18.539819,
+   "ward_id": "CPT-008",
+   "equity_weight": 0.59
+  },
+  {
+   "id": "r112",
+   "category": "refuse",
+   "severity": 5,
+   "created_at": "2026-10-02T13:46:39Z",
+   "lat": -33.941203,
+   "lng": 18.507806,
+   "ward_id": "CPT-008",
+   "equity_weight": 0.59
+  },
+  {
+   "id": "r113",
+   "category": "electricity",
+   "severity": 3,
+   "created_at": "2026-10-02T13:55:54Z",
+   "lat": -33.845692,
+   "lng": 18.714264,
+   "ward_id": "CPT-020",
+   "equity_weight": 0.54
+  },
+  {
+   "id": "r114",
+   "category": "refuse",
+   "severity": 3,
+   "created_at": "2026-10-02T14:31:55Z",
+   "lat": -33.975314,
+   "lng": 18.565768,
+   "ward_id": "CPT-004",
+   "equity_weight": 0.712
+  },
+  {
+   "id": "r115",
+   "category": "refuse",
+   "severity": 4,
+   "created_at": "2026-10-02T14:40:19Z",
+   "lat": -34.097521,
+   "lng": 18.599169,
+   "ward_id": "CPT-002",
+   "equity_weight": 0.6541
+  },
+  {
+   "id": "r116",
+   "category": "sanitation",
+   "severity": 3,
+   "created_at": "2026-10-02T14:49:30Z",
+   "lat": -33.937981,
+   "lng": 18.629103,
+   "ward_id": "CPT-007",
+   "equity_weight": 0.63
+  },
+  {
+   "id": "r117",
+   "category": "sanitation",
+   "severity": 1,
+   "created_at": "2026-10-02T14:52:14Z",
+   "lat": -33.896497,
+   "lng": 18.510262,
+   "ward_id": "CPT-011",
+   "equity_weight": 0.24
+  },
+  {
+   "id": "r118",
+   "category": "refuse",
+   "severity": 3,
+   "created_at": "2026-10-02T15:14:11Z",
+   "lat": -33.963765,
+   "lng": 18.603326,
+   "ward_id": "CPT-007",
+   "equity_weight": 0.63
+  },
+  {
+   "id": "r119",
+   "category": "water",
+   "severity": 4,
+   "created_at": "2026-10-02T15:37:27Z",
+   "lat": -33.943244,
+   "lng": 18.578281,
+   "ward_id": "CPT-019",
+   "equity_weight": 0.51
+  },
+  {
+   "id": "r120",
+   "category": "electricity",
+   "severity": 3,
+   "created_at": "2026-10-02T15:57:04Z",
+   "lat": -33.916957,
+   "lng": 18.453629,
+   "ward_id": "CPT-018",
+   "equity_weight": 0.42
+  },
+  {
+   "id": "r121",
+   "category": "water",
+   "severity": 1,
+   "created_at": "2026-10-02T16:38:24Z",
+   "lat": -33.862362,
+   "lng": 18.643389,
+   "ward_id": "CPT-012",
+   "equity_weight": 0.18
+  },
+  {
+   "id": "r122",
+   "category": "refuse",
+   "severity": 3,
+   "created_at": "2026-10-02T16:57:58Z",
+   "lat": -33.973826,
+   "lng": 18.677512,
+   "ward_id": "CPT-007",
+   "equity_weight": 0.63
+  },
+  {
+   "id": "r123",
+   "category": "water",
+   "severity": 1,
+   "created_at": "2026-10-02T17:07:10Z",
+   "lat": -34.062213,
+   "lng": 18.668486,
+   "ward_id": "CPT-001",
+   "equity_weight": 0.7823
+  },
+  {
+   "id": "r124",
+   "category": "sanitation",
+   "severity": 3,
+   "created_at": "2026-10-02T17:47:16Z",
+   "lat": -33.946111,
+   "lng": 18.571274,
+   "ward_id": "CPT-019",
+   "equity_weight": 0.51
+  },
+  {
+   "id": "r125",
+   "category": "water",
+   "severity": 1,
+   "created_at": "2026-10-02T18:17:39Z",
+   "lat": -33.923523,
+   "lng": 18.624522,
+   "ward_id": "CPT-003",
+   "equity_weight": 0.3102
+  },
+  {
+   "id": "r126",
+   "category": "water",
+   "severity": 4,
+   "created_at": "2026-10-02T18:19:01Z",
+   "lat": -33.902999,
+   "lng": 18.572005,
+   "ward_id": "CPT-013",
+   "equity_weight": 0.35
+  },
+  {
+   "id": "r127",
+   "category": "electricity",
+   "severity": 1,
+   "created_at": "2026-10-02T18:21:45Z",
+   "lat": -33.917112,
+   "lng": 18.399957,
+   "ward_id": "CPT-016",
+   "equity_weight": 0.12
+  },
+  {
+   "id": "r128",
+   "category": "electricity",
+   "severity": 3,
+   "created_at": "2026-10-02T18:34:31Z",
+   "lat": -33.961922,
+   "lng": 18.600572,
+   "ward_id": "CPT-004",
+   "equity_weight": 0.712
+  },
+  {
+   "id": "r129",
+   "category": "roads",
+   "severity": 3,
+   "created_at": "2026-10-02T18:51:57Z",
+   "lat": -33.949072,
+   "lng": 18.504361,
+   "ward_id": "CPT-009",
+   "equity_weight": 0.45
+  },
+  {
+   "id": "r130",
+   "category": "refuse",
+   "severity": 3,
+   "created_at": "2026-10-02T18:57:34Z",
+   "lat": -33.983225,
+   "lng": 18.500249,
+   "ward_id": "CPT-009",
+   "equity_weight": 0.45
+  },
+  {
+   "id": "r131",
+   "category": "refuse",
+   "severity": 3,
+   "created_at": "2026-10-02T18:58:20Z",
+   "lat": -33.978538,
+   "lng": 18.413017,
+   "ward_id": "CPT-015",
+   "equity_weight": 0.15
+  },
+  {
+   "id": "r132",
+   "category": "roads",
+   "severity": 2,
+   "created_at": "2026-10-02T19:26:28Z",
+   "lat": -34.073165,
+   "lng": 18.614097,
+   "ward_id": "CPT-002",
+   "equity_weight": 0.6541
+  },
+  {
+   "id": "r133",
+   "category": "water",
+   "severity": 3,
+   "created_at": "2026-10-02T19:46:13Z",
+   "lat": -33.962533,
+   "lng": 18.660372,
+   "ward_id": "CPT-007",
+   "equity_weight": 0.63
+  },
+  {
+   "id": "r134",
+   "category": "water",
+   "severity": 5,
+   "created_at": "2026-10-02T20:07:43Z",
+   "lat": -34.025638,
+   "lng": 18.588001,
+   "ward_id": "CPT-006",
+   "equity_weight": 0.69
+  },
+  {
+   "id": "r135",
+   "category": "electricity",
+   "severity": 5,
+   "created_at": "2026-10-02T20:30:41Z",
+   "lat": -34.008208,
+   "lng": 18.588576,
+   "ward_id": "CPT-006",
+   "equity_weight": 0.69
+  },
+  {
+   "id": "r136",
+   "category": "water",
+   "severity": 3,
+   "created_at": "2026-10-02T21:15:09Z",
+   "lat": -33.805691,
+   "lng": 18.643725,
+   "ward_id": "CPT-012",
+   "equity_weight": 0.18
+  },
+  {
+   "id": "r137",
+   "category": "roads",
+   "severity": 4,
+   "created_at": "2026-10-02T21:15:34Z",
+   "lat": -34.048302,
+   "lng": 18.615437,
+   "ward_id": "CPT-002",
+   "equity_weight": 0.6541
+  },
+  {
+   "id": "r138",
+   "category": "refuse",
+   "severity": 2,
+   "created_at": "2026-10-02T22:25:37Z",
+   "lat": -33.827277,
+   "lng": 18.738713,
+   "ward_id": "CPT-020",
+   "equity_weight": 0.54
+  },
+  {
+   "id": "r139",
+   "category": "roads",
+   "severity": 3,
+   "created_at": "2026-10-02T23:56:12Z",
+   "lat": -33.897587,
+   "lng": 18.455287,
+   "ward_id": "CPT-011",
+   "equity_weight": 0.24
+  },
+  {
+   "id": "r140",
+   "category": "electricity",
+   "severity": 1,
+   "created_at": "2026-10-03T00:29:10Z",
+   "lat": -33.967437,
+   "lng": 18.645007,
+   "ward_id": "CPT-007",
+   "equity_weight": 0.63
+  },
+  {
+   "id": "r141",
+   "category": "water",
+   "severity": 4,
+   "created_at": "2026-10-03T02:55:07Z",
+   "lat": -33.975485,
+   "lng": 18.484721,
+   "ward_id": "CPT-015",
+   "equity_weight": 0.15
+  },
+  {
+   "id": "r142",
+   "category": "electricity",
+   "severity": 5,
+   "created_at": "2026-10-03T03:28:35Z",
+   "lat": -33.896011,
+   "lng": 18.507017,
+   "ward_id": "CPT-011",
+   "equity_weight": 0.24
+  },
+  {
+   "id": "r143",
+   "category": "water",
+   "severity": 3,
+   "created_at": "2026-10-03T04:10:16Z",
+   "lat": -34.054979,
+   "lng": 18.695478,
+   "ward_id": "CPT-001",
+   "equity_weight": 0.7823
+  },
+  {
+   "id": "r144",
+   "category": "roads",
+   "severity": 3,
+   "created_at": "2026-10-03T04:44:10Z",
+   "lat": -33.926425,
+   "lng": 18.573386,
+   "ward_id": "CPT-019",
+   "equity_weight": 0.51
+  },
+  {
+   "id": "r145",
+   "category": "electricity",
+   "severity": 3,
+   "created_at": "2026-10-03T04:45:44Z",
+   "lat": -33.876159,
+   "lng": 18.594676,
+   "ward_id": "CPT-003",
+   "equity_weight": 0.3102
+  },
+  {
+   "id": "r146",
+   "category": "electricity",
+   "severity": 3,
+   "created_at": "2026-10-03T05:03:21Z",
+   "lat": -33.817011,
+   "lng": 18.643376,
+   "ward_id": "CPT-012",
+   "equity_weight": 0.18
+  },
+  {
+   "id": "r147",
+   "category": "refuse",
+   "severity": 2,
+   "created_at": "2026-10-03T05:36:46Z",
+   "lat": -34.008866,
+   "lng": 18.556015,
+   "ward_id": "CPT-010",
+   "equity_weight": 0.56
+  },
+  {
+   "id": "r148",
+   "category": "electricity",
+   "severity": 3,
+   "created_at": "2026-10-03T05:40:31Z",
+   "lat": -33.920941,
+   "lng": 18.607236,
+   "ward_id": "CPT-019",
+   "equity_weight": 0.51
+  },
+  {
+   "id": "r149",
+   "category": "water",
+   "severity": 3,
+   "created_at": "2026-10-03T05:49:07Z",
+   "lat": -34.026682,
+   "lng": 18.642385,
+   "ward_id": "CPT-001",
+   "equity_weight": 0.7823
+  },
+  {
+   "id": "r150",
+   "category": "water",
+   "severity": 2,
+   "created_at": "2026-10-03T06:12:46Z",
+   "lat": -34.001534,
+   "lng": 18.506927,
+   "ward_id": "CPT-010",
+   "equity_weight": 0.56
+  },
+  {
+   "id": "r151",
+   "category": "electricity",
+   "severity": 1,
+   "created_at": "2026-10-03T06:18:02Z",
+   "lat": -33.89616,
+   "lng": 18.622129,
+   "ward_id": "CPT-003",
+   "equity_weight": 0.3102
+  },
+  {
+   "id": "r152",
+   "category": "electricity",
+   "severity": 4,
+   "created_at": "2026-10-03T06:23:52Z",
+   "lat": -33.945556,
+   "lng": 18.571754,
+   "ward_id": "CPT-019",
+   "equity_weight": 0.51
+  },
+  {
+   "id": "r153",
+   "category": "roads",
+   "severity": 3,
+   "created_at": "2026-10-03T07:00:46Z",
+   "lat": -33.959916,
+   "lng": 18.654825,
+   "ward_id": "CPT-007",
+   "equity_weight": 0.63
+  },
+  {
+   "id": "r154",
+   "category": "roads",
+   "severity": 1,
+   "created_at": "2026-10-03T07:14:06Z",
+   "lat": -33.98465,
+   "lng": 18.597833,
+   "ward_id": "CPT-005",
+   "equity_weight": 0.745
+  },
+  {
+   "id": "r155",
+   "category": "electricity",
+   "severity": 2,
+   "created_at": "2026-10-03T07:20:20Z",
+   "lat": -33.836858,
+   "lng": 18.662105,
+   "ward_id": "CPT-012",
+   "equity_weight": 0.18
+  },
+  {
+   "id": "r156",
+   "category": "water",
+   "severity": 3,
+   "created_at": "2026-10-03T07:36:38Z",
+   "lat": -34.039549,
+   "lng": 18.637408,
+   "ward_id": "CPT-002",
+   "equity_weight": 0.6541
+  },
+  {
+   "id": "r157",
+   "category": "water",
+   "severity": 4,
+   "created_at": "2026-10-03T07:44:46Z",
+   "lat": -34.010124,
+   "lng": 18.640196,
+   "ward_id": "CPT-006",
+   "equity_weight": 0.69
+  },
+  {
+   "id": "r158",
+   "category": "electricity",
+   "severity": 3,
+   "created_at": "2026-10-03T08:02:20Z",
+   "lat": -34.02681,
+   "lng": 18.613328,
+   "ward_id": "CPT-002",
+   "equity_weight": 0.6541
+  },
+  {
+   "id": "r159",
+   "category": "roads",
+   "severity": 3,
+   "created_at": "2026-10-03T08:40:37Z",
+   "lat": -33.943143,
+   "lng": 18.497553,
+   "ward_id": "CPT-009",
+   "equity_weight": 0.45
+  },
+  {
+   "id": "r160",
+   "category": "sanitation",
+   "severity": 5,
+   "created_at": "2026-10-03T08:44:38Z",
+   "lat": -33.921889,
+   "lng": 18.559598,
+   "ward_id": "CPT-019",
+   "equity_weight": 0.51
+  },
+  {
+   "id": "r161",
+   "category": "roads",
+   "severity": 4,
+   "created_at": "2026-10-03T08:47:32Z",
+   "lat": -33.893285,
+   "lng": 18.390723,
+   "ward_id": "CPT-016",
+   "equity_weight": 0.12
+  },
+  {
+   "id": "r162",
+   "category": "electricity",
+   "severity": 3,
+   "created_at": "2026-10-03T08:49:36Z",
+   "lat": -34.047872,
+   "lng": 18.620294,
+   "ward_id": "CPT-002",
+   "equity_weight": 0.6541
+  },
+  {
+   "id": "r163",
+   "category": "roads",
+   "severity": 2,
+   "created_at": "2026-10-03T08:59:31Z",
+   "lat": -34.01288,
+   "lng": 18.615074,
+   "ward_id": "CPT-006",
+   "equity_weight": 0.69
+  },
+  {
+   "id": "r164",
+   "category": "sanitation",
+   "severity": 3,
+   "created_at": "2026-10-03T09:17:59Z",
+   "lat": -33.945344,
+   "lng": 18.497087,
+   "ward_id": "CPT-009",
+   "equity_weight": 0.45
+  },
+  {
+   "id": "r165",
+   "category": "refuse",
+   "severity": 3,
+   "created_at": "2026-10-03T09:30:56Z",
+   "lat": -33.973489,
+   "lng": 18.568076,
+   "ward_id": "CPT-004",
+   "equity_weight": 0.712
+  },
+  {
+   "id": "r166",
+   "category": "refuse",
+   "severity": 2,
+   "created_at": "2026-10-03T09:39:31Z",
+   "lat": -33.915389,
+   "lng": 18.611999,
+   "ward_id": "CPT-003",
+   "equity_weight": 0.3102
+  },
+  {
+   "id": "r167",
+   "category": "roads",
+   "severity": 3,
+   "created_at": "2026-10-03T09:51:56Z",
+   "lat": -34.000731,
+   "lng": 18.577929,
+   "ward_id": "CPT-005",
+   "equity_weight": 0.745
+  },
+  {
+   "id": "r168",
+   "category": "roads",
+   "severity": 5,
+   "created_at": "2026-10-03T10:31:23Z",
+   "lat": -33.907688,
+   "lng": 18.595058,
+   "ward_id": "CPT-019",
+   "equity_weight": 0.51
+  },
+  {
+   "id": "r169",
+   "category": "electricity",
+   "severity": 2,
+   "created_at": "2026-10-03T10:32:47Z",
+   "lat": -34.003347,
+   "lng": 18.668395,
+   "ward_id": "CPT-001",
+   "equity_weight": 0.7823
+  },
+  {
+   "id": "r170",
+   "category": "water",
+   "severity": 3,
+   "created_at": "2026-10-03T10:32:52Z",
+   "lat": -33.908647,
+   "lng": 18.506845,
+   "ward_id": "CPT-011",
+   "equity_weight": 0.24
+  },
+  {
+   "id": "r171",
+   "category": "roads",
+   "severity": 2,
+   "created_at": "2026-10-03T10:35:47Z",
+   "lat": -33.98181,
+   "lng": 18.454211,
+   "ward_id": "CPT-015",
+   "equity_weight": 0.15
+  },
+  {
+   "id": "r172",
+   "category": "refuse",
+   "severity": 3,
+   "created_at": "2026-10-03T10:49:25Z",
+   "lat": -33.85509,
+   "lng": 18.750784,
+   "ward_id": "CPT-020",
+   "equity_weight": 0.54
+  },
+  {
+   "id": "r173",
+   "category": "roads",
+   "severity": 4,
+   "created_at": "2026-10-03T11:24:19Z",
+   "lat": -33.959914,
+   "lng": 18.580914,
+   "ward_id": "CPT-004",
+   "equity_weight": 0.712
+  },
+  {
+   "id": "r174",
+   "category": "electricity",
+   "severity": 2,
+   "created_at": "2026-10-03T11:28:30Z",
+   "lat": -33.864479,
+   "lng": 18.54597,
+   "ward_id": "CPT-013",
+   "equity_weight": 0.35
+  },
+  {
+   "id": "r175",
+   "category": "sanitation",
+   "severity": 4,
+   "created_at": "2026-10-03T11:43:55Z",
+   "lat": -33.904158,
+   "lng": 18.536784,
+   "ward_id": "CPT-014",
+   "equity_weight": 0.33
+  },
+  {
+   "id": "r176",
+   "category": "electricity",
+   "severity": 4,
+   "created_at": "2026-10-03T11:53:15Z",
+   "lat": -33.940417,
+   "lng": 18.396425,
+   "ward_id": "CPT-016",
+   "equity_weight": 0.12
+  },
+  {
+   "id": "r177",
+   "category": "roads",
+   "severity": 3,
+   "created_at": "2026-10-03T11:56:45Z",
+   "lat": -33.891761,
+   "lng": 18.5285,
+   "ward_id": "CPT-014",
+   "equity_weight": 0.33
+  },
+  {
+   "id": "r178",
+   "category": "electricity",
+   "severity": 3,
+   "created_at": "2026-10-03T12:04:08Z",
+   "lat": -33.973819,
+   "lng": 18.690004,
+   "ward_id": "CPT-007",
+   "equity_weight": 0.63
+  },
+  {
+   "id": "r179",
+   "category": "electricity",
+   "severity": 4,
+   "created_at": "2026-10-03T12:11:44Z",
+   "lat": -33.978411,
+   "lng": 18.670036,
+   "ward_id": "CPT-007",
+   "equity_weight": 0.63
+  },
+  {
+   "id": "r180",
+   "category": "roads",
+   "severity": 3,
+   "created_at": "2026-10-03T12:18:33Z",
+   "lat": -33.82414,
+   "lng": 18.772629,
+   "ward_id": "CPT-020",
+   "equity_weight": 0.54
+  },
+  {
+   "id": "r181",
+   "category": "electricity",
+   "severity": 4,
+   "created_at": "2026-10-03T12:35:27Z",
+   "lat": -33.998888,
+   "lng": 18.478394,
+   "ward_id": "CPT-015",
+   "equity_weight": 0.15
+  },
+  {
+   "id": "r182",
+   "category": "water",
+   "severity": 5,
+   "created_at": "2026-10-03T12:58:33Z",
+   "lat": -33.915066,
+   "lng": 18.488006,
+   "ward_id": "CPT-011",
+   "equity_weight": 0.24
+  },
+  {
+   "id": "r183",
+   "category": "refuse",
+   "severity": 2,
+   "created_at": "2026-10-03T13:22:08Z",
+   "lat": -33.915087,
+   "lng": 18.56545,
+   "ward_id": "CPT-013",
+   "equity_weight": 0.35
+  },
+  {
+   "id": "r184",
+   "category": "water",
+   "severity": 3,
+   "created_at": "2026-10-03T13:29:01Z",
+   "lat": -33.910289,
+   "lng": 18.533813,
+   "ward_id": "CPT-014",
+   "equity_weight": 0.33
+  },
+  {
+   "id": "r185",
+   "category": "roads",
+   "severity": 3,
+   "created_at": "2026-10-03T13:39:58Z",
+   "lat": -33.891707,
+   "lng": 18.589778,
+   "ward_id": "CPT-013",
+   "equity_weight": 0.35
+  },
+  {
+   "id": "r186",
+   "category": "water",
+   "severity": 3,
+   "created_at": "2026-10-03T13:41:50Z",
+   "lat": -33.975124,
+   "lng": 18.561654,
+   "ward_id": "CPT-004",
+   "equity_weight": 0.712
+  },
+  {
+   "id": "r187",
+   "category": "refuse",
+   "severity": 4,
+   "created_at": "2026-10-03T13:45:13Z",
+   "lat": -33.915385,
+   "lng": 18.531716,
+   "ward_id": "CPT-014",
+   "equity_weight": 0.33
+  },
+  {
+   "id": "r188",
+   "category": "sanitation",
+   "severity": 3,
+   "created_at": "2026-10-03T14:10:12Z",
+   "lat": -33.946669,
+   "lng": 18.569422,
+   "ward_id": "CPT-019",
+   "equity_weight": 0.51
+  },
+  {
+   "id": "r189",
+   "category": "electricity",
+   "severity": 3,
+   "created_at": "2026-10-03T14:21:42Z",
+   "lat": -33.845259,
+   "lng": 18.620891,
+   "ward_id": "CPT-012",
+   "equity_weight": 0.18
+  },
+  {
+   "id": "r190",
+   "category": "electricity",
+   "severity": 3,
+   "created_at": "2026-10-03T14:37:30Z",
+   "lat": -34.039009,
+   "lng": 18.590671,
+   "ward_id": "CPT-002",
+   "equity_weight": 0.6541
+  },
+  {
+   "id": "r191",
+   "category": "refuse",
+   "severity": 1,
+   "created_at": "2026-10-03T14:41:01Z",
+   "lat": -33.91235,
+   "lng": 18.491118,
+   "ward_id": "CPT-011",
+   "equity_weight": 0.24
+  },
+  {
+   "id": "r192",
+   "category": "refuse",
+   "severity": 3,
+   "created_at": "2026-10-03T14:49:51Z",
+   "lat": -33.88101,
+   "lng": 18.448192,
+   "ward_id": "CPT-011",
+   "equity_weight": 0.24
+  },
+  {
+   "id": "r193",
+   "category": "roads",
+   "severity": 2,
+   "created_at": "2026-10-03T15:09:34Z",
+   "lat": -33.922151,
+   "lng": 18.486426,
+   "ward_id": "CPT-011",
+   "equity_weight": 0.24
+  },
+  {
+   "id": "r194",
+   "category": "roads",
+   "severity": 4,
+   "created_at": "2026-10-03T15:17:02Z",
+   "lat": -33.999205,
+   "lng": 18.577049,
+   "ward_id": "CPT-005",
+   "equity_weight": 0.745
+  },
+  {
+   "id": "r195",
+   "category": "water",
+   "severity": 4,
+   "created_at": "2026-10-03T15:46:02Z",
+   "lat": -33.945414,
+   "lng": 18.49527,
+   "ward_id": "CPT-009",
+   "equity_weight": 0.45
+  },
+  {
+   "id": "r196",
+   "category": "roads",
+   "severity": 2,
+   "created_at": "2026-10-03T16:03:35Z",
+   "lat": -33.850413,
+   "lng": 18.719305,
+   "ward_id": "CPT-020",
+   "equity_weight": 0.54
+  },
+  {
+   "id": "r197",
+   "category": "electricity",
+   "severity": 2,
+   "created_at": "2026-10-03T16:04:31Z",
+   "lat": -33.970883,
+   "lng": 18.585849,
+   "ward_id": "CPT-004",
+   "equity_weight": 0.712
+  },
+  {
+   "id": "r198",
+   "category": "electricity",
+   "severity": 3,
+   "created_at": "2026-10-03T16:24:07Z",
+   "lat": -34.070214,
+   "lng": 18.593011,
+   "ward_id": "CPT-002",
+   "equity_weight": 0.6541
+  },
+  {
+   "id": "r199",
+   "category": "electricity",
+   "severity": 4,
+   "created_at": "2026-10-03T16:26:10Z",
+   "lat": -33.889091,
+   "lng": 18.5531,
+   "ward_id": "CPT-013",
+   "equity_weight": 0.35
+  },
+  {
+   "id": "r200",
+   "category": "electricity",
+   "severity": 2,
+   "created_at": "2026-10-03T16:36:53Z",
+   "lat": -34.00446,
+   "lng": 18.574772,
+   "ward_id": "CPT-005",
+   "equity_weight": 0.745
+  },
+  {
+   "id": "r201",
+   "category": "refuse",
+   "severity": 2,
+   "created_at": "2026-10-03T16:45:30Z",
+   "lat": -33.833606,
+   "lng": 18.73587,
+   "ward_id": "CPT-020",
+   "equity_weight": 0.54
+  },
+  {
+   "id": "r202",
+   "category": "electricity",
+   "severity": 4,
+   "created_at": "2026-10-03T17:07:19Z",
+   "lat": -33.89627,
+   "lng": 18.488482,
+   "ward_id": "CPT-011",
+   "equity_weight": 0.24
+  },
+  {
+   "id": "r203",
+   "category": "water",
+   "severity": 3,
+   "created_at": "2026-10-03T17:09:25Z",
+   "lat": -33.896615,
+   "lng": 18.370241,
+   "ward_id": "CPT-016",
+   "equity_weight": 0.12
+  },
+  {
+   "id": "r204",
+   "category": "roads",
+   "severity": 4,
+   "created_at": "2026-10-03T17:26:22Z",
+   "lat": -33.856766,
+   "lng": 18.678854,
+   "ward_id": "CPT-012",
+   "equity_weight": 0.18
+  },
+  {
+   "id": "r205",
+   "category": "refuse",
+   "severity": 4,
+   "created_at": "2026-10-03T17:31:59Z",
+   "lat": -34.037327,
+   "lng": 18.696833,
+   "ward_id": "CPT-001",
+   "equity_weight": 0.7823
+  },
+  {
+   "id": "r206",
+   "category": "water",
+   "severity": 5,
+   "created_at": "2026-10-03T17:37:20Z",
+   "lat": -33.898952,
+   "lng": 18.491736,
+   "ward_id": "CPT-011",
+   "equity_weight": 0.24
+  },
+  {
+   "id": "r207",
+   "category": "water",
+   "severity": 1,
+   "created_at": "2026-10-03T17:54:07Z",
+   "lat": -33.857516,
+   "lng": 18.596972,
+   "ward_id": "CPT-003",
+   "equity_weight": 0.3102
+  },
+  {
+   "id": "r208",
+   "category": "electricity",
+   "severity": 5,
+   "created_at": "2026-10-03T17:54:22Z",
+   "lat": -33.970771,
+   "lng": 18.585786,
+   "ward_id": "CPT-004",
+   "equity_weight": 0.712
+  },
+  {
+   "id": "r209",
+   "category": "water",
+   "severity": 3,
+   "created_at": "2026-10-03T18:06:15Z",
+   "lat": -34.00839,
+   "lng": 18.660734,
+   "ward_id": "CPT-001",
+   "equity_weight": 0.7823
+  },
+  {
+   "id": "r210",
+   "category": "sanitation",
+   "severity": 2,
+   "created_at": "2026-10-03T18:09:40Z",
+   "lat": -33.907608,
+   "lng": 18.426764,
+   "ward_id": "CPT-017",
+   "equity_weight": 0.2
+  },
+  {
+   "id": "r211",
+   "category": "electricity",
+   "severity": 2,
+   "created_at": "2026-10-03T18:14:15Z",
+   "lat": -34.01325,
+   "lng": 18.622609,
+   "ward_id": "CPT-006",
+   "equity_weight": 0.69
+  },
+  {
+   "id": "r212",
+   "category": "roads",
+   "severity": 2,
+   "created_at": "2026-10-03T19:02:53Z",
+   "lat": -33.90372,
+   "lng": 18.556671,
+   "ward_id": "CPT-013",
+   "equity_weight": 0.35
+  },
+  {
+   "id": "r213",
+   "category": "electricity",
+   "severity": 2,
+   "created_at": "2026-10-03T19:04:31Z",
+   "lat": -34.031448,
+   "lng": 18.603609,
+   "ward_id": "CPT-002",
+   "equity_weight": 0.6541
+  },
+  {
+   "id": "r214",
+   "category": "electricity",
+   "severity": 3,
+   "created_at": "2026-10-03T19:19:56Z",
+   "lat": -34.047722,
+   "lng": 18.683038,
+   "ward_id": "CPT-001",
+   "equity_weight": 0.7823
+  },
+  {
+   "id": "r215",
+   "category": "roads",
+   "severity": 3,
+   "created_at": "2026-10-03T19:24:25Z",
+   "lat": -33.916644,
+   "lng": 18.553827,
+   "ward_id": "CPT-014",
+   "equity_weight": 0.33
+  },
+  {
+   "id": "r216",
+   "category": "refuse",
+   "severity": 4,
+   "created_at": "2026-10-03T19:58:08Z",
+   "lat": -33.885166,
+   "lng": 18.5796,
+   "ward_id": "CPT-013",
+   "equity_weight": 0.35
+  },
+  {
+   "id": "r217",
+   "category": "water",
+   "severity": 4,
+   "created_at": "2026-10-03T19:59:59Z",
+   "lat": -34.055292,
+   "lng": 18.669794,
+   "ward_id": "CPT-001",
+   "equity_weight": 0.7823
+  },
+  {
+   "id": "r218",
+   "category": "roads",
+   "severity": 3,
+   "created_at": "2026-10-03T20:17:31Z",
+   "lat": -33.900413,
+   "lng": 18.611978,
+   "ward_id": "CPT-003",
+   "equity_weight": 0.3102
+  },
+  {
+   "id": "r219",
+   "category": "electricity",
+   "severity": 5,
+   "created_at": "2026-10-03T20:44:19Z",
+   "lat": -33.915581,
+   "lng": 18.494861,
+   "ward_id": "CPT-011",
+   "equity_weight": 0.24
+  },
+  {
+   "id": "r220",
+   "category": "water",
+   "severity": 4,
+   "created_at": "2026-10-03T21:34:53Z",
+   "lat": -34.064973,
+   "lng": 18.676237,
+   "ward_id": "CPT-001",
+   "equity_weight": 0.7823
+  },
+  {
+   "id": "r221",
+   "category": "water",
+   "severity": 3,
+   "created_at": "2026-10-03T21:57:07Z",
+   "lat": -33.976,
+   "lng": 18.584648,
+   "ward_id": "CPT-004",
+   "equity_weight": 0.712
+  },
+  {
+   "id": "r222",
+   "category": "electricity",
+   "severity": 1,
+   "created_at": "2026-10-03T22:05:07Z",
+   "lat": -34.059414,
+   "lng": 18.693299,
+   "ward_id": "CPT-001",
+   "equity_weight": 0.7823
+  },
+  {
+   "id": "r223",
+   "category": "refuse",
+   "severity": 3,
+   "created_at": "2026-10-03T22:07:24Z",
+   "lat": -33.910451,
+   "lng": 18.523635,
+   "ward_id": "CPT-014",
+   "equity_weight": 0.33
+  },
+  {
+   "id": "r224",
+   "category": "water",
+   "severity": 2,
+   "created_at": "2026-10-03T22:28:30Z",
+   "lat": -33.938198,
+   "lng": 18.497639,
+   "ward_id": "CPT-009",
+   "equity_weight": 0.45
+  },
+  {
+   "id": "r225",
+   "category": "electricity",
+   "severity": 4,
+   "created_at": "2026-10-03T23:10:38Z",
+   "lat": -34.025587,
+   "lng": 18.710047,
+   "ward_id": "CPT-001",
+   "equity_weight": 0.7823
+  },
+  {
+   "id": "r226",
+   "category": "water",
+   "severity": 2,
+   "created_at": "2026-10-04T00:07:21Z",
+   "lat": -33.997435,
+   "lng": 18.629314,
+   "ward_id": "CPT-006",
+   "equity_weight": 0.69
+  },
+  {
+   "id": "r227",
+   "category": "electricity",
+   "severity": 2,
+   "created_at": "2026-10-04T03:06:45Z",
+   "lat": -33.921622,
+   "lng": 18.61419,
+   "ward_id": "CPT-003",
+   "equity_weight": 0.3102
+  },
+  {
+   "id": "r228",
+   "category": "electricity",
+   "severity": 4,
+   "created_at": "2026-10-04T05:11:41Z",
+   "lat": -33.903135,
+   "lng": 18.366903,
+   "ward_id": "CPT-016",
+   "equity_weight": 0.12
+  },
+  {
+   "id": "r229",
+   "category": "refuse",
+   "severity": 3,
+   "created_at": "2026-10-04T05:24:07Z",
+   "lat": -33.827524,
+   "lng": 18.704191,
+   "ward_id": "CPT-020",
+   "equity_weight": 0.54
+  },
+  {
+   "id": "r230",
+   "category": "roads",
+   "severity": 2,
+   "created_at": "2026-10-04T06:15:14Z",
+   "lat": -33.846166,
+   "lng": 18.616829,
+   "ward_id": "CPT-012",
+   "equity_weight": 0.18
+  },
+  {
+   "id": "r231",
+   "category": "refuse",
+   "severity": 4,
+   "created_at": "2026-10-04T06:22:25Z",
+   "lat": -33.906073,
+   "lng": 18.577007,
+   "ward_id": "CPT-019",
+   "equity_weight": 0.51
+  },
+  {
+   "id": "r232",
+   "category": "water",
+   "severity": 3,
+   "created_at": "2026-10-04T06:34:25Z",
+   "lat": -33.938611,
+   "lng": 18.59948,
+   "ward_id": "CPT-019",
+   "equity_weight": 0.51
+  },
+  {
+   "id": "r233",
+   "category": "water",
+   "severity": 2,
+   "created_at": "2026-10-04T07:20:29Z",
+   "lat": -33.991516,
+   "lng": 18.632341,
+   "ward_id": "CPT-007",
+   "equity_weight": 0.63
+  },
+  {
+   "id": "r234",
+   "category": "roads",
+   "severity": 5,
+   "created_at": "2026-10-04T07:28:11Z",
+   "lat": -33.922192,
+   "lng": 18.417074,
+   "ward_id": "CPT-017",
+   "equity_weight": 0.2
+  },
+  {
+   "id": "r235",
+   "category": "electricity",
+   "severity": 4,
+   "created_at": "2026-10-04T07:31:16Z",
+   "lat": -34.020654,
+   "lng": 18.551764,
+   "ward_id": "CPT-010",
+   "equity_weight": 0.56
+  },
+  {
+   "id": "r236",
+   "category": "water",
+   "severity": 2,
+   "created_at": "2026-10-04T07:45:31Z",
+   "lat": -33.961201,
+   "lng": 18.499165,
+   "ward_id": "CPT-009",
+   "equity_weight": 0.45
+  },
+  {
+   "id": "r237",
+   "category": "water",
+   "severity": 2,
+   "created_at": "2026-10-04T07:46:43Z",
+   "lat": -34.008064,
+   "lng": 18.519958,
+   "ward_id": "CPT-010",
+   "equity_weight": 0.56
+  },
+  {
+   "id": "r238",
+   "category": "sanitation",
+   "severity": 2,
+   "created_at": "2026-10-04T07:55:41Z",
+   "lat": -34.014786,
+   "lng": 18.654694,
+   "ward_id": "CPT-001",
+   "equity_weight": 0.7823
+  },
+  {
+   "id": "r239",
+   "category": "refuse",
+   "severity": 3,
+   "created_at": "2026-10-04T07:55:57Z",
+   "lat": -33.915746,
+   "lng": 18.428735,
+   "ward_id": "CPT-017",
+   "equity_weight": 0.2
+  },
+  {
+   "id": "r240",
+   "category": "water",
+   "severity": 2,
+   "created_at": "2026-10-04T08:04:52Z",
+   "lat": -33.976337,
+   "lng": 18.633297,
+   "ward_id": "CPT-007",
+   "equity_weight": 0.63
+  },
+  {
+   "id": "r241",
+   "category": "water",
+   "severity": 3,
+   "created_at": "2026-10-04T08:07:44Z",
+   "lat": -33.966973,
+   "lng": 18.547341,
+   "ward_id": "CPT-004",
+   "equity_weight": 0.712
+  },
+  {
+   "id": "r242",
+   "category": "water",
+   "severity": 5,
+   "created_at": "2026-10-04T08:10:01Z",
+   "lat": -33.93774,
+   "lng": 18.540677,
+   "ward_id": "CPT-008",
+   "equity_weight": 0.59
+  },
+  {
+   "id": "r243",
+   "category": "electricity",
+   "severity": 3,
+   "created_at": "2026-10-04T08:38:58Z",
+   "lat": -33.901385,
+   "lng": 18.509107,
+   "ward_id": "CPT-011",
+   "equity_weight": 0.24
+  },
+  {
+   "id": "r244",
+   "category": "water",
+   "severity": 3,
+   "created_at": "2026-10-04T08:56:49Z",
+   "lat": -33.950889,
+   "lng": 18.492766,
+   "ward_id": "CPT-009",
+   "equity_weight": 0.45
+  },
+  {
+   "id": "r245",
+   "category": "sanitation",
+   "severity": 3,
+   "created_at": "2026-10-04T09:22:32Z",
+   "lat": -33.948125,
+   "lng": 18.589053,
+   "ward_id": "CPT-019",
+   "equity_weight": 0.51
+  },
+  {
+   "id": "r246",
+   "category": "roads",
+   "severity": 4,
+   "created_at": "2026-10-04T09:30:42Z",
+   "lat": -33.864601,
+   "lng": 18.609949,
+   "ward_id": "CPT-003",
+   "equity_weight": 0.3102
+  },
+  {
+   "id": "r247",
+   "category": "water",
+   "severity": 5,
+   "created_at": "2026-10-04T09:44:27Z",
+   "lat": -33.808729,
+   "lng": 18.653704,
+   "ward_id": "CPT-012",
+   "equity_weight": 0.18
+  },
+  {
+   "id": "r248",
+   "category": "water",
+   "severity": 1,
+   "created_at": "2026-10-04T09:48:03Z",
+   "lat": -33.981408,
+   "lng": 18.495114,
+   "ward_id": "CPT-009",
+   "equity_weight": 0.45
+  },
+  {
+   "id": "r249",
+   "category": "electricity",
+   "severity": 2,
+   "created_at": "2026-10-04T10:06:01Z",
+   "lat": -33.981041,
+   "lng": 18.475465,
+   "ward_id": "CPT-015",
+   "equity_weight": 0.15
+  },
+  {
+   "id": "r250",
+   "category": "sanitation",
+   "severity": 3,
+   "created_at": "2026-10-04T10:16:20Z",
+   "lat": -33.962239,
+   "lng": 18.569488,
+   "ward_id": "CPT-004",
+   "equity_weight": 0.712
+  },
+  {
+   "id": "r251",
+   "category": "electricity",
+   "severity": 4,
+   "created_at": "2026-10-04T10:17:05Z",
+   "lat": -33.901119,
+   "lng": 18.416661,
+   "ward_id": "CPT-017",
+   "equity_weight": 0.2
+  },
+  {
+   "id": "r252",
+   "category": "refuse",
+   "severity": 3,
+   "created_at": "2026-10-04T10:20:27Z",
+   "lat": -34.016035,
+   "lng": 18.608294,
+   "ward_id": "CPT-006",
+   "equity_weight": 0.69
+  },
+  {
+   "id": "r253",
+   "category": "roads",
+   "severity": 3,
+   "created_at": "2026-10-04T10:30:58Z",
+   "lat": -33.948871,
+   "lng": 18.580814,
+   "ward_id": "CPT-019",
+   "equity_weight": 0.51
+  },
+  {
+   "id": "r254",
+   "category": "refuse",
+   "severity": 3,
+   "created_at": "2026-10-04T10:40:49Z",
+   "lat": -33.934805,
+   "lng": 18.562478,
+   "ward_id": "CPT-019",
+   "equity_weight": 0.51
+  },
+  {
+   "id": "r255",
+   "category": "sanitation",
+   "severity": 2,
+   "created_at": "2026-10-04T10:41:44Z",
+   "lat": -33.903941,
+   "lng": 18.536351,
+   "ward_id": "CPT-014",
+   "equity_weight": 0.33
+  },
+  {
+   "id": "r256",
+   "category": "refuse",
+   "severity": 3,
+   "created_at": "2026-10-04T10:47:36Z",
+   "lat": -34.023378,
+   "lng": 18.611041,
+   "ward_id": "CPT-006",
+   "equity_weight": 0.69
+  },
+  {
+   "id": "r257",
+   "category": "electricity",
+   "severity": 4,
+   "created_at": "2026-10-04T11:13:26Z",
+   "lat": -33.916821,
+   "lng": 18.337327,
+   "ward_id": "CPT-016",
+   "equity_weight": 0.12
+  },
+  {
+   "id": "r258",
+   "category": "refuse",
+   "severity": 3,
+   "created_at": "2026-10-04T11:39:28Z",
+   "lat": -33.816208,
+   "lng": 18.699521,
+   "ward_id": "CPT-020",
+   "equity_weight": 0.54
+  },
+  {
+   "id": "r259",
+   "category": "water",
+   "severity": 5,
+   "created_at": "2026-10-04T11:47:23Z",
+   "lat": -33.997447,
+   "lng": 18.515877,
+   "ward_id": "CPT-010",
+   "equity_weight": 0.56
+  },
+  {
+   "id": "r260",
+   "category": "sanitation",
+   "severity": 4,
+   "created_at": "2026-10-04T11:50:15Z",
+   "lat": -33.899321,
+   "lng": 18.517366,
+   "ward_id": "CPT-011",
+   "equity_weight": 0.24
+  },
+  {
+   "id": "r261",
+   "category": "roads",
+   "severity": 2,
+   "created_at": "2026-10-04T12:02:43Z",
+   "lat": -34.022459,
+   "lng": 18.694736,
+   "ward_id": "CPT-001",
+   "equity_weight": 0.7823
+  },
+  {
+   "id": "r262",
+   "category": "refuse",
+   "severity": 3,
+   "created_at": "2026-10-04T12:15:34Z",
+   "lat": -34.015768,
+   "lng": 18.590563,
+   "ward_id": "CPT-006",
+   "equity_weight": 0.69
+  },
+  {
+   "id": "r263",
+   "category": "roads",
+   "severity": 5,
+   "created_at": "2026-10-04T12:24:04Z",
+   "lat": -33.987487,
+   "lng": 18.547795,
+   "ward_id": "CPT-010",
+   "equity_weight": 0.56
+  },
+  {
+   "id": "r264",
+   "category": "roads",
+   "severity": 3,
+   "created_at": "2026-10-04T12:38:45Z",
+   "lat": -33.832681,
+   "lng": 18.625875,
+   "ward_id": "CPT-012",
+   "equity_weight": 0.18
+  },
+  {
+   "id": "r265",
+   "category": "water",
+   "severity": 2,
+   "created_at": "2026-10-04T12:52:50Z",
+   "lat": -33.854936,
+   "lng": 18.702043,
+   "ward_id": "CPT-020",
+   "equity_weight": 0.54
+  },
+  {
+   "id": "r266",
+   "category": "water",
+   "severity": 4,
+   "created_at": "2026-10-04T12:57:59Z",
+   "lat": -33.918555,
+   "lng": 18.561711,
+   "ward_id": "CPT-013",
+   "equity_weight": 0.35
+  },
+  {
+   "id": "r267",
+   "category": "refuse",
+   "severity": 2,
+   "created_at": "2026-10-04T13:11:53Z",
+   "lat": -33.981568,
+   "lng": 18.647908,
+   "ward_id": "CPT-007",
+   "equity_weight": 0.63
+  },
+  {
+   "id": "r268",
+   "category": "water",
+   "severity": 4,
+   "created_at": "2026-10-04T13:12:08Z",
+   "lat": -34.06831,
+   "lng": 18.626391,
+   "ward_id": "CPT-002",
+   "equity_weight": 0.6541
+  },
+  {
+   "id": "r269",
+   "category": "roads",
+   "severity": 1,
+   "created_at": "2026-10-04T13:17:36Z",
+   "lat": -33.898229,
+   "lng": 18.466588,
+   "ward_id": "CPT-011",
+   "equity_weight": 0.24
+  },
+  {
+   "id": "r270",
+   "category": "electricity",
+   "severity": 3,
+   "created_at": "2026-10-04T13:17:57Z",
+   "lat": -34.019056,
+   "lng": 18.55642,
+   "ward_id": "CPT-010",
+   "equity_weight": 0.56
+  },
+  {
+   "id": "r271",
+   "category": "water",
+   "severity": 4,
+   "created_at": "2026-10-04T13:33:04Z",
+   "lat": -33.976413,
+   "lng": 18.44284,
+   "ward_id": "CPT-015",
+   "equity_weight": 0.15
+  },
+  {
+   "id": "r272",
+   "category": "sanitation",
+   "severity": 2,
+   "created_at": "2026-10-04T13:52:57Z",
+   "lat": -33.935296,
+   "lng": 18.516728,
+   "ward_id": "CPT-008",
+   "equity_weight": 0.59
+  },
+  {
+   "id": "r273",
+   "category": "refuse",
+   "severity": 3,
+   "created_at": "2026-10-04T14:11:19Z",
+   "lat": -33.770659,
+   "lng": 18.665072,
+   "ward_id": "CPT-012",
+   "equity_weight": 0.18
+  },
+  {
+   "id": "r274",
+   "category": "water",
+   "severity": 3,
+   "created_at": "2026-10-04T14:48:31Z",
+   "lat": -33.94504,
+   "lng": 18.384137,
+   "ward_id": "CPT-016",
+   "equity_weight": 0.12
+  },
+  {
+   "id": "r275",
+   "category": "roads",
+   "severity": 2,
+   "created_at": "2026-10-04T14:58:02Z",
+   "lat": -33.892149,
+   "lng": 18.542324,
+   "ward_id": "CPT-014",
+   "equity_weight": 0.33
+  },
+  {
+   "id": "r276",
+   "category": "electricity",
+   "severity": 3,
+   "created_at": "2026-10-04T15:05:03Z",
+   "lat": -33.931261,
+   "lng": 18.586562,
+   "ward_id": "CPT-019",
+   "equity_weight": 0.51
+  },
+  {
+   "id": "r277",
+   "category": "refuse",
+   "severity": 3,
+   "created_at": "2026-10-04T15:10:58Z",
+   "lat": -33.964506,
+   "lng": 18.574357,
+   "ward_id": "CPT-004",
+   "equity_weight": 0.712
+  },
+  {
+   "id": "r278",
+   "category": "roads",
+   "severity": 2,
+   "created_at": "2026-10-04T15:12:26Z",
+   "lat": -33.929907,
+   "lng": 18.456962,
+   "ward_id": "CPT-018",
+   "equity_weight": 0.42
+  },
+  {
+   "id": "r279",
+   "category": "electricity",
+   "severity": 3,
+   "created_at": "2026-10-04T15:44:40Z",
+   "lat": -33.876382,
+   "lng": 18.436753,
+   "ward_id": "CPT-017",
+   "equity_weight": 0.2
+  },
+  {
+   "id": "r280",
+   "category": "electricity",
+   "severity": 4,
+   "created_at": "2026-10-04T16:08:09Z",
+   "lat": -33.974072,
+   "lng": 18.458491,
+   "ward_id": "CPT-015",
+   "equity_weight": 0.15
+  },
+  {
+   "id": "r281",
+   "category": "electricity",
+   "severity": 2,
+   "created_at": "2026-10-04T16:32:00Z",
+   "lat": -34.004896,
+   "lng": 18.590584,
+   "ward_id": "CPT-006",
+   "equity_weight": 0.69
+  },
+  {
+   "id": "r282",
+   "category": "refuse",
+   "severity": 4,
+   "created_at": "2026-10-04T16:32:58Z",
+   "lat": -33.830781,
+   "lng": 18.598877,
+   "ward_id": "CPT-012",
+   "equity_weight": 0.18
+  },
+  {
+   "id": "r283",
+   "category": "sanitation",
+   "severity": 3,
+   "created_at": "2026-10-04T16:36:48Z",
+   "lat": -34.032181,
+   "lng": 18.53852,
+   "ward_id": "CPT-010",
+   "equity_weight": 0.56
+  },
+  {
+   "id": "r284",
+   "category": "sanitation",
+   "severity": 4,
+   "created_at": "2026-10-04T16:52:14Z",
+   "lat": -34.053019,
+   "lng": 18.603466,
+   "ward_id": "CPT-002",
+   "equity_weight": 0.6541
+  },
+  {
+   "id": "r285",
+   "category": "roads",
+   "severity": 4,
+   "created_at": "2026-10-04T17:01:44Z",
+   "lat": -34.013154,
+   "lng": 18.553236,
+   "ward_id": "CPT-010",
+   "equity_weight": 0.56
+  },
+  {
+   "id": "r286",
+   "category": "water",
+   "severity": 4,
+   "created_at": "2026-10-04T17:26:12Z",
+   "lat": -33.956028,
+   "lng": 18.65201,
+   "ward_id": "CPT-007",
+   "equity_weight": 0.63
+  },
+  {
+   "id": "r287",
+   "category": "roads",
+   "severity": 1,
+   "created_at": "2026-10-04T17:40:45Z",
+   "lat": -33.950084,
+   "lng": 18.410446,
+   "ward_id": "CPT-017",
+   "equity_weight": 0.2
+  },
+  {
+   "id": "r288",
+   "category": "roads",
+   "severity": 2,
+   "created_at": "2026-10-04T17:51:36Z",
+   "lat": -33.85309,
+   "lng": 18.677573,
+   "ward_id": "CPT-012",
+   "equity_weight": 0.18
+  },
+  {
+   "id": "r289",
+   "category": "roads",
+   "severity": 4,
+   "created_at": "2026-10-04T18:46:04Z",
+   "lat": -33.964948,
+   "lng": 18.60543,
+   "ward_id": "CPT-007",
+   "equity_weight": 0.63
+  },
+  {
+   "id": "r290",
+   "category": "sanitation",
+   "severity": 5,
+   "created_at": "2026-10-04T18:49:22Z",
+   "lat": -33.945998,
+   "lng": 18.654595,
+   "ward_id": "CPT-007",
+   "equity_weight": 0.63
+  },
+  {
+   "id": "r291",
+   "category": "roads",
+   "severity": 3,
+   "created_at": "2026-10-04T18:56:17Z",
+   "lat": -33.972702,
+   "lng": 18.488575,
+   "ward_id": "CPT-009",
+   "equity_weight": 0.45
+  },
+  {
+   "id": "r292",
+   "category": "water",
+   "severity": 4,
+   "created_at": "2026-10-04T19:06:06Z",
+   "lat": -33.971675,
+   "lng": 18.568577,
+   "ward_id": "CPT-004",
+   "equity_weight": 0.712
+  },
+  {
+   "id": "r293",
+   "category": "roads",
+   "severity": 2,
+   "created_at": "2026-10-04T20:15:20Z",
+   "lat": -34.000677,
+   "lng": 18.601381,
+   "ward_id": "CPT-006",
+   "equity_weight": 0.69
+  },
+  {
+   "id": "r294",
+   "category": "water",
+   "severity": 2,
+   "created_at": "2026-10-04T22:24:27Z",
+   "lat": -33.940473,
+   "lng": 18.591359,
+   "ward_id": "CPT-019",
+   "equity_weight": 0.51
+  },
+  {
+   "id": "r295",
+   "category": "roads",
+   "severity": 2,
+   "created_at": "2026-10-04T23:58:21Z",
+   "lat": -34.016396,
+   "lng": 18.657323,
+   "ward_id": "CPT-001",
+   "equity_weight": 0.7823
+  },
+  {
+   "id": "r296",
+   "category": "water",
+   "severity": 3,
+   "created_at": "2026-10-05T01:23:33Z",
+   "lat": -34.02796,
+   "lng": 18.605367,
+   "ward_id": "CPT-002",
+   "equity_weight": 0.6541
+  },
+  {
+   "id": "r297",
+   "category": "sanitation",
+   "severity": 4,
+   "created_at": "2026-10-05T03:26:16Z",
+   "lat": -33.946682,
+   "lng": 18.608059,
+   "ward_id": "CPT-007",
+   "equity_weight": 0.63
+  },
+  {
+   "id": "r298",
+   "category": "water",
+   "severity": 2,
+   "created_at": "2026-10-05T04:14:48Z",
+   "lat": -33.895954,
+   "lng": 18.474116,
+   "ward_id": "CPT-011",
+   "equity_weight": 0.24
+  },
+  {
+   "id": "r299",
+   "category": "water",
+   "severity": 3,
+   "created_at": "2026-10-05T06:24:33Z",
+   "lat": -33.861707,
+   "lng": 18.754337,
+   "ward_id": "CPT-020",
+   "equity_weight": 0.54
+  },
+  {
+   "id": "r300",
+   "category": "water",
+   "severity": 3,
+   "created_at": "2026-10-05T06:29:26Z",
+   "lat": -34.055233,
+   "lng": 18.626976,
+   "ward_id": "CPT-002",
+   "equity_weight": 0.6541
+  },
+  {
+   "id": "r301",
+   "category": "roads",
+   "severity": 3,
+   "created_at": "2026-10-05T06:43:26Z",
+   "lat": -33.964046,
+   "lng": 18.444052,
+   "ward_id": "CPT-015",
+   "equity_weight": 0.15
+  },
+  {
+   "id": "r302",
+   "category": "roads",
+   "severity": 3,
+   "created_at": "2026-10-05T07:11:12Z",
+   "lat": -33.930542,
+   "lng": 18.530593,
+   "ward_id": "CPT-008",
+   "equity_weight": 0.59
+  },
+  {
+   "id": "r303",
+   "category": "sanitation",
+   "severity": 4,
+   "created_at": "2026-10-05T07:24:06Z",
+   "lat": -33.98318,
+   "lng": 18.655986,
+   "ward_id": "CPT-007",
+   "equity_weight": 0.63
+  },
+  {
+   "id": "r304",
+   "category": "electricity",
+   "severity": 4,
+   "created_at": "2026-10-05T07:24:26Z",
+   "lat": -33.964991,
+   "lng": 18.527036,
+   "ward_id": "CPT-009",
+   "equity_weight": 0.45
+  },
+  {
+   "id": "r305",
+   "category": "electricity",
+   "severity": 3,
+   "created_at": "2026-10-05T07:49:32Z",
+   "lat": -33.816292,
+   "lng": 18.718082,
+   "ward_id": "CPT-020",
+   "equity_weight": 0.54
+  },
+  {
+   "id": "r306",
+   "category": "refuse",
+   "severity": 4,
+   "created_at": "2026-10-05T08:18:47Z",
+   "lat": -33.913333,
+   "lng": 18.465183,
+   "ward_id": "CPT-018",
+   "equity_weight": 0.42
+  },
+  {
+   "id": "r307",
+   "category": "sanitation",
+   "severity": 3,
+   "created_at": "2026-10-05T08:28:58Z",
+   "lat": -33.965884,
+   "lng": 18.500516,
+   "ward_id": "CPT-009",
+   "equity_weight": 0.45
+  },
+  {
+   "id": "r308",
+   "category": "water",
+   "severity": 4,
+   "created_at": "2026-10-05T08:44:17Z",
+   "lat": -34.000112,
+   "lng": 18.596483,
+   "ward_id": "CPT-006",
+   "equity_weight": 0.69
+  },
+  {
+   "id": "r309",
+   "category": "water",
+   "severity": 2,
+   "created_at": "2026-10-05T08:50:46Z",
+   "lat": -33.913795,
+   "lng": 18.521687,
+   "ward_id": "CPT-014",
+   "equity_weight": 0.33
+  },
+  {
+   "id": "r310",
+   "category": "water",
+   "severity": 4,
+   "created_at": "2026-10-05T08:52:01Z",
+   "lat": -34.003688,
+   "lng": 18.588384,
+   "ward_id": "CPT-006",
+   "equity_weight": 0.69
+  },
+  {
+   "id": "r311",
+   "category": "electricity",
+   "severity": 4,
+   "created_at": "2026-10-05T09:15:16Z",
+   "lat": -34.060391,
+   "lng": 18.674188,
+   "ward_id": "CPT-001",
+   "equity_weight": 0.7823
+  },
+  {
+   "id": "r312",
+   "category": "water",
+   "severity": 1,
+   "created_at": "2026-10-05T09:18:51Z",
+   "lat": -34.002115,
+   "lng": 18.546763,
+   "ward_id": "CPT-010",
+   "equity_weight": 0.56
+  },
+  {
+   "id": "r313",
+   "category": "sanitation",
+   "severity": 3,
+   "created_at": "2026-10-05T09:19:15Z",
+   "lat": -34.009811,
+   "lng": 18.528163,
+   "ward_id": "CPT-010",
+   "equity_weight": 0.56
+  },
+  {
+   "id": "r314",
+   "category": "roads",
+   "severity": 2,
+   "created_at": "2026-10-05T09:21:09Z",
+   "lat": -33.979586,
+   "lng": 18.556449,
+   "ward_id": "CPT-004",
+   "equity_weight": 0.712
+  },
+  {
+   "id": "r315",
+   "category": "sanitation",
+   "severity": 3,
+   "created_at": "2026-10-05T09:47:27Z",
+   "lat": -34.046052,
+   "lng": 18.51671,
+   "ward_id": "CPT-010",
+   "equity_weight": 0.56
+  },
+  {
+   "id": "r316",
+   "category": "sanitation",
+   "severity": 3,
+   "created_at": "2026-10-05T09:55:18Z",
+   "lat": -33.913151,
+   "lng": 18.489775,
+   "ward_id": "CPT-011",
+   "equity_weight": 0.24
+  },
+  {
+   "id": "r317",
+   "category": "water",
+   "severity": 3,
+   "created_at": "2026-10-05T10:03:13Z",
+   "lat": -33.992318,
+   "lng": 18.59157,
+   "ward_id": "CPT-005",
+   "equity_weight": 0.745
+  },
+  {
+   "id": "r318",
+   "category": "water",
+   "severity": 4,
+   "created_at": "2026-10-05T10:42:39Z",
+   "lat": -33.812333,
+   "lng": 18.720217,
+   "ward_id": "CPT-020",
+   "equity_weight": 0.54
+  },
+  {
+   "id": "r319",
+   "category": "roads",
+   "severity": 3,
+   "created_at": "2026-10-05T11:07:12Z",
+   "lat": -33.972624,
+   "lng": 18.593902,
+   "ward_id": "CPT-005",
+   "equity_weight": 0.745
+  },
+  {
+   "id": "r320",
+   "category": "electricity",
+   "severity": 3,
+   "created_at": "2026-10-05T11:31:24Z",
+   "lat": -33.95324,
+   "lng": 18.473404,
+   "ward_id": "CPT-009",
+   "equity_weight": 0.45
+  },
+  {
+   "id": "r321",
+   "category": "electricity",
+   "severity": 5,
+   "created_at": "2026-10-05T11:32:27Z",
+   "lat": -33.958524,
+   "lng": 18.503126,
+   "ward_id": "CPT-009",
+   "equity_weight": 0.45
+  },
+  {
+   "id": "r322",
+   "category": "roads",
+   "severity": 2,
+   "created_at": "2026-10-05T12:24:51Z",
+   "lat": -33.990592,
+   "lng": 18.477165,
+   "ward_id": "CPT-015",
+   "equity_weight": 0.15
+  },
+  {
+   "id": "r323",
+   "category": "electricity",
+   "severity": 3,
+   "created_at": "2026-10-05T12:27:31Z",
+   "lat": -33.897772,
+   "lng": 18.487147,
+   "ward_id": "CPT-011",
+   "equity_weight": 0.24
+  },
+  {
+   "id": "r324",
+   "category": "electricity",
+   "severity": 2,
+   "created_at": "2026-10-05T12:38:27Z",
+   "lat": -33.990934,
+   "lng": 18.425425,
+   "ward_id": "CPT-015",
+   "equity_weight": 0.15
+  },
+  {
+   "id": "r325",
+   "category": "refuse",
+   "severity": 4,
+   "created_at": "2026-10-05T12:40:13Z",
+   "lat": -33.926378,
+   "lng": 18.588227,
+   "ward_id": "CPT-019",
+   "equity_weight": 0.51
+  },
+  {
+   "id": "r326",
+   "category": "sanitation",
+   "severity": 4,
+   "created_at": "2026-10-05T12:50:05Z",
+   "lat": -33.992838,
+   "lng": 18.578694,
+   "ward_id": "CPT-005",
+   "equity_weight": 0.745
+  },
+  {
+   "id": "r327",
+   "category": "roads",
+   "severity": 4,
+   "created_at": "2026-10-05T12:51:38Z",
+   "lat": -33.977605,
+   "lng": 18.602247,
+   "ward_id": "CPT-005",
+   "equity_weight": 0.745
+  },
+  {
+   "id": "r328",
+   "category": "roads",
+   "severity": 3,
+   "created_at": "2026-10-05T12:58:03Z",
+   "lat": -33.979874,
+   "lng": 18.634291,
+   "ward_id": "CPT-007",
+   "equity_weight": 0.63
+  },
+  {
+   "id": "r329",
+   "category": "refuse",
+   "severity": 2,
+   "created_at": "2026-10-05T13:10:17Z",
+   "lat": -33.990694,
+   "lng": 18.6039,
+   "ward_id": "CPT-006",
+   "equity_weight": 0.69
+  },
+  {
+   "id": "r330",
+   "category": "refuse",
+   "severity": 2,
+   "created_at": "2026-10-05T13:14:21Z",
+   "lat": -33.906375,
+   "lng": 18.429347,
+   "ward_id": "CPT-017",
+   "equity_weight": 0.2
+  },
+  {
+   "id": "r331",
+   "category": "water",
+   "severity": 4,
+   "created_at": "2026-10-05T13:20:06Z",
+   "lat": -33.938859,
+   "lng": 18.595842,
+   "ward_id": "CPT-019",
+   "equity_weight": 0.51
+  },
+  {
+   "id": "r332",
+   "category": "refuse",
+   "severity": 4,
+   "created_at": "2026-10-05T13:23:40Z",
+   "lat": -33.918478,
+   "lng": 18.583119,
+   "ward_id": "CPT-019",
+   "equity_weight": 0.51
+  },
+  {
+   "id": "r333",
+   "category": "roads",
+   "severity": 4,
+   "created_at": "2026-10-05T13:36:59Z",
+   "lat": -34.024599,
+   "lng": 18.608979,
+   "ward_id": "CPT-006",
+   "equity_weight": 0.69
+  },
+  {
+   "id": "r334",
+   "category": "refuse",
+   "severity": 3,
+   "created_at": "2026-10-05T13:46:45Z",
+   "lat": -33.846289,
+   "lng": 18.640312,
+   "ward_id": "CPT-012",
+   "equity_weight": 0.18
+  },
+  {
+   "id": "r335",
+   "category": "water",
+   "severity": 1,
+   "created_at": "2026-10-05T13:57:19Z",
+   "lat": -33.962783,
+   "lng": 18.667725,
+   "ward_id": "CPT-007",
+   "equity_weight": 0.63
+  },
+  {
+   "id": "r336",
+   "category": "electricity",
+   "severity": 2,
+   "created_at": "2026-10-05T14:44:07Z",
+   "lat": -34.074861,
+   "lng": 18.662788,
+   "ward_id": "CPT-001",
+   "equity_weight": 0.7823
+  },
+  {
+   "id": "r337",
+   "category": "refuse",
+   "severity": 3,
+   "created_at": "2026-10-05T15:05:03Z",
+   "lat": -34.041372,
+   "lng": 18.658003,
+   "ward_id": "CPT-001",
+   "equity_weight": 0.7823
+  },
+  {
+   "id": "r338",
+   "category": "water",
+   "severity": 3,
+   "created_at": "2026-10-05T15:14:05Z",
+   "lat": -34.036887,
+   "lng": 18.699557,
+   "ward_id": "CPT-001",
+   "equity_weight": 0.7823
+  },
+  {
+   "id": "r339",
+   "category": "electricity",
+   "severity": 3,
+   "created_at": "2026-10-05T15:19:59Z",
+   "lat": -33.938018,
+   "lng": 18.583866,
+   "ward_id": "CPT-019",
+   "equity_weight": 0.51
+  },
+  {
+   "id": "r340",
+   "category": "water",
+   "severity": 2,
+   "created_at": "2026-10-05T15:40:28Z",
+   "lat": -33.902689,
+   "lng": 18.369878,
+   "ward_id": "CPT-016",
+   "equity_weight": 0.12
+  },
+  {
+   "id": "r341",
+   "category": "sanitation",
+   "severity": 2,
+   "created_at": "2026-10-05T15:41:19Z",
+   "lat": -34.039429,
+   "lng": 18.681787,
+   "ward_id": "CPT-001",
+   "equity_weight": 0.7823
+  },
+  {
+   "id": "r342",
+   "category": "refuse",
+   "severity": 2,
+   "created_at": "2026-10-05T15:45:28Z",
+   "lat": -33.823113,
+   "lng": 18.730616,
+   "ward_id": "CPT-020",
+   "equity_weight": 0.54
+  },
+  {
+   "id": "r343",
+   "category": "water",
+   "severity": 4,
+   "created_at": "2026-10-05T16:01:41Z",
+   "lat": -33.935083,
+   "lng": 18.581407,
+   "ward_id": "CPT-019",
+   "equity_weight": 0.51
+  },
+  {
+   "id": "r344",
+   "category": "roads",
+   "severity": 3,
+   "created_at": "2026-10-05T16:43:43Z",
+   "lat": -34.086668,
+   "lng": 18.610536,
+   "ward_id": "CPT-002",
+   "equity_weight": 0.6541
+  },
+  {
+   "id": "r345",
+   "category": "water",
+   "severity": 4,
+   "created_at": "2026-10-05T17:12:06Z",
+   "lat": -33.926037,
+   "lng": 18.636374,
+   "ward_id": "CPT-003",
+   "equity_weight": 0.3102
+  },
+  {
+   "id": "r346",
+   "category": "water",
+   "severity": 3,
+   "created_at": "2026-10-05T17:41:55Z",
+   "lat": -33.910411,
+   "lng": 18.436842,
+   "ward_id": "CPT-017",
+   "equity_weight": 0.2
+  },
+  {
+   "id": "r347",
+   "category": "water",
+   "severity": 4,
+   "created_at": "2026-10-05T17:43:04Z",
+   "lat": -33.892207,
+   "lng": 18.526261,
+   "ward_id": "CPT-014",
+   "equity_weight": 0.33
+  },
+  {
+   "id": "r348",
+   "category": "sanitation",
+   "severity": 3,
+   "created_at": "2026-10-05T17:47:09Z",
+   "lat": -33.876655,
+   "lng": 18.339827,
+   "ward_id": "CPT-016",
+   "equity_weight": 0.12
+  },
+  {
+   "id": "r349",
+   "category": "sanitation",
+   "severity": 3,
+   "created_at": "2026-10-05T17:59:10Z",
+   "lat": -33.863347,
+   "lng": 18.733848,
+   "ward_id": "CPT-020",
+   "equity_weight": 0.54
+  },
+  {
+   "id": "r350",
+   "category": "refuse",
+   "severity": 3,
+   "created_at": "2026-10-05T18:14:05Z",
+   "lat": -33.936188,
+   "lng": 18.650915,
+   "ward_id": "CPT-007",
+   "equity_weight": 0.63
+  },
+  {
+   "id": "r351",
+   "category": "roads",
+   "severity": 2,
+   "created_at": "2026-10-05T18:18:16Z",
+   "lat": -33.983772,
+   "lng": 18.579116,
+   "ward_id": "CPT-004",
+   "equity_weight": 0.712
+  },
+  {
+   "id": "r352",
+   "category": "water",
+   "severity": 2,
+   "created_at": "2026-10-05T18:19:02Z",
+   "lat": -33.911762,
+   "lng": 18.511197,
+   "ward_id": "CPT-011",
+   "equity_weight": 0.24
+  },
+  {
+   "id": "r353",
+   "category": "refuse",
+   "severity": 3,
+   "created_at": "2026-10-05T18:26:15Z",
+   "lat": -33.988379,
+   "lng": 18.563166,
+   "ward_id": "CPT-004",
+   "equity_weight": 0.712
+  },
+  {
+   "id": "r354",
+   "category": "water",
+   "severity": 3,
+   "created_at": "2026-10-05T18:55:40Z",
+   "lat": -33.915543,
+   "lng": 18.58969,
+   "ward_id": "CPT-019",
+   "equity_weight": 0.51
+  },
+  {
+   "id": "r355",
+   "category": "electricity",
+   "severity": 3,
+   "created_at": "2026-10-05T19:10:54Z",
+   "lat": -33.904744,
+   "lng": 18.53829,
+   "ward_id": "CPT-014",
+   "equity_weight": 0.33
+  },
+  {
+   "id": "r356",
+   "category": "water",
+   "severity": 5,
+   "created_at": "2026-10-05T20:12:37Z",
+   "lat": -34.02442,
+   "lng": 18.571107,
+   "ward_id": "CPT-010",
+   "equity_weight": 0.56
+  },
+  {
+   "id": "r357",
+   "category": "electricity",
+   "severity": 3,
+   "created_at": "2026-10-05T20:34:51Z",
+   "lat": -34.031548,
+   "lng": 18.680351,
+   "ward_id": "CPT-001",
+   "equity_weight": 0.7823
+  },
+  {
+   "id": "r358",
+   "category": "electricity",
+   "severity": 3,
+   "created_at": "2026-10-05T20:48:24Z",
+   "lat": -33.940495,
+   "lng": 18.663745,
+   "ward_id": "CPT-007",
+   "equity_weight": 0.63
+  },
+  {
+   "id": "r359",
+   "category": "roads",
+   "severity": 3,
+   "created_at": "2026-10-05T21:59:16Z",
+   "lat": -33.987464,
+   "lng": 18.54884,
+   "ward_id": "CPT-010",
+   "equity_weight": 0.56
+  },
+  {
+   "id": "r360",
+   "category": "sanitation",
+   "severity": 1,
+   "created_at": "2026-10-05T23:11:32Z",
+   "lat": -33.97588,
+   "lng": 18.568011,
+   "ward_id": "CPT-004",
+   "equity_weight": 0.712
+  },
+  {
+   "id": "r361",
+   "category": "roads",
+   "severity": 2,
+   "created_at": "2026-10-05T23:46:04Z",
+   "lat": -33.947913,
+   "lng": 18.666356,
+   "ward_id": "CPT-007",
+   "equity_weight": 0.63
+  },
+  {
+   "id": "r362",
+   "category": "electricity",
+   "severity": 5,
+   "created_at": "2026-10-06T00:24:59Z",
+   "lat": -33.958677,
+   "lng": 18.561112,
+   "ward_id": "CPT-004",
+   "equity_weight": 0.712
+  },
+  {
+   "id": "r363",
+   "category": "roads",
+   "severity": 1,
+   "created_at": "2026-10-06T03:03:11Z",
+   "lat": -33.999306,
+   "lng": 18.569757,
+   "ward_id": "CPT-005",
+   "equity_weight": 0.745
+  },
+  {
+   "id": "r364",
+   "category": "roads",
+   "severity": 5,
+   "created_at": "2026-10-06T06:02:14Z",
+   "lat": -33.905991,
+   "lng": 18.460444,
+   "ward_id": "CPT-011",
+   "equity_weight": 0.24
+  },
+  {
+   "id": "r365",
+   "category": "refuse",
+   "severity": 3,
+   "created_at": "2026-10-06T06:24:00Z",
+   "lat": -33.917956,
+   "lng": 18.535097,
+   "ward_id": "CPT-014",
+   "equity_weight": 0.33
+  },
+  {
+   "id": "r366",
+   "category": "sanitation",
+   "severity": 2,
+   "created_at": "2026-10-06T06:51:10Z",
+   "lat": -33.997055,
+   "lng": 18.425276,
+   "ward_id": "CPT-015",
+   "equity_weight": 0.15
+  },
+  {
+   "id": "r367",
+   "category": "electricity",
+   "severity": 2,
+   "created_at": "2026-10-06T07:20:11Z",
+   "lat": -33.843699,
+   "lng": 18.666951,
+   "ward_id": "CPT-012",
+   "equity_weight": 0.18
+  },
+  {
+   "id": "r368",
+   "category": "refuse",
+   "severity": 4,
+   "created_at": "2026-10-06T07:20:18Z",
+   "lat": -33.88712,
+   "lng": 18.596637,
+   "ward_id": "CPT-003",
+   "equity_weight": 0.3102
+  },
+  {
+   "id": "r369",
+   "category": "water",
+   "severity": 1,
+   "created_at": "2026-10-06T07:24:54Z",
+   "lat": -33.920908,
+   "lng": 18.643179,
+   "ward_id": "CPT-003",
+   "equity_weight": 0.3102
+  },
+  {
+   "id": "r370",
+   "category": "refuse",
+   "severity": 5,
+   "created_at": "2026-10-06T07:55:30Z",
+   "lat": -33.958224,
+   "lng": 18.664143,
+   "ward_id": "CPT-007",
+   "equity_weight": 0.63
+  },
+  {
+   "id": "r371",
+   "category": "water",
+   "severity": 3,
+   "created_at": "2026-10-06T08:00:21Z",
+   "lat": -33.8681,
+   "lng": 18.739243,
+   "ward_id": "CPT-020",
+   "equity_weight": 0.54
+  },
+  {
+   "id": "r372",
+   "category": "electricity",
+   "severity": 3,
+   "created_at": "2026-10-06T08:03:22Z",
+   "lat": -33.940069,
+   "lng": 18.455715,
+   "ward_id": "CPT-018",
+   "equity_weight": 0.42
+  },
+  {
+   "id": "r373",
+   "category": "electricity",
+   "severity": 3,
+   "created_at": "2026-10-06T08:17:47Z",
+   "lat": -33.922297,
+   "lng": 18.432425,
+   "ward_id": "CPT-017",
+   "equity_weight": 0.2
+  },
+  {
+   "id": "r374",
+   "category": "water",
+   "severity": 3,
+   "created_at": "2026-10-06T08:31:26Z",
+   "lat": -34.060446,
+   "lng": 18.632654,
+   "ward_id": "CPT-002",
+   "equity_weight": 0.6541
+  },
+  {
+   "id": "r375",
+   "category": "roads",
+   "severity": 4,
+   "created_at": "2026-10-06T08:47:30Z",
+   "lat": -33.93081,
+   "lng": 18.463378,
+   "ward_id": "CPT-018",
+   "equity_weight": 0.42
+  },
+  {
+   "id": "r376",
+   "category": "electricity",
+   "severity": 3,
+   "created_at": "2026-10-06T09:09:30Z",
+   "lat": -33.971092,
+   "lng": 18.640481,
+   "ward_id": "CPT-007",
+   "equity_weight": 0.63
+  },
+  {
+   "id": "r377",
+   "category": "refuse",
+   "severity": 3,
+   "created_at": "2026-10-06T09:25:20Z",
+   "lat": -34.000909,
+   "lng": 18.540363,
+   "ward_id": "CPT-010",
+   "equity_weight": 0.56
+  },
+  {
+   "id": "r378",
+   "category": "water",
+   "severity": 4,
+   "created_at": "2026-10-06T09:37:18Z",
+   "lat": -34.023872,
+   "lng": 18.648435,
+   "ward_id": "CPT-001",
+   "equity_weight": 0.7823
+  },
+  {
+   "id": "r379",
+   "category": "refuse",
+   "severity": 2,
+   "created_at": "2026-10-06T09:46:09Z",
+   "lat": -33.956189,
+   "lng": 18.580284,
+   "ward_id": "CPT-004",
+   "equity_weight": 0.712
+  },
+  {
+   "id": "r380",
+   "category": "electricity",
+   "severity": 4,
+   "created_at": "2026-10-06T10:00:18Z",
+   "lat": -33.864519,
+   "lng": 18.488344,
+   "ward_id": "CPT-011",
+   "equity_weight": 0.24
+  },
+  {
+   "id": "r381",
+   "category": "refuse",
+   "severity": 3,
+   "created_at": "2026-10-06T10:07:42Z",
+   "lat": -34.0058,
+   "lng": 18.615577,
+   "ward_id": "CPT-006",
+   "equity_weight": 0.69
+  },
+  {
+   "id": "r382",
+   "category": "water",
+   "severity": 3,
+   "created_at": "2026-10-06T10:27:16Z",
+   "lat": -33.925994,
+   "lng": 18.470801,
+   "ward_id": "CPT-018",
+   "equity_weight": 0.42
+  },
+  {
+   "id": "r383",
+   "category": "roads",
+   "severity": 3,
+   "created_at": "2026-10-06T10:36:28Z",
+   "lat": -34.052097,
+   "lng": 18.658886,
+   "ward_id": "CPT-001",
+   "equity_weight": 0.7823
+  },
+  {
+   "id": "r384",
+   "category": "roads",
+   "severity": 1,
+   "created_at": "2026-10-06T11:05:33Z",
+   "lat": -33.913165,
+   "lng": 18.593883,
+   "ward_id": "CPT-019",
+   "equity_weight": 0.51
+  },
+  {
+   "id": "r385",
+   "category": "water",
+   "severity": 3,
+   "created_at": "2026-10-06T11:09:37Z",
+   "lat": -34.001271,
+   "lng": 18.584333,
+   "ward_id": "CPT-005",
+   "equity_weight": 0.745
+  },
+  {
+   "id": "r386",
+   "category": "water",
+   "severity": 3,
+   "created_at": "2026-10-06T11:12:02Z",
+   "lat": -33.832526,
+   "lng": 18.692328,
+   "ward_id": "CPT-020",
+   "equity_weight": 0.54
+  },
+  {
+   "id": "r387",
+   "category": "refuse",
+   "severity": 4,
+   "created_at": "2026-10-06T11:27:00Z",
+   "lat": -33.90757,
+   "lng": 18.380401,
+   "ward_id": "CPT-016",
+   "equity_weight": 0.12
+  },
+  {
+   "id": "r388",
+   "category": "water",
+   "severity": 1,
+   "created_at": "2026-10-06T11:42:50Z",
+   "lat": -33.969491,
+   "lng": 18.491528,
+   "ward_id": "CPT-009",
+   "equity_weight": 0.45
+  },
+  {
+   "id": "r389",
+   "category": "water",
+   "severity": 4,
+   "created_at": "2026-10-06T12:05:15Z",
+   "lat": -33.94142,
+   "lng": 18.480638,
+   "ward_id": "CPT-009",
+   "equity_weight": 0.45
+  },
+  {
+   "id": "r390",
+   "category": "roads",
+   "severity": 4,
+   "created_at": "2026-10-06T12:18:20Z",
+   "lat": -33.997488,
+   "lng": 18.642567,
+   "ward_id": "CPT-007",
+   "equity_weight": 0.63
+  },
+  {
+   "id": "r391",
+   "category": "refuse",
+   "severity": 2,
+   "created_at": "2026-10-06T12:19:06Z",
+   "lat": -33.847348,
+   "lng": 18.715188,
+   "ward_id": "CPT-020",
+   "equity_weight": 0.54
+  },
+  {
+   "id": "r392",
+   "category": "roads",
+   "severity": 3,
+   "created_at": "2026-10-06T12:38:29Z",
+   "lat": -33.83085,
+   "lng": 18.607126,
+   "ward_id": "CPT-012",
+   "equity_weight": 0.18
+  },
+  {
+   "id": "r393",
+   "category": "roads",
+   "severity": 2,
+   "created_at": "2026-10-06T12:45:17Z",
+   "lat": -33.895828,
+   "lng": 18.373977,
+   "ward_id": "CPT-016",
+   "equity_weight": 0.12
+  },
+  {
+   "id": "r394",
+   "category": "electricity",
+   "severity": 2,
+   "created_at": "2026-10-06T12:47:55Z",
+   "lat": -33.885018,
+   "lng": 18.54179,
+   "ward_id": "CPT-014",
+   "equity_weight": 0.33
+  },
+  {
+   "id": "r395",
+   "category": "electricity",
+   "severity": 1,
+   "created_at": "2026-10-06T13:05:33Z",
+   "lat": -34.090008,
+   "lng": 18.647713,
+   "ward_id": "CPT-002",
+   "equity_weight": 0.6541
+  },
+  {
+   "id": "r396",
+   "category": "electricity",
+   "severity": 3,
+   "created_at": "2026-10-06T13:13:28Z",
+   "lat": -33.999225,
+   "lng": 18.617229,
+   "ward_id": "CPT-006",
+   "equity_weight": 0.69
+  },
+  {
+   "id": "r397",
+   "category": "refuse",
+   "severity": 3,
+   "created_at": "2026-10-06T13:13:40Z",
+   "lat": -33.939702,
+   "lng": 18.549974,
+   "ward_id": "CPT-008",
+   "equity_weight": 0.59
+  },
+  {
+   "id": "r398",
+   "category": "electricity",
+   "severity": 2,
+   "created_at": "2026-10-06T13:32:55Z",
+   "lat": -33.930583,
+   "lng": 18.575473,
+   "ward_id": "CPT-019",
+   "equity_weight": 0.51
+  },
+  {
+   "id": "r399",
+   "category": "electricity",
+   "severity": 3,
+   "created_at": "2026-10-06T13:46:06Z",
+   "lat": -33.971614,
+   "lng": 18.592696,
+   "ward_id": "CPT-004",
+   "equity_weight": 0.712
+  },
+  {
+   "id": "r400",
+   "category": "electricity",
+   "severity": 1,
+   "created_at": "2026-10-06T13:59:51Z",
+   "lat": -34.060897,
+   "lng": 18.533117,
+   "ward_id": "CPT-010",
+   "equity_weight": 0.56
+  },
+  {
+   "id": "r401",
+   "category": "water",
+   "severity": 3,
+   "created_at": "2026-10-06T14:21:11Z",
+   "lat": -33.964279,
+   "lng": 18.606031,
+   "ward_id": "CPT-007",
+   "equity_weight": 0.63
+  },
+  {
+   "id": "r402",
+   "category": "refuse",
+   "severity": 2,
+   "created_at": "2026-10-06T14:49:47Z",
+   "lat": -33.964144,
+   "lng": 18.542596,
+   "ward_id": "CPT-008",
+   "equity_weight": 0.59
+  },
+  {
+   "id": "r403",
+   "category": "water",
+   "severity": 3,
+   "created_at": "2026-10-06T14:59:42Z",
+   "lat": -34.01997,
+   "lng": 18.696494,
+   "ward_id": "CPT-001",
+   "equity_weight": 0.7823
+  },
+  {
+   "id": "r404",
+   "category": "electricity",
+   "severity": 4,
+   "created_at": "2026-10-06T15:01:20Z",
+   "lat": -33.833852,
+   "lng": 18.717293,
+   "ward_id": "CPT-020",
+   "equity_weight": 0.54
+  },
+  {
+   "id": "r405",
+   "category": "sanitation",
+   "severity": 3,
+   "created_at": "2026-10-06T15:26:35Z",
+   "lat": -34.024449,
+   "lng": 18.508208,
+   "ward_id": "CPT-010",
+   "equity_weight": 0.56
+  },
+  {
+   "id": "r406",
+   "category": "refuse",
+   "severity": 2,
+   "created_at": "2026-10-06T15:59:21Z",
+   "lat": -33.901184,
+   "lng": 18.559165,
+   "ward_id": "CPT-013",
+   "equity_weight": 0.35
+  },
+  {
+   "id": "r407",
+   "category": "roads",
+   "severity": 3,
+   "created_at": "2026-10-06T15:59:32Z",
+   "lat": -33.862767,
+   "lng": 18.760796,
+   "ward_id": "CPT-020",
+   "equity_weight": 0.54
+  },
+  {
+   "id": "r408",
+   "category": "electricity",
+   "severity": 4,
+   "created_at": "2026-10-06T16:17:32Z",
+   "lat": -33.895815,
+   "lng": 18.521189,
+   "ward_id": "CPT-014",
+   "equity_weight": 0.33
+  },
+  {
+   "id": "r409",
+   "category": "sanitation",
+   "severity": 3,
+   "created_at": "2026-10-06T16:33:24Z",
+   "lat": -34.046263,
+   "lng": 18.676139,
+   "ward_id": "CPT-001",
+   "equity_weight": 0.7823
+  },
+  {
+   "id": "r410",
+   "category": "refuse",
+   "severity": 4,
+   "created_at": "2026-10-06T16:54:27Z",
+   "lat": -33.922619,
+   "lng": 18.629999,
+   "ward_id": "CPT-003",
+   "equity_weight": 0.3102
+  },
+  {
+   "id": "r411",
+   "category": "sanitation",
+   "severity": 1,
+   "created_at": "2026-10-06T17:05:45Z",
+   "lat": -34.044252,
+   "lng": 18.609187,
+   "ward_id": "CPT-002",
+   "equity_weight": 0.6541
+  },
+  {
+   "id": "r412",
+   "category": "electricity",
+   "severity": 4,
+   "created_at": "2026-10-06T17:10:10Z",
+   "lat": -33.983583,
+   "lng": 18.515852,
+   "ward_id": "CPT-009",
+   "equity_weight": 0.45
+  },
+  {
+   "id": "r413",
+   "category": "roads",
+   "severity": 4,
+   "created_at": "2026-10-06T17:14:25Z",
+   "lat": -33.844426,
+   "lng": 18.74243,
+   "ward_id": "CPT-020",
+   "equity_weight": 0.54
+  },
+  {
+   "id": "r414",
+   "category": "water",
+   "severity": 2,
+   "created_at": "2026-10-06T17:31:35Z",
+   "lat": -34.057263,
+   "lng": 18.637111,
+   "ward_id": "CPT-002",
+   "equity_weight": 0.6541
+  },
+  {
+   "id": "r415",
+   "category": "electricity",
+   "severity": 4,
+   "created_at": "2026-10-06T17:59:43Z",
+   "lat": -33.916587,
+   "lng": 18.594935,
+   "ward_id": "CPT-019",
+   "equity_weight": 0.51
+  },
+  {
+   "id": "r416",
+   "category": "electricity",
+   "severity": 3,
+   "created_at": "2026-10-06T18:01:48Z",
+   "lat": -33.890197,
+   "lng": 18.546352,
+   "ward_id": "CPT-014",
+   "equity_weight": 0.33
+  },
+  {
+   "id": "r417",
+   "category": "refuse",
+   "severity": 3,
+   "created_at": "2026-10-06T18:04:01Z",
+   "lat": -33.991673,
+   "lng": 18.618159,
+   "ward_id": "CPT-006",
+   "equity_weight": 0.69
+  },
+  {
+   "id": "r418",
+   "category": "electricity",
+   "severity": 2,
+   "created_at": "2026-10-06T18:09:00Z",
+   "lat": -33.925046,
+   "lng": 18.512668,
+   "ward_id": "CPT-008",
+   "equity_weight": 0.59
+  },
+  {
+   "id": "r419",
+   "category": "electricity",
+   "severity": 3,
+   "created_at": "2026-10-06T18:11:18Z",
+   "lat": -33.974819,
+   "lng": 18.658041,
+   "ward_id": "CPT-007",
+   "equity_weight": 0.63
+  },
+  {
+   "id": "r420",
+   "category": "refuse",
+   "severity": 3,
+   "created_at": "2026-10-06T18:17:48Z",
+   "lat": -34.003328,
+   "lng": 18.613191,
+   "ward_id": "CPT-006",
+   "equity_weight": 0.69
+  },
+  {
+   "id": "r421",
+   "category": "sanitation",
+   "severity": 4,
+   "created_at": "2026-10-06T18:40:11Z",
+   "lat": -34.010535,
+   "lng": 18.501085,
+   "ward_id": "CPT-015",
+   "equity_weight": 0.15
+  },
+  {
+   "id": "r422",
+   "category": "water",
+   "severity": 4,
+   "created_at": "2026-10-06T19:44:23Z",
+   "lat": -34.011811,
+   "lng": 18.572301,
+   "ward_id": "CPT-010",
+   "equity_weight": 0.56
+  },
+  {
+   "id": "r423",
+   "category": "roads",
+   "severity": 2,
+   "created_at": "2026-10-06T19:44:51Z",
+   "lat": -33.968835,
+   "lng": 18.567407,
+   "ward_id": "CPT-004",
+   "equity_weight": 0.712
+  },
+  {
+   "id": "r424",
+   "category": "roads",
+   "severity": 4,
+   "created_at": "2026-10-06T19:45:56Z",
+   "lat": -34.027603,
+   "lng": 18.634419,
+   "ward_id": "CPT-002",
+   "equity_weight": 0.6541
+  },
+  {
+   "id": "r425",
+   "category": "roads",
+   "severity": 3,
+   "created_at": "2026-10-06T20:12:42Z",
+   "lat": -34.014515,
+   "lng": 18.581628,
+   "ward_id": "CPT-006",
+   "equity_weight": 0.69
+  },
+  {
+   "id": "r426",
+   "category": "refuse",
+   "severity": 3,
+   "created_at": "2026-10-06T20:20:31Z",
+   "lat": -33.924115,
+   "lng": 18.445085,
+   "ward_id": "CPT-018",
+   "equity_weight": 0.42
+  },
+  {
+   "id": "r427",
+   "category": "sanitation",
+   "severity": 4,
+   "created_at": "2026-10-06T20:26:42Z",
+   "lat": -34.02266,
+   "lng": 18.696303,
+   "ward_id": "CPT-001",
+   "equity_weight": 0.7823
+  },
+  {
+   "id": "r428",
+   "category": "refuse",
+   "severity": 1,
+   "created_at": "2026-10-06T20:54:09Z",
+   "lat": -33.917661,
+   "lng": 18.539554,
+   "ward_id": "CPT-014",
+   "equity_weight": 0.33
+  },
+  {
+   "id": "r429",
+   "category": "refuse",
+   "severity": 4,
+   "created_at": "2026-10-06T21:24:56Z",
+   "lat": -33.998206,
+   "lng": 18.617561,
+   "ward_id": "CPT-006",
+   "equity_weight": 0.69
+  },
+  {
+   "id": "r430",
+   "category": "water",
+   "severity": 3,
+   "created_at": "2026-10-06T21:52:54Z",
+   "lat": -33.897436,
+   "lng": 18.423731,
+   "ward_id": "CPT-017",
+   "equity_weight": 0.2
+  },
+  {
+   "id": "r431",
+   "category": "electricity",
+   "severity": 3,
+   "created_at": "2026-10-06T22:25:51Z",
+   "lat": -34.00351,
+   "lng": 18.467343,
+   "ward_id": "CPT-015",
+   "equity_weight": 0.15
+  },
+  {
+   "id": "r432",
+   "category": "water",
+   "severity": 4,
+   "created_at": "2026-10-06T23:30:48Z",
+   "lat": -34.02891,
+   "lng": 18.577994,
+   "ward_id": "CPT-006",
+   "equity_weight": 0.69
+  },
+  {
+   "id": "r433",
+   "category": "refuse",
+   "severity": 3,
+   "created_at": "2026-10-06T23:59:16Z",
+   "lat": -33.912197,
+   "lng": 18.403841,
+   "ward_id": "CPT-016",
+   "equity_weight": 0.12
+  },
+  {
+   "id": "r434",
+   "category": "refuse",
+   "severity": 2,
+   "created_at": "2026-10-07T02:51:12Z",
+   "lat": -33.970948,
+   "lng": 18.552876,
+   "ward_id": "CPT-004",
+   "equity_weight": 0.712
+  },
+  {
+   "id": "r435",
+   "category": "electricity",
+   "severity": 3,
+   "created_at": "2026-10-07T04:36:09Z",
+   "lat": -33.970619,
+   "lng": 18.579882,
+   "ward_id": "CPT-004",
+   "equity_weight": 0.712
+  },
+  {
+   "id": "r436",
+   "category": "roads",
+   "severity": 3,
+   "created_at": "2026-10-07T04:38:24Z",
+   "lat": -33.970942,
+   "lng": 18.442367,
+   "ward_id": "CPT-015",
+   "equity_weight": 0.15
+  },
+  {
+   "id": "r437",
+   "category": "electricity",
+   "severity": 4,
+   "created_at": "2026-10-07T05:05:45Z",
+   "lat": -34.053494,
+   "lng": 18.656781,
+   "ward_id": "CPT-001",
+   "equity_weight": 0.7823
+  },
+  {
+   "id": "r438",
+   "category": "roads",
+   "severity": 2,
+   "created_at": "2026-10-07T06:05:25Z",
+   "lat": -33.982401,
+   "lng": 18.563575,
+   "ward_id": "CPT-004",
+   "equity_weight": 0.712
+  },
+  {
+   "id": "r439",
+   "category": "refuse",
+   "severity": 4,
+   "created_at": "2026-10-07T06:12:41Z",
+   "lat": -34.002744,
+   "lng": 18.534936,
+   "ward_id": "CPT-010",
+   "equity_weight": 0.56
+  },
+  {
+   "id": "r440",
+   "category": "electricity",
+   "severity": 3,
+   "created_at": "2026-10-07T06:28:50Z",
+   "lat": -33.941707,
+   "lng": 18.517752,
+   "ward_id": "CPT-008",
+   "equity_weight": 0.59
+  },
+  {
+   "id": "r441",
+   "category": "electricity",
+   "severity": 4,
+   "created_at": "2026-10-07T06:34:14Z",
+   "lat": -33.972022,
+   "lng": 18.500196,
+   "ward_id": "CPT-009",
+   "equity_weight": 0.45
+  },
+  {
+   "id": "r442",
+   "category": "roads",
+   "severity": 3,
+   "created_at": "2026-10-07T06:42:48Z",
+   "lat": -34.032332,
+   "lng": 18.646189,
+   "ward_id": "CPT-001",
+   "equity_weight": 0.7823
+  },
+  {
+   "id": "r443",
+   "category": "sanitation",
+   "severity": 3,
+   "created_at": "2026-10-07T06:56:36Z",
+   "lat": -33.913544,
+   "lng": 18.375864,
+   "ward_id": "CPT-016",
+   "equity_weight": 0.12
+  },
+  {
+   "id": "r444",
+   "category": "electricity",
+   "severity": 3,
+   "created_at": "2026-10-07T07:04:08Z",
+   "lat": -33.991441,
+   "lng": 18.573185,
+   "ward_id": "CPT-005",
+   "equity_weight": 0.745
+  },
+  {
+   "id": "r445",
+   "category": "water",
+   "severity": 4,
+   "created_at": "2026-10-07T07:20:32Z",
+   "lat": -34.001007,
+   "lng": 18.561826,
+   "ward_id": "CPT-010",
+   "equity_weight": 0.56
+  },
+  {
+   "id": "r446",
+   "category": "water",
+   "severity": 1,
+   "created_at": "2026-10-07T07:27:10Z",
+   "lat": -33.93198,
+   "lng": 18.423686,
+   "ward_id": "CPT-017",
+   "equity_weight": 0.2
+  },
+  {
+   "id": "r447",
+   "category": "water",
+   "severity": 2,
+   "created_at": "2026-10-07T07:32:38Z",
+   "lat": -34.047956,
+   "lng": 18.658553,
+   "ward_id": "CPT-001",
+   "equity_weight": 0.7823
+  },
+  {
+   "id": "r448",
+   "category": "refuse",
+   "severity": 3,
+   "created_at": "2026-10-07T07:34:39Z",
+   "lat": -33.871717,
+   "lng": 18.523823,
+   "ward_id": "CPT-014",
+   "equity_weight": 0.33
+  },
+  {
+   "id": "r449",
+   "category": "electricity",
+   "severity": 4,
+   "created_at": "2026-10-07T08:09:25Z",
+   "lat": -33.86659,
+   "lng": 18.71686,
+   "ward_id": "CPT-020",
+   "equity_weight": 0.54
+  },
+  {
+   "id": "r450",
+   "category": "roads",
+   "severity": 3,
+   "created_at": "2026-10-07T08:15:20Z",
+   "lat": -33.979562,
+   "lng": 18.504136,
+   "ward_id": "CPT-009",
+   "equity_weight": 0.45
+  },
+  {
+   "id": "r451",
+   "category": "electricity",
+   "severity": 3,
+   "created_at": "2026-10-07T08:25:30Z",
+   "lat": -33.956462,
+   "lng": 18.615453,
+   "ward_id": "CPT-007",
+   "equity_weight": 0.63
+  },
+  {
+   "id": "r452",
+   "category": "sanitation",
+   "severity": 3,
+   "created_at": "2026-10-07T08:38:10Z",
+   "lat": -34.043969,
+   "lng": 18.68088,
+   "ward_id": "CPT-001",
+   "equity_weight": 0.7823
+  },
+  {
+   "id": "r453",
+   "category": "water",
+   "severity": 3,
+   "created_at": "2026-10-07T09:06:26Z",
+   "lat": -33.871393,
+   "lng": 18.703036,
+   "ward_id": "CPT-020",
+   "equity_weight": 0.54
+  },
+  {
+   "id": "r454",
+   "category": "roads",
+   "severity": 4,
+   "created_at": "2026-10-07T09:06:44Z",
+   "lat": -33.925937,
+   "lng": 18.520219,
+   "ward_id": "CPT-008",
+   "equity_weight": 0.59
+  },
+  {
+   "id": "r455",
+   "category": "electricity",
+   "severity": 1,
+   "created_at": "2026-10-07T09:24:36Z",
+   "lat": -34.085712,
+   "lng": 18.594979,
+   "ward_id": "CPT-002",
+   "equity_weight": 0.6541
+  },
+  {
+   "id": "r456",
+   "category": "refuse",
+   "severity": 1,
+   "created_at": "2026-10-07T09:36:51Z",
+   "lat": -33.918147,
+   "lng": 18.620634,
+   "ward_id": "CPT-003",
+   "equity_weight": 0.3102
+  },
+  {
+   "id": "r457",
+   "category": "electricity",
+   "severity": 4,
+   "created_at": "2026-10-07T09:46:54Z",
+   "lat": -33.994253,
+   "lng": 18.581925,
+   "ward_id": "CPT-005",
+   "equity_weight": 0.745
+  },
+  {
+   "id": "r458",
+   "category": "roads",
+   "severity": 3,
+   "created_at": "2026-10-07T09:55:09Z",
+   "lat": -33.907384,
+   "lng": 18.384147,
+   "ward_id": "CPT-016",
+   "equity_weight": 0.12
+  },
+  {
+   "id": "r459",
+   "category": "sanitation",
+   "severity": 4,
+   "created_at": "2026-10-07T10:13:40Z",
+   "lat": -34.005861,
+   "lng": 18.549517,
+   "ward_id": "CPT-010",
+   "equity_weight": 0.56
+  },
+  {
+   "id": "r460",
+   "category": "refuse",
+   "severity": 2,
+   "created_at": "2026-10-07T11:05:26Z",
+   "lat": -33.882443,
+   "lng": 18.497796,
+   "ward_id": "CPT-011",
+   "equity_weight": 0.24
+  },
+  {
+   "id": "r461",
+   "category": "water",
+   "severity": 2,
+   "created_at": "2026-10-07T11:13:56Z",
+   "lat": -33.873563,
+   "lng": 18.605497,
+   "ward_id": "CPT-003",
+   "equity_weight": 0.3102
+  },
+  {
+   "id": "r462",
+   "category": "refuse",
+   "severity": 2,
+   "created_at": "2026-10-07T11:24:07Z",
+   "lat": -34.023756,
+   "lng": 18.709732,
+   "ward_id": "CPT-001",
+   "equity_weight": 0.7823
+  },
+  {
+   "id": "r463",
+   "category": "water",
+   "severity": 4,
+   "created_at": "2026-10-07T11:28:54Z",
+   "lat": -34.012099,
+   "lng": 18.577416,
+   "ward_id": "CPT-005",
+   "equity_weight": 0.745
+  },
+  {
+   "id": "r464",
+   "category": "refuse",
+   "severity": 5,
+   "created_at": "2026-10-07T11:31:11Z",
+   "lat": -34.079323,
+   "lng": 18.666957,
+   "ward_id": "CPT-001",
+   "equity_weight": 0.7823
+  },
+  {
+   "id": "r465",
+   "category": "refuse",
+   "severity": 4,
+   "created_at": "2026-10-07T11:35:30Z",
+   "lat": -33.97631,
+   "lng": 18.558823,
+   "ward_id": "CPT-004",
+   "equity_weight": 0.712
+  },
+  {
+   "id": "r466",
+   "category": "refuse",
+   "severity": 2,
+   "created_at": "2026-10-07T11:38:06Z",
+   "lat": -34.036606,
+   "lng": 18.61338,
+   "ward_id": "CPT-002",
+   "equity_weight": 0.6541
+  },
+  {
+   "id": "r467",
+   "category": "sanitation",
+   "severity": 4,
+   "created_at": "2026-10-07T12:03:01Z",
+   "lat": -33.893754,
+   "lng": 18.476575,
+   "ward_id": "CPT-011",
+   "equity_weight": 0.24
+  },
+  {
+   "id": "r468",
+   "category": "roads",
+   "severity": 3,
+   "created_at": "2026-10-07T12:26:05Z",
+   "lat": -33.9676,
+   "lng": 18.502918,
+   "ward_id": "CPT-009",
+   "equity_weight": 0.45
+  },
+  {
+   "id": "r469",
+   "category": "electricity",
+   "severity": 1,
+   "created_at": "2026-10-07T12:33:22Z",
+   "lat": -34.096669,
+   "lng": 18.612157,
+   "ward_id": "CPT-002",
+   "equity_weight": 0.6541
+  },
+  {
+   "id": "r470",
+   "category": "roads",
+   "severity": 3,
+   "created_at": "2026-10-07T13:12:32Z",
+   "lat": -34.07568,
+   "lng": 18.616156,
+   "ward_id": "CPT-002",
+   "equity_weight": 0.6541
+  },
+  {
+   "id": "r471",
+   "category": "water",
+   "severity": 3,
+   "created_at": "2026-10-07T13:49:35Z",
+   "lat": -33.995352,
+   "lng": 18.625174,
+   "ward_id": "CPT-006",
+   "equity_weight": 0.69
+  },
+  {
+   "id": "r472",
+   "category": "electricity",
+   "severity": 4,
+   "created_at": "2026-10-07T14:20:43Z",
+   "lat": -33.939762,
+   "lng": 18.521743,
+   "ward_id": "CPT-008",
+   "equity_weight": 0.59
+  },
+  {
+   "id": "r473",
+   "category": "refuse",
+   "severity": 2,
+   "created_at": "2026-10-07T14:30:28Z",
+   "lat": -33.989252,
+   "lng": 18.630189,
+   "ward_id": "CPT-007",
+   "equity_weight": 0.63
+  },
+  {
+   "id": "r474",
+   "category": "roads",
+   "severity": 1,
+   "created_at": "2026-10-07T14:42:28Z",
+   "lat": -33.94216,
+   "lng": 18.507336,
+   "ward_id": "CPT-009",
+   "equity_weight": 0.45
+  },
+  {
+   "id": "r475",
+   "category": "water",
+   "severity": 3,
+   "created_at": "2026-10-07T15:27:55Z",
+   "lat": -33.998308,
+   "lng": 18.579712,
+   "ward_id": "CPT-005",
+   "equity_weight": 0.745
+  },
+  {
+   "id": "r476",
+   "category": "water",
+   "severity": 3,
+   "created_at": "2026-10-07T15:38:00Z",
+   "lat": -33.941353,
+   "lng": 18.530341,
+   "ward_id": "CPT-008",
+   "equity_weight": 0.59
+  },
+  {
+   "id": "r477",
+   "category": "electricity",
+   "severity": 2,
+   "created_at": "2026-10-07T16:08:29Z",
+   "lat": -33.823349,
+   "lng": 18.688498,
+   "ward_id": "CPT-020",
+   "equity_weight": 0.54
+  },
+  {
+   "id": "r478",
+   "category": "refuse",
+   "severity": 2,
+   "created_at": "2026-10-07T16:18:44Z",
+   "lat": -33.898762,
+   "lng": 18.502316,
+   "ward_id": "CPT-011",
+   "equity_weight": 0.24
+  },
+  {
+   "id": "r479",
+   "category": "water",
+   "severity": 4,
+   "created_at": "2026-10-07T16:30:42Z",
+   "lat": -34.011275,
+   "lng": 18.557911,
+   "ward_id": "CPT-010",
+   "equity_weight": 0.56
+  },
+  {
+   "id": "r480",
+   "category": "water",
+   "severity": 3,
+   "created_at": "2026-10-07T17:03:19Z",
+   "lat": -33.987112,
+   "lng": 18.602008,
+   "ward_id": "CPT-006",
+   "equity_weight": 0.69
+  },
+  {
+   "id": "r481",
+   "category": "refuse",
+   "severity": 2,
+   "created_at": "2026-10-07T17:27:40Z",
+   "lat": -34.051505,
+   "lng": 18.640817,
+   "ward_id": "CPT-002",
+   "equity_weight": 0.6541
+  },
+  {
+   "id": "r482",
+   "category": "electricity",
+   "severity": 2,
+   "created_at": "2026-10-07T17:28:22Z",
+   "lat": -34.00606,
+   "lng": 18.585502,
+   "ward_id": "CPT-006",
+   "equity_weight": 0.69
+  },
+  {
+   "id": "r483",
+   "category": "roads",
+   "severity": 1,
+   "created_at": "2026-10-07T17:32:55Z",
+   "lat": -33.998753,
+   "lng": 18.587796,
+   "ward_id": "CPT-005",
+   "equity_weight": 0.745
+  },
+  {
+   "id": "r484",
+   "category": "roads",
+   "severity": 4,
+   "created_at": "2026-10-07T17:47:26Z",
+   "lat": -34.033518,
+   "lng": 18.601934,
+   "ward_id": "CPT-002",
+   "equity_weight": 0.6541
+  },
+  {
+   "id": "r485",
+   "category": "electricity",
+   "severity": 3,
+   "created_at": "2026-10-07T17:49:14Z",
+   "lat": -33.967544,
+   "lng": 18.523437,
+   "ward_id": "CPT-009",
+   "equity_weight": 0.45
+  },
+  {
+   "id": "r486",
+   "category": "sanitation",
+   "severity": 5,
+   "created_at": "2026-10-07T17:57:12Z",
+   "lat": -33.975403,
+   "lng": 18.464364,
+   "ward_id": "CPT-015",
+   "equity_weight": 0.15
+  },
+  {
+   "id": "r487",
+   "category": "roads",
+   "severity": 3,
+   "created_at": "2026-10-07T18:55:09Z",
+   "lat": -33.916353,
+   "lng": 18.60821,
+   "ward_id": "CPT-019",
+   "equity_weight": 0.51
+  },
+  {
+   "id": "r488",
+   "category": "roads",
+   "severity": 3,
+   "created_at": "2026-10-07T19:31:36Z",
+   "lat": -33.945772,
+   "lng": 18.649689,
+   "ward_id": "CPT-007",
+   "equity_weight": 0.63
+  },
+  {
+   "id": "r489",
+   "category": "sanitation",
+   "severity": 3,
+   "created_at": "2026-10-07T19:37:00Z",
+   "lat": -34.034614,
+   "lng": 18.677352,
+   "ward_id": "CPT-001",
+   "equity_weight": 0.7823
+  },
+  {
+   "id": "r490",
+   "category": "water",
+   "severity": 4,
+   "created_at": "2026-10-07T19:55:51Z",
+   "lat": -33.96279,
+   "lng": 18.615835,
+   "ward_id": "CPT-007",
+   "equity_weight": 0.63
+  },
+  {
+   "id": "r491",
+   "category": "electricity",
+   "severity": 3,
+   "created_at": "2026-10-07T20:33:08Z",
+   "lat": -33.94824,
+   "lng": 18.629942,
+   "ward_id": "CPT-007",
+   "equity_weight": 0.63
+  },
+  {
+   "id": "r492",
+   "category": "refuse",
+   "severity": 5,
+   "created_at": "2026-10-07T20:56:43Z",
+   "lat": -34.111701,
+   "lng": 18.571969,
+   "ward_id": "CPT-002",
+   "equity_weight": 0.6541
+  },
+  {
+   "id": "r493",
+   "category": "electricity",
+   "severity": 2,
+   "created_at": "2026-10-07T20:59:58Z",
+   "lat": -33.959869,
+   "lng": 18.590435,
+   "ward_id": "CPT-004",
+   "equity_weight": 0.712
+  },
+  {
+   "id": "r494",
+   "category": "roads",
+   "severity": 3,
+   "created_at": "2026-10-07T21:56:51Z",
+   "lat": -33.935197,
+   "lng": 18.634687,
+   "ward_id": "CPT-007",
+   "equity_weight": 0.63
+  },
+  {
+   "id": "r495",
+   "category": "refuse",
+   "severity": 4,
+   "created_at": "2026-10-07T22:04:58Z",
+   "lat": -33.962273,
+   "lng": 18.42809,
+   "ward_id": "CPT-018",
+   "equity_weight": 0.42
+  },
+  {
+   "id": "r496",
+   "category": "electricity",
+   "severity": 1,
+   "created_at": "2026-10-07T22:31:18Z",
+   "lat": -33.865336,
+   "lng": 18.754323,
+   "ward_id": "CPT-020",
+   "equity_weight": 0.54
+  },
+  {
+   "id": "r497",
+   "category": "electricity",
+   "severity": 3,
+   "created_at": "2026-10-07T22:44:55Z",
+   "lat": -33.891511,
+   "lng": 18.599356,
+   "ward_id": "CPT-003",
+   "equity_weight": 0.3102
+  },
+  {
+   "id": "r498",
+   "category": "sanitation",
+   "severity": 2,
+   "created_at": "2026-10-07T22:57:01Z",
+   "lat": -33.894518,
+   "lng": 18.467698,
+   "ward_id": "CPT-011",
+   "equity_weight": 0.24
+  },
+  {
+   "id": "r499",
+   "category": "electricity",
+   "severity": 3,
+   "created_at": "2026-10-07T23:24:22Z",
+   "lat": -33.9054,
+   "lng": 18.524919,
+   "ward_id": "CPT-014",
+   "equity_weight": 0.33
+  },
+  {
+   "id": "r500",
+   "category": "roads",
+   "severity": 2,
+   "created_at": "2026-10-07T23:55:04Z",
+   "lat": -33.980877,
+   "lng": 18.561498,
+   "ward_id": "CPT-004",
+   "equity_weight": 0.712
+  }
+ ],
+ "workers": [
+  {
+   "id": "w01",
+   "lat": -33.917486,
+   "lng": 18.58908,
+   "available": true
+  },
+  {
+   "id": "w02",
+   "lat": -33.948075,
+   "lng": 18.460505,
+   "available": true
+  },
+  {
+   "id": "w03",
+   "lat": -33.872236,
+   "lng": 18.631277,
+   "available": true
+  },
+  {
+   "id": "w04",
+   "lat": -33.907833,
+   "lng": 18.551031,
+   "available": true
+  },
+  {
+   "id": "w05",
+   "lat": -33.942536,
+   "lng": 18.62332,
+   "available": true
+  },
+  {
+   "id": "w06",
+   "lat": -33.977254,
+   "lng": 18.556968,
+   "available": true
+  },
+  {
+   "id": "w07",
+   "lat": -33.907392,
+   "lng": 18.489193,
+   "available": true
+  },
+  {
+   "id": "w08",
+   "lat": -33.981793,
+   "lng": 18.579357,
+   "available": true
+  },
+  {
+   "id": "w09",
+   "lat": -34.043944,
+   "lng": 18.613858,
+   "available": true
+  },
+  {
+   "id": "w10",
+   "lat": -33.958014,
+   "lng": 18.576331,
+   "available": true
+  }
+ ]
+}

@@ -211,6 +211,13 @@ Base URL (local): `http://localhost:8000`
 }
 ```
 
+Optional request fields (genetic only): `generations` (default 50 for live mode, pass 100 for benchmark mode, capped at 500) and `seed` (integer; set it to make a run reproducible). The genetic endpoint accepts at most 2000 reports per request.
+
+### Metric definitions
+- `avg_response_time_estimate` is in **minutes**. Each report goes to its nearest available worker, each worker serves their reports in the prioritised order, and travel is estimated at 30 km/h with no on-site time.
+- `gini_coefficient` is the inequality of the **average response time between wards** (0 = every ward waits the same time on average).
+- `high_severity_rate` and `low_income_coverage` are `null` until they are defined and implemented in Phase 3 (P3-05).
+
 ### Output schema (all algorithms)
 ```json
 {
