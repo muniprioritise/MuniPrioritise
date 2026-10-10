@@ -69,7 +69,7 @@ function OverviewPage() {
         label="Avg Response Time"
         value={`${metrics.avg_response_time_hours} hrs`}
         tone="info"
-        hint="Mean time from create to update"
+        hint="Mean time from request to resolution"
       />
       <StatCard
         label="Resolution Rate"
@@ -81,7 +81,7 @@ function OverviewPage() {
         label="Equity Score"
         value={metrics.equity_score}
         tone="neutral"
-        hint="Distribution fairness across wards"
+        hint="Avg ward deprivation (0-1) of open requests"
       />
     </section>
   );

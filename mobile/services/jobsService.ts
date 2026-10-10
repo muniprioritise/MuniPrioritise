@@ -22,19 +22,18 @@ function mapCategory(value: unknown): string {
   return CATEGORY_LABELS[key] ?? String(value ?? "Unknown");
 }
 
+// Reports are rated 1-5. Severity 5 used to fall through to "low", so the most
+// urgent jobs were shown as the least urgent.
 function mapSeverity(value: unknown): JobSeverity {
   switch (Number(value)) {
-    case 1:
-      return "low";
-
-    case 2:
-      return "medium";
-
-    case 3:
-      return "high";
+    case 5:
+      return "critical";
 
     case 4:
-      return "critical";
+      return "high";
+
+    case 3:
+      return "medium";
 
     default:
       return "low";
@@ -92,7 +91,8 @@ function mapJob(rawJob: Record<string, any>): Job {
 
     severity: mapSeverity(report.severity),
 
-    status: mapStatus(report.status),
+    // /workers/assigned names the report's status "report_status".
+    status: mapStatus(report.status ?? report.report_status),
 
     address:
       report.address ??
@@ -113,21 +113,25 @@ function mapJob(rawJob: Record<string, any>): Job {
 
     submittedAt: String(
       report.created_at ??
+        report.report_created_at ??
         new Date().toISOString()
     ),
 
+    // null (not yet scored) must stay undefined; Number(null) is 0.
     priorityScore:
-      rawJob.priority_score !== undefined
+      rawJob.priority_score != null
         ? Number(rawJob.priority_score)
-        : undefined,
+        : rawJob.score != null
+          ? Number(rawJob.score)
+          : undefined,
 
     efficiencyScore:
-      rawJob.efficiency_score !== undefined
+      rawJob.efficiency_score != null
         ? Number(rawJob.efficiency_score)
         : undefined,
 
     equityScore:
-      rawJob.equity_score !== undefined
+      rawJob.equity_score != null
         ? Number(rawJob.equity_score)
         : undefined,
 
@@ -147,28 +151,33 @@ export async function getJobs(): Promise<Job[]> {
     return mockJobs;
   }
 
-  const response = await api.get("/jobs");
-  const data = response.data;
-
-  if (Array.isArray(data.jobs)) {
-    return data.jobs.map(
-      (job: Record<string, any>) =>
-        mapJob(job)
+  // GET /jobs runs the prioritisation algorithm and stores the assignments.
+  // It returns every worker's jobs and only reports that are still pending,
+  // so it cannot be the worker's list: other people's jobs would show up
+  // (accepting them fails) and a job disappears once it is accepted.
+  // Call it to refresh the assignments, then read this worker's own queue.
+  try {
+    await api.get("/jobs");
+  } catch (error) {
+    console.warn(
+      "Could not refresh job assignments; showing the last assigned queue.",
+      error
     );
   }
 
-  if (
-    data.fallback === true &&
-    Array.isArray(data.data)
-  ) {
-    return data.data.map(
-      (report: Record<string, any>) =>
-        mapJob(report)
+  const response = await api.get(
+    "/workers/assigned"
+  );
+
+  if (!Array.isArray(response.data)) {
+    throw new Error(
+      "Unexpected jobs response from backend"
     );
   }
 
-  throw new Error(
-    "Unexpected jobs response from backend"
+  return response.data.map(
+    (job: Record<string, any>) =>
+      mapJob(job)
   );
 }
 
