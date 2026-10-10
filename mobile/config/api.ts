@@ -10,7 +10,7 @@ export const AUTH_ROLE_KEY = "muniprioritise_auth_role";
 
 export const api = axios.create({
   baseURL: `${API_BASE_URL}/api`,
-  timeout: 10000,
+  timeout: 45000, // Render free tier can take 30-50 s to wake
   headers: {
     "Content-Type": "application/json",
   },

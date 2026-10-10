@@ -61,6 +61,7 @@ export default function JobDetailScreen() {
       params: {
         id: params.id,
         jobId: params.jobId,
+        status: params.status,
       },
     });
   };
