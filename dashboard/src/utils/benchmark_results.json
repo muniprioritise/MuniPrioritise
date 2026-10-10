@@ -1,0 +1,14 @@
+{
+  "algorithms": [
+    { "name": "FCFS", "gini": 0.45, "avgResponseTime": 120, "compTime": 12 },
+    { "name": "Strict Priority", "gini": 0.72, "avgResponseTime": 85, "compTime": 18 },
+    { "name": "Hybrid", "gini": 0.55, "avgResponseTime": 95, "compTime": 45 }
+  ],
+  "alphaSensitivity": [
+    { "alpha": 0.1, "gini": 0.48, "avgResponseTime": 115 },
+    { "alpha": 0.3, "gini": 0.52, "avgResponseTime": 105 },
+    { "alpha": 0.5, "gini": 0.55, "avgResponseTime": 95 },
+    { "alpha": 0.7, "gini": 0.62, "avgResponseTime": 90 },
+    { "alpha": 0.9, "gini": 0.68, "avgResponseTime": 88 }
+  ]
+}
