@@ -39,7 +39,7 @@ export default function MapScreen() {
           return;
         }
 
-        const position = await Location.getCurrentPositionAsync({});
+        const position = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.High });
 
         if (active) {
           setCoords({
@@ -158,4 +158,3 @@ const styles = StyleSheet.create({
     padding: 12,
   },
 });
-

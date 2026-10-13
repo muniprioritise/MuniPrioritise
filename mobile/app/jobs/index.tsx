@@ -1,5 +1,5 @@
-import { router } from "expo-router";
-import { useCallback, useEffect, useState } from "react";
+import { router, useFocusEffect } from "expo-router";
+import { useCallback, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -42,9 +42,13 @@ export default function JobsScreen() {
     }
   }, []);
 
-  useEffect(() => {
-    loadJobs();
-  }, [loadJobs]);
+  // Reload every time this screen comes back into view, so a job accepted or
+  // resolved on the next screens shows its new state when the worker returns.
+  useFocusEffect(
+    useCallback(() => {
+      loadJobs();
+    }, [loadJobs])
+  );
 
   const handleRefresh = useCallback(() => {
     setRefreshing(true);

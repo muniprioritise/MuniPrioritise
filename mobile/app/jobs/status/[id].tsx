@@ -17,6 +17,8 @@ import {
   updateReportStatus,
 } from "@/services/jobsService";
 
+import { getApiErrorMessage } from "@/services/apiError";
+
 import { useState } from "react";
 
 export default function StatusScreen() {
@@ -24,15 +26,24 @@ export default function StatusScreen() {
     useLocalSearchParams<{
       id: string;
       jobId: string;
+      status?: string;
     }>();
 
+  // The backend marks a job in_progress the moment it is accepted, so a job
+  // that is no longer pending has already been accepted. Starting from
+  // "pending" every time let the worker accept the same job twice (a 404).
   const [currentStep, setCurrentStep] =
     useState<
       | "pending"
       | "assigned"
       | "en_route"
       | "in_progress"
-    >("pending");
+    >(
+      params.status === "assigned" ||
+        params.status === "in_progress"
+        ? "assigned"
+        : "pending"
+    );
 
   const [loading, setLoading] =
     useState(false);
@@ -48,7 +59,10 @@ export default function StatusScreen() {
 
       Alert.alert(
         "Update failed",
-        "The job could not be updated."
+        getApiErrorMessage(
+          error,
+          "The job could not be updated."
+        )
       );
     } finally {
       setLoading(false);
@@ -67,7 +81,14 @@ export default function StatusScreen() {
 
       Alert.alert(
         "Job accepted",
-        "This job has been assigned to you."
+        "This job has been assigned to you.",
+        [
+          {
+            text: "OK",
+            onPress: () =>
+              router.dismissTo("/jobs"),
+          },
+        ]
       );
     });
   };
