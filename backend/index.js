@@ -494,7 +494,7 @@ app.get('/api/jobs', verifyToken, requireRole(['worker', 'supervisor']), async (
       available: true
     }));
     try {
-      const algoResponse = await fetch(`${process.env.ALGORITHM_SERVICE_URL}/prioritise/fcfs`, {
+      const algoResponse = await fetch(`${process.env.ALGORITHM_SERVICE_URL}/prioritise/hybrid`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ reports: reportsForAlgorithm, workers })
