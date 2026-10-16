@@ -5,15 +5,25 @@ import pytest
 from fastapi.testclient import TestClient
 
 from main import (
+    CONFIG_HISTORY_LIMIT,
     Report,
     Worker,
     app,
     build_ga_toolbox,
     gini,
+    reset_config,
     simulate_response_times,
 )
 
 client = TestClient(app)
+
+
+@pytest.fixture(autouse=True)
+def fresh_config():
+    # The live alpha is module state, so put it back before and after every test.
+    reset_config()
+    yield
+    reset_config()
 
 
 def make_report(i, severity=3, lat=-33.92, lng=18.42, created="2026-07-20T10:00:00Z", ward="CPT-001", equity=None):
@@ -386,6 +396,76 @@ def test_hybrid_reports_gini_and_response_time():
     m = client.post("/prioritise/hybrid", json=make_problem(30)).json()["metrics"]
     assert m["gini_coefficient"] is not None and 0 <= m["gini_coefficient"] <= 1
     assert m["avg_response_time_estimate"] is not None and m["avg_response_time_estimate"] > 0
+
+
+# ---------------------------------------------------------------------- config
+
+def test_config_get_returns_defaults():
+    body = client.get("/prioritise/config").json()
+    assert body["alpha"] == pytest.approx(0.4)
+    assert body["default_alpha"] == pytest.approx(0.4)
+    assert body["efficiency_weights"] == {"severity": 0.4, "waiting": 0.3, "proximity": 0.3}
+    assert body["wait_horizon_hours"] == 168.0
+    assert body["history"] == []
+
+
+def test_config_patch_changes_alpha_and_hybrid_uses_it():
+    response = client.patch("/prioritise/config", json={"alpha": 0.7})
+    assert response.status_code == 200
+    assert response.json()["alpha"] == pytest.approx(0.7)
+    assert client.get("/prioritise/config").json()["alpha"] == pytest.approx(0.7)
+    assert hybrid([make_report(1)]).json()["alpha_used"] == pytest.approx(0.7)
+
+
+def test_request_alpha_overrides_the_config():
+    client.patch("/prioritise/config", json={"alpha": 0.7})
+    assert hybrid([make_report(1)], alpha=0.2).json()["alpha_used"] == pytest.approx(0.2)
+
+
+def test_config_accepts_the_boundaries():
+    for value in (0.0, 1.0):
+        assert client.patch("/prioritise/config", json={"alpha": value}).status_code == 200
+
+
+@pytest.mark.parametrize("bad", [-0.1, 1.5, "high", None])
+def test_config_rejects_bad_alpha_and_leaves_it_unchanged(bad):
+    response = client.patch("/prioritise/config", json={"alpha": bad})
+    assert response.status_code == 422
+    assert client.get("/prioritise/config").json()["alpha"] == pytest.approx(0.4)
+
+
+def test_config_patch_without_alpha_is_rejected():
+    assert client.patch("/prioritise/config", json={}).status_code == 422
+
+
+def test_config_change_is_logged_with_timestamp_and_author():
+    client.patch("/prioritise/config", json={"alpha": 0.6, "changed_by": "supervisor-1"})
+    client.patch("/prioritise/config", json={"alpha": 0.3})
+    history = client.get("/prioritise/config").json()["history"]
+    assert len(history) == 2
+    assert history[0]["old_alpha"] == pytest.approx(0.4)
+    assert history[0]["new_alpha"] == pytest.approx(0.6)
+    assert history[0]["changed_by"] == "supervisor-1"
+    assert history[1]["old_alpha"] == pytest.approx(0.6)
+    assert history[1]["changed_by"] is None
+    assert history[0]["timestamp"].endswith("+00:00")
+
+
+def test_config_history_is_capped():
+    for i in range(CONFIG_HISTORY_LIMIT + 5):
+        client.patch("/prioritise/config", json={"alpha": (i % 10) / 10})
+    assert len(client.get("/prioritise/config").json()["history"]) == CONFIG_HISTORY_LIMIT
+
+
+def test_config_patch_needs_the_key_when_one_is_set(monkeypatch):
+    monkeypatch.setenv("CONFIG_API_KEY", "s3cret")
+    body = {"alpha": 0.9}
+    assert client.patch("/prioritise/config", json=body).status_code == 403
+    assert client.patch("/prioritise/config", json=body, headers={"X-Config-Key": "wrong"}).status_code == 403
+    assert client.get("/prioritise/config").json()["alpha"] == pytest.approx(0.4)
+    assert client.patch("/prioritise/config", json=body, headers={"X-Config-Key": "s3cret"}).status_code == 200
+    # Reading stays open: the backend and dashboard need it.
+    assert client.get("/prioritise/config").status_code == 200
 
 
 # --------------------------------------------------------------------- compare

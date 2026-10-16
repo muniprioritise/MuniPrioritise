@@ -1,11 +1,15 @@
+import logging
+import os
+import secrets
+import threading
 import time
 import math
 import random
 from datetime import datetime, timezone
 
 import numpy as np
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
+from fastapi import FastAPI, Header, HTTPException
+from pydantic import BaseModel, Field
 from deap import base, creator, tools
 
 app = FastAPI()
@@ -479,6 +483,27 @@ EFFICIENCY_WEIGHTS = {"severity": 0.4, "waiting": 0.3, "proximity": 0.3}
 # relative to the batch) so a lone old report is not stretched to look urgent.
 WAIT_HORIZON_HOURS = 168.0  # 7 days, the length of the benchmark dataset
 
+# Live alpha, changed through PATCH /prioritise/config. It is held in memory, so
+# it returns to DEFAULT_ALPHA whenever the service restarts (Render free tier
+# sleeps and redeploys). Every change is logged with a timestamp.
+CONFIG_HISTORY_LIMIT = 100
+config_logger = logging.getLogger("muniprioritise.config")
+_config_lock = threading.Lock()
+_config: dict = {"alpha": DEFAULT_ALPHA}
+_config_history: list[dict] = []
+
+
+def current_alpha() -> float:
+    with _config_lock:
+        return _config["alpha"]
+
+
+def reset_config() -> None:
+    """Back to the start-up state. Used by the tests."""
+    with _config_lock:
+        _config["alpha"] = DEFAULT_ALPHA
+        _config_history.clear()
+
 
 def parse_timestamp(value: str) -> datetime:
     try:
@@ -489,8 +514,9 @@ def parse_timestamp(value: str) -> datetime:
 
 
 def resolve_alpha(alpha: float | None) -> float:
+    """A request's own alpha wins. Otherwise use the live config value."""
     if alpha is None:
-        return DEFAULT_ALPHA
+        return current_alpha()
     if not 0.0 <= alpha <= 1.0:
         raise HTTPException(status_code=422, detail="alpha must be between 0.0 and 1.0")
     return alpha
@@ -576,6 +602,52 @@ def prioritise_hybrid(payload: PrioritiseRequest):
         metrics=metrics,
         alpha_used=alpha,
     )
+
+
+class ConfigUpdate(BaseModel):
+    alpha: float = Field(ge=0.0, le=1.0)
+    changed_by: str | None = None  # who asked, for the log (the backend passes the supervisor id)
+
+
+def config_view() -> dict:
+    with _config_lock:
+        return {
+            "alpha": _config["alpha"],
+            "default_alpha": DEFAULT_ALPHA,
+            "efficiency_weights": dict(EFFICIENCY_WEIGHTS),
+            "wait_horizon_hours": WAIT_HORIZON_HOURS,
+            "history": list(_config_history),
+        }
+
+
+@app.get("/prioritise/config")
+def get_config():
+    return config_view()
+
+
+@app.patch("/prioritise/config")
+def patch_config(update: ConfigUpdate, x_config_key: str | None = Header(default=None)):
+    # The service URL is public. If CONFIG_API_KEY is set (it should be on Render),
+    # only callers that send the same value in X-Config-Key may change alpha.
+    required_key = os.environ.get("CONFIG_API_KEY")
+    if required_key and not secrets.compare_digest(x_config_key or "", required_key):
+        raise HTTPException(status_code=403, detail="missing or invalid X-Config-Key")
+
+    with _config_lock:
+        entry = {
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "old_alpha": _config["alpha"],
+            "new_alpha": update.alpha,
+            "changed_by": update.changed_by,
+        }
+        _config["alpha"] = update.alpha
+        _config_history.append(entry)
+        del _config_history[:-CONFIG_HISTORY_LIMIT]
+
+    config_logger.info(
+        "alpha changed %s -> %s by %s", entry["old_alpha"], entry["new_alpha"], entry["changed_by"]
+    )
+    return config_view()
 
 
 @app.post("/prioritise/compare")
