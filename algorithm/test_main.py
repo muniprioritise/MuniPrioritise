@@ -16,8 +16,8 @@ from main import (
 client = TestClient(app)
 
 
-def make_report(i, severity=3, lat=-33.92, lng=18.42, created="2026-07-20T10:00:00Z", ward="CPT-001"):
-    return {
+def make_report(i, severity=3, lat=-33.92, lng=18.42, created="2026-07-20T10:00:00Z", ward="CPT-001", equity=None):
+    report = {
         "id": f"r{i}",
         "category": "water",
         "severity": severity,
@@ -26,6 +26,9 @@ def make_report(i, severity=3, lat=-33.92, lng=18.42, created="2026-07-20T10:00:
         "lng": lng,
         "ward_id": ward,
     }
+    if equity is not None:
+        report["equity_weight"] = equity
+    return report
 
 
 def make_problem(n, workers=5, seed=1):
@@ -251,11 +254,145 @@ def test_genetic_generations_are_clamped():
     assert time.perf_counter() - start < 10
 
 
+# ---------------------------------------------------------------------- hybrid
+
+ONE_WORKER = [{"id": "w1", "lat": -33.93, "lng": 18.43, "available": True}]
+
+
+def hybrid(reports, alpha=None, workers=None):
+    payload = {"reports": reports, "workers": workers or ONE_WORKER}
+    if alpha is not None:
+        payload["alpha"] = alpha
+    return client.post("/prioritise/hybrid", json=payload)
+
+
+def test_hybrid_default_alpha_is_0_4():
+    body = hybrid([make_report(1, equity=0.5)]).json()
+    assert body["algorithm"] == "hybrid"
+    assert body["alpha_used"] == pytest.approx(0.4)
+
+
+def test_hybrid_alpha_zero_ignores_equity():
+    # Same place and time, so severity is the only efficiency difference.
+    reports = [
+        make_report(1, severity=5, equity=0.1),
+        make_report(2, severity=2, equity=0.9),
+    ]
+    assert hybrid(reports, alpha=0.0).json()["prioritised_order"] == ["r1", "r2"]
+
+
+def test_hybrid_alpha_one_orders_by_equity_only():
+    reports = [
+        make_report(1, severity=5, equity=0.1),
+        make_report(2, severity=1, equity=0.9),
+        make_report(3, severity=3, equity=0.5),
+    ]
+    assert hybrid(reports, alpha=1.0).json()["prioritised_order"] == ["r2", "r3", "r1"]
+
+
+def test_hybrid_equity_breaks_a_tie_at_default_alpha():
+    reports = [make_report(1, equity=0.12), make_report(2, equity=0.78)]
+    assert hybrid(reports).json()["prioritised_order"] == ["r2", "r1"]
+
+
+def test_hybrid_final_score_matches_formula():
+    reports = [
+        make_report(1, severity=4, equity=0.6, created="2026-10-01T08:00:00Z"),
+        make_report(2, severity=2, equity=0.2, created="2026-10-03T08:00:00Z", lat=-33.95),
+    ]
+    body = hybrid(reports, alpha=0.3).json()
+    for a in body["assignments"]:
+        expected = 0.7 * a["efficiency_score"] + 0.3 * a["equity_score"]
+        assert a["score"] == pytest.approx(expected, abs=1e-5)
+
+
+def test_hybrid_scores_stay_between_0_and_1():
+    payload = {**make_problem(80, seed=4), "alpha": 0.4}
+    for r in payload["reports"]:
+        r["equity_weight"] = 0.5
+    body = client.post("/prioritise/hybrid", json=payload).json()
+    for a in body["assignments"]:
+        assert 0 <= a["efficiency_score"] <= 1
+        assert 0 <= a["equity_score"] <= 1
+        assert 0 <= a["score"] <= 1
+
+
+def test_hybrid_older_report_first_when_otherwise_equal():
+    reports = [
+        make_report(1, created="2026-10-05T08:00:00Z"),
+        make_report(2, created="2026-10-01T08:00:00Z"),
+    ]
+    assert hybrid(reports, alpha=0.0).json()["prioritised_order"] == ["r2", "r1"]
+
+
+def test_hybrid_waiting_is_not_stretched_across_a_short_batch():
+    # Regression guard for the design choice: the waiting term uses a fixed
+    # horizon. Five minutes apart must not look like oldest-vs-newest.
+    reports = [
+        make_report(1, created="2026-10-05T08:00:00Z"),
+        make_report(2, created="2026-10-05T08:05:00Z"),
+    ]
+    a, b = hybrid(reports, alpha=0.0).json()["assignments"]
+    assert abs(a["efficiency_score"] - b["efficiency_score"]) < 0.001
+
+
+def test_hybrid_missing_equity_weight_scores_zero_and_is_counted():
+    reports = [make_report(1, equity=0.8), make_report(2), make_report(3)]
+    body = hybrid(reports).json()
+    by_id = {a["report_id"]: a for a in body["assignments"]}
+    assert by_id["r2"]["equity_score"] == 0.0
+    assert by_id["r3"]["equity_score"] == 0.0
+    assert by_id["r1"]["equity_score"] == pytest.approx(0.8)
+    assert body["metrics"]["equity_missing_count"] == 2
+
+
+@pytest.mark.parametrize("alpha", [-0.1, 1.5])
+def test_hybrid_rejects_alpha_outside_0_to_1(alpha):
+    assert hybrid([make_report(1)], alpha=alpha).status_code == 422
+
+
+def test_hybrid_rejects_a_bad_timestamp():
+    assert hybrid([make_report(1, created="not-a-date")]).status_code == 422
+
+
+def test_hybrid_accepts_millisecond_timestamps_from_the_backend():
+    # Postgres/Node timestamps arrive as 2026-10-13T10:00:00.000Z
+    reports = [make_report(1, created="2026-10-13T10:00:00.000Z")]
+    assert hybrid(reports).status_code == 200
+
+
+def test_hybrid_is_deterministic():
+    payload = {**make_problem(60, seed=8), "alpha": 0.4}
+    a = client.post("/prioritise/hybrid", json=payload).json()["prioritised_order"]
+    b = client.post("/prioritise/hybrid", json=payload).json()["prioritised_order"]
+    assert a == b
+
+
+@pytest.mark.parametrize("n", [0, 1, 2])
+def test_hybrid_handles_tiny_inputs(n):
+    response = hybrid([make_report(i) for i in range(n)])
+    assert response.status_code == 200
+    assert len(response.json()["prioritised_order"]) == n
+
+
+def test_hybrid_with_no_available_worker():
+    workers = [{"id": "w1", "lat": -33.93, "lng": 18.43, "available": False}]
+    body = hybrid([make_report(i, severity=5) for i in range(3)], workers=workers).json()
+    assert len(body["prioritised_order"]) == 3
+    assert body["assignments"] == []
+
+
+def test_hybrid_reports_gini_and_response_time():
+    m = client.post("/prioritise/hybrid", json=make_problem(30)).json()["metrics"]
+    assert m["gini_coefficient"] is not None and 0 <= m["gini_coefficient"] <= 1
+    assert m["avg_response_time_estimate"] is not None and m["avg_response_time_estimate"] > 0
+
+
 # --------------------------------------------------------------------- compare
 
-def test_compare_returns_all_three_with_metrics():
+def test_compare_returns_all_four_with_metrics():
     body = client.post("/prioritise/compare", json=make_problem(30)).json()
-    assert set(body) == {"fcfs", "greedy", "genetic"}
+    assert set(body) == {"fcfs", "greedy", "genetic", "hybrid"}
     for name, result in body.items():
         assert result["algorithm"] == name
         assert result["metrics"]["gini_coefficient"] is not None
@@ -279,7 +416,7 @@ def test_gini_basics():
 
 def test_nfr02_1000_reports_within_5_seconds_for_every_algorithm():
     payload = {**make_problem(1000, workers=10), "seed": 1}
-    for name in ("fcfs", "greedy", "genetic"):
+    for name in ("fcfs", "greedy", "genetic", "hybrid"):
         start = time.perf_counter()
         response = client.post(f"/prioritise/{name}", json=payload)
         elapsed = time.perf_counter() - start

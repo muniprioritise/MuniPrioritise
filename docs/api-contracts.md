@@ -213,6 +213,21 @@ Base URL (local): `http://localhost:8000`
 
 Optional request fields (genetic only): `generations` (default 50 for live mode, pass 100 for benchmark mode, capped at 500) and `seed` (integer; set it to make a run reproducible). The genetic endpoint accepts at most 2000 reports per request.
 
+### Hybrid scoring (`POST /prioritise/hybrid`)
+Every term is scaled 0 to 1 before it is weighted.
+```
+E (efficiency) = 0.4 * (severity / 5) + 0.3 * waiting + 0.3 * proximity
+Q (equity)     = equity_weight            (the ward's SAMPI score, 0 to 1)
+final_score    = (1 - alpha) * E + alpha * Q          default alpha = 0.4
+```
+- `waiting` is hours waited divided by 168 (7 days), capped at 1. "Now" is the newest `created_at` in the request, not the system clock, so the same input always gives the same result.
+- `proximity` is the same value Greedy uses: 1 for the report closest to its nearest available worker in the batch, 0 for the furthest.
+- A report with no `equity_weight` (for example an unassigned ward) gets Q = 0. The count is returned in `metrics.equity_missing_count`.
+- `alpha` must be between 0.0 and 1.0, otherwise the service returns 422. A `created_at` that is not ISO 8601 also returns 422.
+- Ties go to the older report, then the lower id.
+- Each hybrid assignment also carries `efficiency_score` (E) and `equity_score` (Q). The hybrid response carries `alpha_used`. These fields are `null` for the other algorithms.
+- `/prioritise/compare` returns `fcfs`, `greedy`, `genetic` and `hybrid`.
+
 ### Metric definitions
 - `avg_response_time_estimate` is in **minutes**. Each report goes to its nearest available worker, each worker serves their reports in the prioritised order, and travel is estimated at 30 km/h with no on-site time.
 - `gini_coefficient` is the inequality of the **average response time between wards** (0 = every ward waits the same time on average).
