@@ -228,6 +228,30 @@ final_score    = (1 - alpha) * E + alpha * Q          default alpha = 0.4
 - Each hybrid assignment also carries `efficiency_score` (E) and `equity_score` (Q). The hybrid response carries `alpha_used`. These fields are `null` for the other algorithms.
 - `/prioritise/compare` returns `fcfs`, `greedy`, `genetic` and `hybrid`.
 
+### Config (`GET` and `PATCH /prioritise/config`)
+Holds the live alpha. A hybrid request with no `alpha` uses this value; an `alpha` in the request body always wins.
+
+`GET /prioritise/config` response:
+```json
+{
+  "alpha": 0.4,
+  "default_alpha": 0.4,
+  "efficiency_weights": { "severity": 0.4, "waiting": 0.3, "proximity": 0.3 },
+  "wait_horizon_hours": 168.0,
+  "history": [
+    { "timestamp": "2026-10-16T20:00:00+00:00", "old_alpha": 0.4, "new_alpha": 0.6, "changed_by": "supervisor-uuid" }
+  ]
+}
+```
+`PATCH /prioritise/config` request (returns the same shape as GET):
+```json
+{ "alpha": 0.6, "changed_by": "supervisor-uuid" }
+```
+- `alpha` is required and must be between 0.0 and 1.0, otherwise 422. `changed_by` is optional and is only written to the log.
+- Every change is recorded in `history` (the last 100) and in the service log.
+- If the service has a `CONFIG_API_KEY` environment variable, `PATCH` must send the same value in an `X-Config-Key` header, otherwise 403. `GET` is always open. Set the variable on Render, because the service URL is public.
+- The value is held in memory. It returns to the default (0.4) and the history is cleared when the service restarts, which happens on every Render redeploy and after the free tier sleeps.
+
 ### Metric definitions
 - `avg_response_time_estimate` is in **minutes**. Each report goes to its nearest available worker, each worker serves their reports in the prioritised order, and travel is estimated at 30 km/h with no on-site time.
 - `gini_coefficient` is the inequality of the **average response time between wards** (0 = every ward waits the same time on average).
