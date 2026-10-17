@@ -28,14 +28,13 @@ CREATE TABLE IF NOT EXISTS reports (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE IF NOT EXISTS job_assignments (
+CREATE TABLE IF NOT EXISTS jobs (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    report_id UUID REFERENCES reports(id) ON DELETE CASCADE UNIQUE,
+    report_id UUID REFERENCES reports(id) ON DELETE CASCADE,
     worker_id UUID REFERENCES users(id) ON DELETE CASCADE,
-    algorithm_used VARCHAR(50),
-    priority_score NUMERIC,
-    override_by UUID REFERENCES users(id) ON DELETE SET NULL,
-    assigned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status VARCHAR(50) DEFAULT 'assigned' CHECK (status IN ('assigned', 'accepted', 'completed', 'escalated')),
+    assigned_by VARCHAR(255) DEFAULT 'algorithm',
+    score NUMERIC,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
