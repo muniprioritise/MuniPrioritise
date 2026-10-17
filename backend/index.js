@@ -478,7 +478,7 @@ app.get('/api/jobs', verifyToken, requireRole(['worker', 'supervisor']), async (
     // A report with no ward is sent as 'UNASSIGNED' with no equity weight. It
     // used to be relabelled CPT-001 (SAMPI 0.78), which gave every unlocated
     // report a high equity score. equity_weight is the ward's SAMPI score (the
-    // algorithm's Q term); the hybrid endpoint will read it.
+    // algorithm's Q term); the hybrid endpoint reads it. A null weight gives Q = 0.
     const reportsForAlgorithm = pendingReports.map(r => ({
       ...r,
       ward_id: r.ward_id ?? 'UNASSIGNED',
@@ -514,16 +514,26 @@ app.get('/api/jobs', verifyToken, requireRole(['worker', 'supervisor']), async (
         // skip the update for those rows, so RETURNING gives nothing and we
         // read the stored (overridden) row instead.
         const upserted = await pool.query(
-          `INSERT INTO job_assignments (report_id, worker_id, algorithm_used, priority_score)
-           VALUES ($1, $2, $3, $4)
+          `INSERT INTO job_assignments
+             (report_id, worker_id, algorithm_used, priority_score, efficiency_score, equity_score)
+           VALUES ($1, $2, $3, $4, $5, $6)
            ON CONFLICT (report_id) DO UPDATE SET
              worker_id = EXCLUDED.worker_id,
              algorithm_used = EXCLUDED.algorithm_used,
              priority_score = EXCLUDED.priority_score,
+             efficiency_score = EXCLUDED.efficiency_score,
+             equity_score = EXCLUDED.equity_score,
              assigned_at = NOW()
            WHERE job_assignments.override_by IS NULL
            RETURNING *`,
-          [a.report_id, a.worker_id, algoResult.algorithm, a.score]
+          [
+            a.report_id,
+            a.worker_id,
+            algoResult.algorithm,
+            a.score,
+            a.efficiency_score ?? null,
+            a.equity_score ?? null
+          ]
         );
         let job = upserted.rows[0];
         if (!job) {
@@ -534,13 +544,18 @@ app.get('/api/jobs', verifyToken, requireRole(['worker', 'supervisor']), async (
           id: job.id,
           report_id: job.report_id,
           worker_id: job.worker_id,
+          algorithm_used: job.algorithm_used,
           score: job.priority_score,
+          priority_score: job.priority_score,
+          efficiency_score: job.efficiency_score,
+          equity_score: job.equity_score,
           report: reportsById[job.report_id]
         });
       }
 
       return res.status(200).json({
         algorithm: algoResult.algorithm,
+        alpha: algoResult.alpha_used ?? null,
         jobs: persistedJobs,
         metrics: algoResult.metrics
       });
