@@ -8,6 +8,7 @@ const navItems = [
   { to: '/prioritisation-override', label: 'Prioritisation Override' },
   { to: '/analytics', label: 'Analytics' },
   { to: '/reports', label: 'Reports' },
+  { to: '/benchmarks', label: 'Algorithm Benchmarks' },
 ];
 
 function getPageTitle(pathname) {

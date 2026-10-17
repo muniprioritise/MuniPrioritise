@@ -9,6 +9,7 @@ import RequestTablePage from './pages/RequestTablePage.jsx';
 import PrioritisationOverridePage from './pages/PrioritisationOverridePage.jsx';
 import AnalyticsPage from './pages/AnalyticsPage.jsx';
 import ReportsPage from './pages/ReportsPage.jsx';
+import AlgorithmComparisonPage from './pages/AlgorithmComparisonPage.jsx';
 
 function App() {
   return (
@@ -31,6 +32,7 @@ function App() {
             <Route path="prioritisation-override" element={<PrioritisationOverridePage />} />
             <Route path="analytics" element={<AnalyticsPage />} />
             <Route path="reports" element={<ReportsPage />} />
+            <Route path="benchmarks" element={<AlgorithmComparisonPage />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
