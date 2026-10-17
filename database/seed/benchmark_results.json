@@ -1,0 +1,1560 @@
+{
+ "_note": "SYNTHETIC data. Produced by algorithm/benchmark.py. Timings depend on the machine.",
+ "config": {
+  "datasets": 10,
+  "seeds": [
+   42,
+   43,
+   44,
+   45,
+   46,
+   47,
+   48,
+   49,
+   50,
+   51
+  ],
+  "requests_per_dataset": 500,
+  "workers_per_dataset": 10,
+  "wards": 20,
+  "genetic_generations": 100,
+  "genetic_population": 50,
+  "hybrid_alpha": 0.4,
+  "alphas": [
+   0.0,
+   0.2,
+   0.4,
+   0.6,
+   0.8,
+   1.0
+  ],
+  "efficiency_weights": {
+   "severity": 0.4,
+   "waiting": 0.3,
+   "proximity": 0.3
+  },
+  "wait_horizon_hours": 168.0,
+  "high_severity_top_share": 0.2,
+  "low_income_top_share": 0.5,
+  "low_income_sampi_threshold": 0.5,
+  "share_of_requests_in_low_income_wards": 0.611,
+  "committed_dataset_matches_seed_42": true,
+  "python": "3.11.9",
+  "machine": "Windows-10-10.0.26300-SP0"
+ },
+ "metric_notes": {
+  "gini_coefficient": "Inequality of average response time between wards. Measures sameness, not fairness.",
+  "avg_response_time_estimate": "Minutes. Travel only, nearest available worker, 30 km/h.",
+  "high_severity_rate": "Share of severity 4/5 reports in the top 20% of the queue. Random is about 0.2.",
+  "low_income_coverage": "Share of low-income-ward reports in the top 50% of the queue. Random is about 0.5.",
+  "computational_time_ms": "Wall clock for one call on 500 requests, metric calculation included.",
+  "sampi_wait_correlation": "Spearman correlation of ward SAMPI with ward average wait. Negative means deprived wards wait less.",
+  "mean_leg_km": "Average distance a worker travels between consecutive jobs. Explains most of the response-time differences."
+ },
+ "runs": [
+  {
+   "seed": 42,
+   "algorithm": "fcfs",
+   "metrics": {
+    "gini_coefficient": 0.3062,
+    "avg_response_time_estimate": 321.82,
+    "high_severity_rate": 0.1793,
+    "low_income_coverage": 0.4742,
+    "computational_time_ms": 6.032,
+    "sampi_wait_correlation": -0.21954887218045113,
+    "mean_leg_km": 4.870439413596768
+   }
+  },
+  {
+   "seed": 42,
+   "algorithm": "greedy",
+   "metrics": {
+    "gini_coefficient": 0.3351,
+    "avg_response_time_estimate": 260.12,
+    "high_severity_rate": 0.6414,
+    "low_income_coverage": 0.5194,
+    "computational_time_ms": 8.558,
+    "sampi_wait_correlation": -0.17142857142857143,
+    "mean_leg_km": 4.247504632858592
+   }
+  },
+  {
+   "seed": 42,
+   "algorithm": "genetic",
+   "metrics": {
+    "gini_coefficient": 0.2795,
+    "avg_response_time_estimate": 244.19,
+    "high_severity_rate": 0.2276,
+    "low_income_coverage": 0.5258,
+    "computational_time_ms": 1213.637,
+    "sampi_wait_correlation": -0.21353383458646616,
+    "mean_leg_km": 4.039673084476454
+   }
+  },
+  {
+   "seed": 42,
+   "algorithm": "hybrid",
+   "metrics": {
+    "gini_coefficient": 0.3719,
+    "avg_response_time_estimate": 259.82,
+    "high_severity_rate": 0.3724,
+    "low_income_coverage": 0.7065,
+    "computational_time_ms": 9.999,
+    "sampi_wait_correlation": -0.38796992481203,
+    "mean_leg_km": 4.3137095788931425
+   }
+  },
+  {
+   "seed": 43,
+   "algorithm": "fcfs",
+   "metrics": {
+    "gini_coefficient": 0.3106,
+    "avg_response_time_estimate": 355.75,
+    "high_severity_rate": 0.1824,
+    "low_income_coverage": 0.4876,
+    "computational_time_ms": 5.732,
+    "sampi_wait_correlation": 0.362406015037594,
+    "mean_leg_km": 4.737752926805953
+   }
+  },
+  {
+   "seed": 43,
+   "algorithm": "greedy",
+   "metrics": {
+    "gini_coefficient": 0.3484,
+    "avg_response_time_estimate": 278.19,
+    "high_severity_rate": 0.6284,
+    "low_income_coverage": 0.5093,
+    "computational_time_ms": 8.831,
+    "sampi_wait_correlation": 0.4030075187969925,
+    "mean_leg_km": 4.194244885316976
+   }
+  },
+  {
+   "seed": 43,
+   "algorithm": "genetic",
+   "metrics": {
+    "gini_coefficient": 0.2823,
+    "avg_response_time_estimate": 297.19,
+    "high_severity_rate": 0.2635,
+    "low_income_coverage": 0.5062,
+    "computational_time_ms": 1331.517,
+    "sampi_wait_correlation": 0.40451127819548865,
+    "mean_leg_km": 4.346798779779248
+   }
+  },
+  {
+   "seed": 43,
+   "algorithm": "hybrid",
+   "metrics": {
+    "gini_coefficient": 0.3567,
+    "avg_response_time_estimate": 295.56,
+    "high_severity_rate": 0.3716,
+    "low_income_coverage": 0.705,
+    "computational_time_ms": 10.528,
+    "sampi_wait_correlation": 0.193984962406015,
+    "mean_leg_km": 4.349927200191697
+   }
+  },
+  {
+   "seed": 44,
+   "algorithm": "fcfs",
+   "metrics": {
+    "gini_coefficient": 0.4721,
+    "avg_response_time_estimate": 511.61,
+    "high_severity_rate": 0.184,
+    "low_income_coverage": 0.4684,
+    "computational_time_ms": 6.39,
+    "sampi_wait_correlation": 0.2270676691729323,
+    "mean_leg_km": 5.550029221103659
+   }
+  },
+  {
+   "seed": 44,
+   "algorithm": "greedy",
+   "metrics": {
+    "gini_coefficient": 0.4486,
+    "avg_response_time_estimate": 400.81,
+    "high_severity_rate": 0.6012,
+    "low_income_coverage": 0.485,
+    "computational_time_ms": 14.812,
+    "sampi_wait_correlation": 0.19999999999999998,
+    "mean_leg_km": 4.68715614220948
+   }
+  },
+  {
+   "seed": 44,
+   "algorithm": "genetic",
+   "metrics": {
+    "gini_coefficient": 0.3961,
+    "avg_response_time_estimate": 380.18,
+    "high_severity_rate": 0.2147,
+    "low_income_coverage": 0.4817,
+    "computational_time_ms": 1290.834,
+    "sampi_wait_correlation": 0.1744360902255639,
+    "mean_leg_km": 4.528952638491102
+   }
+  },
+  {
+   "seed": 44,
+   "algorithm": "hybrid",
+   "metrics": {
+    "gini_coefficient": 0.4809,
+    "avg_response_time_estimate": 462.91,
+    "high_severity_rate": 0.3558,
+    "low_income_coverage": 0.7276,
+    "computational_time_ms": 10.095,
+    "sampi_wait_correlation": 0.13684210526315788,
+    "mean_leg_km": 5.11498148656667
+   }
+  },
+  {
+   "seed": 45,
+   "algorithm": "fcfs",
+   "metrics": {
+    "gini_coefficient": 0.455,
+    "avg_response_time_estimate": 523.75,
+    "high_severity_rate": 0.1603,
+    "low_income_coverage": 0.4838,
+    "computational_time_ms": 7.273,
+    "sampi_wait_correlation": 0.5834586466165413,
+    "mean_leg_km": 4.803514722228934
+   }
+  },
+  {
+   "seed": 45,
+   "algorithm": "greedy",
+   "metrics": {
+    "gini_coefficient": 0.4839,
+    "avg_response_time_estimate": 397.64,
+    "high_severity_rate": 0.6346,
+    "low_income_coverage": 0.4416,
+    "computational_time_ms": 9.321,
+    "sampi_wait_correlation": 0.4466165413533834,
+    "mean_leg_km": 4.309617069326015
+   }
+  },
+  {
+   "seed": 45,
+   "algorithm": "genetic",
+   "metrics": {
+    "gini_coefficient": 0.4099,
+    "avg_response_time_estimate": 386.27,
+    "high_severity_rate": 0.2372,
+    "low_income_coverage": 0.474,
+    "computational_time_ms": 1268.037,
+    "sampi_wait_correlation": 0.5593984962406015,
+    "mean_leg_km": 4.299865742535867
+   }
+  },
+  {
+   "seed": 45,
+   "algorithm": "hybrid",
+   "metrics": {
+    "gini_coefficient": 0.4796,
+    "avg_response_time_estimate": 456.34,
+    "high_severity_rate": 0.3974,
+    "low_income_coverage": 0.6818,
+    "computational_time_ms": 10.851,
+    "sampi_wait_correlation": 0.4827067669172932,
+    "mean_leg_km": 4.48766214951529
+   }
+  },
+  {
+   "seed": 46,
+   "algorithm": "fcfs",
+   "metrics": {
+    "gini_coefficient": 0.1918,
+    "avg_response_time_estimate": 234.48,
+    "high_severity_rate": 0.2384,
+    "low_income_coverage": 0.5052,
+    "computational_time_ms": 6.615,
+    "sampi_wait_correlation": -0.23759398496240602,
+    "mean_leg_km": 4.2438711940046705
+   }
+  },
+  {
+   "seed": 46,
+   "algorithm": "greedy",
+   "metrics": {
+    "gini_coefficient": 0.2389,
+    "avg_response_time_estimate": 206.17,
+    "high_severity_rate": 0.6093,
+    "low_income_coverage": 0.5258,
+    "computational_time_ms": 9.007,
+    "sampi_wait_correlation": -0.31879699248120297,
+    "mean_leg_km": 3.9810485586646958
+   }
+  },
+  {
+   "seed": 46,
+   "algorithm": "genetic",
+   "metrics": {
+    "gini_coefficient": 0.1845,
+    "avg_response_time_estimate": 190.87,
+    "high_severity_rate": 0.2649,
+    "low_income_coverage": 0.4399,
+    "computational_time_ms": 1148.093,
+    "sampi_wait_correlation": -0.3233082706766917,
+    "mean_leg_km": 3.499413902818812
+   }
+  },
+  {
+   "seed": 46,
+   "algorithm": "hybrid",
+   "metrics": {
+    "gini_coefficient": 0.2603,
+    "avg_response_time_estimate": 213.46,
+    "high_severity_rate": 0.3841,
+    "low_income_coverage": 0.7388,
+    "computational_time_ms": 12.563,
+    "sampi_wait_correlation": -0.4285714285714286,
+    "mean_leg_km": 4.025778864227412
+   }
+  },
+  {
+   "seed": 47,
+   "algorithm": "fcfs",
+   "metrics": {
+    "gini_coefficient": 0.1211,
+    "avg_response_time_estimate": 242.86,
+    "high_severity_rate": 0.2113,
+    "low_income_coverage": 0.5099,
+    "computational_time_ms": 5.11,
+    "sampi_wait_correlation": 0.10977443609022557,
+    "mean_leg_km": 4.453586414371505
+   }
+  },
+  {
+   "seed": 47,
+   "algorithm": "greedy",
+   "metrics": {
+    "gini_coefficient": 0.234,
+    "avg_response_time_estimate": 188.63,
+    "high_severity_rate": 0.5775,
+    "low_income_coverage": 0.5526,
+    "computational_time_ms": 8.236,
+    "sampi_wait_correlation": -0.04060150375939849,
+    "mean_leg_km": 4.07747767019993
+   }
+  },
+  {
+   "seed": 47,
+   "algorithm": "genetic",
+   "metrics": {
+    "gini_coefficient": 0.1151,
+    "avg_response_time_estimate": 192.16,
+    "high_severity_rate": 0.2394,
+    "low_income_coverage": 0.4901,
+    "computational_time_ms": 1129.459,
+    "sampi_wait_correlation": -0.018045112781954885,
+    "mean_leg_km": 3.8833326990532746
+   }
+  },
+  {
+   "seed": 47,
+   "algorithm": "hybrid",
+   "metrics": {
+    "gini_coefficient": 0.2233,
+    "avg_response_time_estimate": 203.07,
+    "high_severity_rate": 0.3732,
+    "low_income_coverage": 0.7368,
+    "computational_time_ms": 14.083,
+    "sampi_wait_correlation": -0.38796992481203,
+    "mean_leg_km": 3.9722343677707594
+   }
+  },
+  {
+   "seed": 48,
+   "algorithm": "fcfs",
+   "metrics": {
+    "gini_coefficient": 0.2079,
+    "avg_response_time_estimate": 293.95,
+    "high_severity_rate": 0.1455,
+    "low_income_coverage": 0.4811,
+    "computational_time_ms": 5.282,
+    "sampi_wait_correlation": 0.10075187969924812,
+    "mean_leg_km": 5.053872663475775
+   }
+  },
+  {
+   "seed": 48,
+   "algorithm": "greedy",
+   "metrics": {
+    "gini_coefficient": 0.3031,
+    "avg_response_time_estimate": 223.17,
+    "high_severity_rate": 0.5515,
+    "low_income_coverage": 0.5189,
+    "computational_time_ms": 8.174,
+    "sampi_wait_correlation": -0.21954887218045113,
+    "mean_leg_km": 4.479085711905152
+   }
+  },
+  {
+   "seed": 48,
+   "algorithm": "genetic",
+   "metrics": {
+    "gini_coefficient": 0.206,
+    "avg_response_time_estimate": 227.57,
+    "high_severity_rate": 0.2727,
+    "low_income_coverage": 0.488,
+    "computational_time_ms": 1124.132,
+    "sampi_wait_correlation": 0.1533834586466165,
+    "mean_leg_km": 4.252622714639051
+   }
+  },
+  {
+   "seed": 48,
+   "algorithm": "hybrid",
+   "metrics": {
+    "gini_coefficient": 0.2925,
+    "avg_response_time_estimate": 249.13,
+    "high_severity_rate": 0.3576,
+    "low_income_coverage": 0.732,
+    "computational_time_ms": 10.883,
+    "sampi_wait_correlation": -0.2526315789473684,
+    "mean_leg_km": 4.621328850221667
+   }
+  },
+  {
+   "seed": 49,
+   "algorithm": "fcfs",
+   "metrics": {
+    "gini_coefficient": 0.1855,
+    "avg_response_time_estimate": 244.64,
+    "high_severity_rate": 0.1989,
+    "low_income_coverage": 0.4966,
+    "computational_time_ms": 6.807,
+    "sampi_wait_correlation": 0.6075187969924812,
+    "mean_leg_km": 4.108475774608178
+   }
+  },
+  {
+   "seed": 49,
+   "algorithm": "greedy",
+   "metrics": {
+    "gini_coefficient": 0.2788,
+    "avg_response_time_estimate": 224.02,
+    "high_severity_rate": 0.5568,
+    "low_income_coverage": 0.5379,
+    "computational_time_ms": 8.168,
+    "sampi_wait_correlation": 0.4586466165413533,
+    "mean_leg_km": 3.9349565658485495
+   }
+  },
+  {
+   "seed": 49,
+   "algorithm": "genetic",
+   "metrics": {
+    "gini_coefficient": 0.2136,
+    "avg_response_time_estimate": 206.92,
+    "high_severity_rate": 0.1932,
+    "low_income_coverage": 0.531,
+    "computational_time_ms": 1124.829,
+    "sampi_wait_correlation": 0.4781954887218045,
+    "mean_leg_km": 3.5348737425318504
+   }
+  },
+  {
+   "seed": 49,
+   "algorithm": "hybrid",
+   "metrics": {
+    "gini_coefficient": 0.2596,
+    "avg_response_time_estimate": 223.1,
+    "high_severity_rate": 0.3352,
+    "low_income_coverage": 0.7586,
+    "computational_time_ms": 11.191,
+    "sampi_wait_correlation": 0.08571428571428572,
+    "mean_leg_km": 3.8125878966245454
+   }
+  },
+  {
+   "seed": 50,
+   "algorithm": "fcfs",
+   "metrics": {
+    "gini_coefficient": 0.2567,
+    "avg_response_time_estimate": 282.87,
+    "high_severity_rate": 0.1939,
+    "low_income_coverage": 0.4938,
+    "computational_time_ms": 5.728,
+    "sampi_wait_correlation": 0.7669172932330827,
+    "mean_leg_km": 4.4374379053555
+   }
+  },
+  {
+   "seed": 50,
+   "algorithm": "greedy",
+   "metrics": {
+    "gini_coefficient": 0.3161,
+    "avg_response_time_estimate": 239.89,
+    "high_severity_rate": 0.5394,
+    "low_income_coverage": 0.4907,
+    "computational_time_ms": 7.987,
+    "sampi_wait_correlation": 0.5488721804511278,
+    "mean_leg_km": 4.154276151667498
+   }
+  },
+  {
+   "seed": 50,
+   "algorithm": "genetic",
+   "metrics": {
+    "gini_coefficient": 0.2128,
+    "avg_response_time_estimate": 229.47,
+    "high_severity_rate": 0.2182,
+    "low_income_coverage": 0.5093,
+    "computational_time_ms": 1124.074,
+    "sampi_wait_correlation": 0.7593984962406014,
+    "mean_leg_km": 3.8332968945193233
+   }
+  },
+  {
+   "seed": 50,
+   "algorithm": "hybrid",
+   "metrics": {
+    "gini_coefficient": 0.2915,
+    "avg_response_time_estimate": 247.87,
+    "high_severity_rate": 0.297,
+    "low_income_coverage": 0.6759,
+    "computational_time_ms": 13.121,
+    "sampi_wait_correlation": 0.24060150375939846,
+    "mean_leg_km": 4.240436349742299
+   }
+  },
+  {
+   "seed": 51,
+   "algorithm": "fcfs",
+   "metrics": {
+    "gini_coefficient": 0.3654,
+    "avg_response_time_estimate": 455.34,
+    "high_severity_rate": 0.1812,
+    "low_income_coverage": 0.4904,
+    "computational_time_ms": 6.04,
+    "sampi_wait_correlation": 0.7669172932330827,
+    "mean_leg_km": 5.390519057738131
+   }
+  },
+  {
+   "seed": 51,
+   "algorithm": "greedy",
+   "metrics": {
+    "gini_coefficient": 0.4006,
+    "avg_response_time_estimate": 363.21,
+    "high_severity_rate": 0.5625,
+    "low_income_coverage": 0.4236,
+    "computational_time_ms": 8.459,
+    "sampi_wait_correlation": 0.6300751879699248,
+    "mean_leg_km": 4.549162754158164
+   }
+  },
+  {
+   "seed": 51,
+   "algorithm": "genetic",
+   "metrics": {
+    "gini_coefficient": 0.3203,
+    "avg_response_time_estimate": 339.75,
+    "high_severity_rate": 0.2562,
+    "low_income_coverage": 0.4936,
+    "computational_time_ms": 1106.132,
+    "sampi_wait_correlation": 0.7263157894736841,
+    "mean_leg_km": 4.490668694276214
+   }
+  },
+  {
+   "seed": 51,
+   "algorithm": "hybrid",
+   "metrics": {
+    "gini_coefficient": 0.3957,
+    "avg_response_time_estimate": 392.86,
+    "high_severity_rate": 0.3937,
+    "low_income_coverage": 0.6688,
+    "computational_time_ms": 12.878,
+    "sampi_wait_correlation": 0.5473684210526315,
+    "mean_leg_km": 4.784874960021878
+   }
+  }
+ ],
+ "summary": {
+  "fcfs": {
+   "gini_coefficient": {
+    "mean": 0.28723,
+    "sd": 0.11719909034535114,
+    "min": 0.1211,
+    "max": 0.4721,
+    "n": 10
+   },
+   "avg_response_time_estimate": {
+    "mean": 346.707,
+    "sd": 111.40253618198186,
+    "min": 234.48,
+    "max": 523.75,
+    "n": 10
+   },
+   "high_severity_rate": {
+    "mean": 0.18752,
+    "sd": 0.025770775868973927,
+    "min": 0.1455,
+    "max": 0.2384,
+    "n": 10
+   },
+   "low_income_coverage": {
+    "mean": 0.4891,
+    "sd": 0.012981696516420513,
+    "min": 0.4684,
+    "max": 0.5099,
+    "n": 10
+   },
+   "computational_time_ms": {
+    "mean": 6.1009,
+    "sd": 0.6795710166470216,
+    "min": 5.11,
+    "max": 7.273,
+    "n": 10
+   },
+   "sampi_wait_correlation": {
+    "mean": 0.3067669172932331,
+    "sd": 0.3733511540451668,
+    "min": -0.23759398496240602,
+    "max": 0.7669172932330827,
+    "n": 10
+   },
+   "mean_leg_km": {
+    "mean": 4.764949929328908,
+    "sd": 0.4727238159039432,
+    "min": 4.108475774608178,
+    "max": 5.550029221103659,
+    "n": 10
+   }
+  },
+  "greedy": {
+   "gini_coefficient": {
+    "mean": 0.33875,
+    "sd": 0.08392320894722746,
+    "min": 0.234,
+    "max": 0.4839,
+    "n": 10
+   },
+   "avg_response_time_estimate": {
+    "mean": 278.185,
+    "sd": 79.92722054052255,
+    "min": 188.63,
+    "max": 400.81,
+    "n": 10
+   },
+   "high_severity_rate": {
+    "mean": 0.59026,
+    "sd": 0.03750597582015727,
+    "min": 0.5394,
+    "max": 0.6414,
+    "n": 10
+   },
+   "low_income_coverage": {
+    "mean": 0.5004800000000001,
+    "sd": 0.041157658933531314,
+    "min": 0.4236,
+    "max": 0.5526,
+    "n": 10
+   },
+   "computational_time_ms": {
+    "mean": 9.1553,
+    "sd": 2.0314806887806953,
+    "min": 7.987,
+    "max": 14.812,
+    "n": 10
+   },
+   "sampi_wait_correlation": {
+    "mean": 0.19368421052631576,
+    "sd": 0.3521721895574223,
+    "min": -0.31879699248120297,
+    "max": 0.6300751879699248,
+    "n": 10
+   },
+   "mean_leg_km": {
+    "mean": 4.261453014215505,
+    "sd": 0.2469718160804933,
+    "min": 3.9349565658485495,
+    "max": 4.68715614220948,
+    "n": 10
+   }
+  },
+  "genetic": {
+   "gini_coefficient": {
+    "mean": 0.26201,
+    "sd": 0.09396187702112668,
+    "min": 0.1151,
+    "max": 0.4099,
+    "n": 10
+   },
+   "avg_response_time_estimate": {
+    "mean": 269.457,
+    "sd": 75.76909822319094,
+    "min": 190.87,
+    "max": 386.27,
+    "n": 10
+   },
+   "high_severity_rate": {
+    "mean": 0.23876,
+    "sd": 0.025725352821249662,
+    "min": 0.1932,
+    "max": 0.2727,
+    "n": 10
+   },
+   "low_income_coverage": {
+    "mean": 0.49395999999999995,
+    "sd": 0.026442020430452073,
+    "min": 0.4399,
+    "max": 0.531,
+    "n": 10
+   },
+   "computational_time_ms": {
+    "mean": 1186.0744,
+    "sd": 83.05036993990788,
+    "min": 1106.132,
+    "max": 1331.517,
+    "n": 10
+   },
+   "sampi_wait_correlation": {
+    "mean": 0.2700751879699248,
+    "sd": 0.37777809554094516,
+    "min": -0.3233082706766917,
+    "max": 0.7593984962406014,
+    "n": 10
+   },
+   "mean_leg_km": {
+    "mean": 4.07094988931212,
+    "sd": 0.3732915007405757,
+    "min": 3.499413902818812,
+    "max": 4.528952638491102,
+    "n": 10
+   }
+  },
+  "hybrid": {
+   "gini_coefficient": {
+    "mean": 0.34120000000000006,
+    "sd": 0.09114652428309536,
+    "min": 0.2233,
+    "max": 0.4809,
+    "n": 10
+   },
+   "avg_response_time_estimate": {
+    "mean": 300.41200000000003,
+    "sd": 99.63310034543964,
+    "min": 203.07,
+    "max": 462.91,
+    "n": 10
+   },
+   "high_severity_rate": {
+    "mean": 0.3638,
+    "sd": 0.029890280843258885,
+    "min": 0.297,
+    "max": 0.3974,
+    "n": 10
+   },
+   "low_income_coverage": {
+    "mean": 0.7131800000000001,
+    "sd": 0.030358992810112232,
+    "min": 0.6688,
+    "max": 0.7586,
+    "n": 10
+   },
+   "computational_time_ms": {
+    "mean": 11.6192,
+    "sd": 1.4242143097160624,
+    "min": 9.999,
+    "max": 14.083,
+    "n": 10
+   },
+   "sampi_wait_correlation": {
+    "mean": 0.023007518796992466,
+    "sd": 0.36476080609493905,
+    "min": -0.4285714285714286,
+    "max": 0.5473684210526315,
+    "n": 10
+   },
+   "mean_leg_km": {
+    "mean": 4.372352170377536,
+    "sd": 0.3960704346537189,
+    "min": 3.8125878966245454,
+    "max": 5.11498148656667,
+    "n": 10
+   }
+  }
+ },
+ "anova": {
+  "gini_coefficient": {
+   "F": 1.6149353692420982,
+   "p": 0.20293109762720749
+  },
+  "avg_response_time_estimate": {
+   "F": 1.3863165082426305,
+   "p": 0.2626228139944562
+  },
+  "high_severity_rate": {
+   "F": 355.1804895704774,
+   "p": 8.701118129690234e-27
+  },
+  "low_income_coverage": {
+   "F": 137.51815557135444,
+   "p": 8.965483250766772e-20
+  },
+  "computational_time_ms": {
+   "F": 2006.9902947543442,
+   "p": 4.174409912911513e-40
+  },
+  "sampi_wait_correlation": {
+   "F": 1.1787086547334646,
+   "p": 0.3314205079068361
+  },
+  "mean_leg_km": {
+   "F": 5.905199883352231,
+   "p": 0.0021947108099136087
+  }
+ },
+ "paired_t_tests": [
+  {
+   "metric": "gini_coefficient",
+   "a": "fcfs",
+   "b": "greedy",
+   "mean_diff": -0.051519999999999996,
+   "t": -4.043835348170147,
+   "p": 0.0029117675024797744,
+   "p_bonferroni": 0.017470605014878647,
+   "cohens_dz": -1.2787730182917674
+  },
+  {
+   "metric": "gini_coefficient",
+   "a": "fcfs",
+   "b": "genetic",
+   "mean_diff": 0.02522000000000001,
+   "t": 2.707841537821784,
+   "p": 0.024082460857713556,
+   "p_bonferroni": 0.14449476514628135,
+   "cohens_dz": 0.8562946802329818
+  },
+  {
+   "metric": "gini_coefficient",
+   "a": "fcfs",
+   "b": "hybrid",
+   "mean_diff": -0.05396999999999998,
+   "t": -5.756536291295264,
+   "p": 0.00027403169867783704,
+   "p_bonferroni": 0.0016441901920670222,
+   "cohens_dz": -1.8203766113911553
+  },
+  {
+   "metric": "gini_coefficient",
+   "a": "greedy",
+   "b": "genetic",
+   "mean_diff": 0.07674,
+   "t": 10.622032386736107,
+   "p": 2.160612744408318e-06,
+   "p_bonferroni": 1.2963676466449908e-05,
+   "cohens_dz": 3.3589815722160608
+  },
+  {
+   "metric": "gini_coefficient",
+   "a": "greedy",
+   "b": "hybrid",
+   "mean_diff": -0.0024499999999999995,
+   "t": -0.36265885721660596,
+   "p": 0.7252302993919623,
+   "p_bonferroni": 1.0,
+   "cohens_dz": -0.11468280024382671
+  },
+  {
+   "metric": "gini_coefficient",
+   "a": "genetic",
+   "b": "hybrid",
+   "mean_diff": -0.07919000000000001,
+   "t": -15.52490117717835,
+   "p": 8.364905423616006e-08,
+   "p_bonferroni": 5.018943254169603e-07,
+   "cohens_dz": -4.909404816891287
+  },
+  {
+   "metric": "avg_response_time_estimate",
+   "a": "fcfs",
+   "b": "greedy",
+   "mean_diff": 68.522,
+   "t": 6.3250388403306435,
+   "p": 0.00013685814196843024,
+   "p_bonferroni": 0.0008211488518105814,
+   "cohens_dz": 2.000152902447491
+  },
+  {
+   "metric": "avg_response_time_estimate",
+   "a": "fcfs",
+   "b": "genetic",
+   "mean_diff": 77.25,
+   "t": 6.563103647353142,
+   "p": 0.00010358991194446601,
+   "p_bonferroni": 0.0006215394716667961,
+   "cohens_dz": 2.075435604539445
+  },
+  {
+   "metric": "avg_response_time_estimate",
+   "a": "fcfs",
+   "b": "hybrid",
+   "mean_diff": 46.295,
+   "t": 8.651629119895746,
+   "p": 1.1778803484811899e-05,
+   "p_bonferroni": 7.06728209088714e-05,
+   "cohens_dz": 2.7358853489908537
+  },
+  {
+   "metric": "avg_response_time_estimate",
+   "a": "greedy",
+   "b": "genetic",
+   "mean_diff": 8.727999999999998,
+   "t": 2.0539612117750474,
+   "p": 0.07016259946202652,
+   "p_bonferroni": 0.4209755967721591,
+   "cohens_dz": 0.6495195654848606
+  },
+  {
+   "metric": "avg_response_time_estimate",
+   "a": "greedy",
+   "b": "hybrid",
+   "mean_diff": -22.227000000000007,
+   "t": -3.128550385177278,
+   "p": 0.012150044552559436,
+   "p_bonferroni": 0.07290026731535662,
+   "cohens_dz": -0.9893344991757284
+  },
+  {
+   "metric": "avg_response_time_estimate",
+   "a": "genetic",
+   "b": "hybrid",
+   "mean_diff": -30.955000000000005,
+   "t": -3.526610223527583,
+   "p": 0.006448163673964579,
+   "p_bonferroni": 0.03868898204378748,
+   "cohens_dz": -1.115212072598269
+  },
+  {
+   "metric": "high_severity_rate",
+   "a": "fcfs",
+   "b": "greedy",
+   "mean_diff": -0.40274,
+   "t": -27.842375381942308,
+   "p": 4.830638375158167e-10,
+   "p_bonferroni": 2.8983830250949e-09,
+   "cohens_dz": -8.80453216763382
+  },
+  {
+   "metric": "high_severity_rate",
+   "a": "fcfs",
+   "b": "genetic",
+   "mean_diff": -0.05124000000000001,
+   "t": -4.194538843437744,
+   "p": 0.0023254251079797674,
+   "p_bonferroni": 0.013952550647878604,
+   "cohens_dz": -1.326429647931169
+  },
+  {
+   "metric": "high_severity_rate",
+   "a": "fcfs",
+   "b": "hybrid",
+   "mean_diff": -0.17627999999999996,
+   "t": -13.718956776297533,
+   "p": 2.443230932477099e-07,
+   "p_bonferroni": 1.4659385594862596e-06,
+   "cohens_dz": -4.33831505345013
+  },
+  {
+   "metric": "high_severity_rate",
+   "a": "greedy",
+   "b": "genetic",
+   "mean_diff": 0.3515,
+   "t": 26.34977283965921,
+   "p": 7.888509044513921e-10,
+   "p_bonferroni": 4.733105426708352e-09,
+   "cohens_dz": 8.332529800136584
+  },
+  {
+   "metric": "high_severity_rate",
+   "a": "greedy",
+   "b": "hybrid",
+   "mean_diff": 0.22646000000000002,
+   "t": 23.497658125711514,
+   "p": 2.1823274381590608e-09,
+   "p_bonferroni": 1.3093964628954365e-08,
+   "cohens_dz": 7.43061193572115
+  },
+  {
+   "metric": "high_severity_rate",
+   "a": "genetic",
+   "b": "hybrid",
+   "mean_diff": -0.12503999999999998,
+   "t": -14.742176342596503,
+   "p": 1.3113077033053282e-07,
+   "p_bonferroni": 7.867846219831969e-07,
+   "cohens_dz": -4.661885491045572
+  },
+  {
+   "metric": "low_income_coverage",
+   "a": "fcfs",
+   "b": "greedy",
+   "mean_diff": -0.011380000000000001,
+   "t": -0.9421986251707282,
+   "p": 0.37069259589305564,
+   "p_bonferroni": 1.0,
+   "cohens_dz": -0.2979493663818754
+  },
+  {
+   "metric": "low_income_coverage",
+   "a": "fcfs",
+   "b": "genetic",
+   "mean_diff": -0.004859999999999998,
+   "t": -0.48113718256513516,
+   "p": 0.6419005340393296,
+   "p_bonferroni": 1.0,
+   "cohens_dz": -0.1521489363902082
+  },
+  {
+   "metric": "low_income_coverage",
+   "a": "fcfs",
+   "b": "hybrid",
+   "mean_diff": -0.22408,
+   "t": -23.575650990817223,
+   "p": 2.1191230486244943e-09,
+   "p_bonferroni": 1.2714738291746967e-08,
+   "cohens_dz": -7.455275445218782
+  },
+  {
+   "metric": "low_income_coverage",
+   "a": "greedy",
+   "b": "genetic",
+   "mean_diff": 0.006520000000000003,
+   "t": 0.45824734331260014,
+   "p": 0.6576385613079977,
+   "p_bonferroni": 1.0,
+   "cohens_dz": 0.14491053365889453
+  },
+  {
+   "metric": "low_income_coverage",
+   "a": "greedy",
+   "b": "hybrid",
+   "mean_diff": -0.21270000000000003,
+   "t": -27.760223408173882,
+   "p": 4.959450939956347e-10,
+   "p_bonferroni": 2.9756705639738083e-09,
+   "cohens_dz": -8.778553432495158
+  },
+  {
+   "metric": "low_income_coverage",
+   "a": "genetic",
+   "b": "hybrid",
+   "mean_diff": -0.21921999999999997,
+   "t": -16.847601074505707,
+   "p": 4.097856305956527e-08,
+   "p_bonferroni": 2.458713783573916e-07,
+   "cohens_dz": -5.327679250533818
+  },
+  {
+   "metric": "computational_time_ms",
+   "a": "fcfs",
+   "b": "greedy",
+   "mean_diff": -3.0544,
+   "t": -4.934771797498191,
+   "p": 0.0008080227105391055,
+   "p_bonferroni": 0.004848136263234633,
+   "cohens_dz": -1.560511861325749
+  },
+  {
+   "metric": "computational_time_ms",
+   "a": "fcfs",
+   "b": "genetic",
+   "mean_diff": -1179.9735,
+   "t": -45.03163698659851,
+   "p": 6.566640631132794e-12,
+   "p_bonferroni": 3.9399843786796764e-11,
+   "cohens_dz": -14.240253964353258
+  },
+  {
+   "metric": "computational_time_ms",
+   "a": "fcfs",
+   "b": "hybrid",
+   "mean_diff": -5.5183,
+   "t": -9.78052951874761,
+   "p": 4.302832996794517e-06,
+   "p_bonferroni": 2.5816997980767102e-05,
+   "cohens_dz": -3.0928750001752956
+  },
+  {
+   "metric": "computational_time_ms",
+   "a": "greedy",
+   "b": "genetic",
+   "mean_diff": -1176.9191,
+   "t": -45.42533133974456,
+   "p": 6.073729224328334e-12,
+   "p_bonferroni": 3.6442375345970004e-11,
+   "cohens_dz": -14.364751050142079
+  },
+  {
+   "metric": "computational_time_ms",
+   "a": "greedy",
+   "b": "hybrid",
+   "mean_diff": -2.4639000000000006,
+   "t": -2.6460677133502486,
+   "p": 0.026647404767945564,
+   "p_bonferroni": 0.15988442860767338,
+   "cohens_dz": -0.8367600817220319
+  },
+  {
+   "metric": "computational_time_ms",
+   "a": "genetic",
+   "b": "hybrid",
+   "mean_diff": 1174.4551999999999,
+   "t": 44.2008428585644,
+   "p": 7.7594337298757e-12,
+   "p_bonferroni": 4.6556602379254196e-11,
+   "cohens_dz": 13.977533793225122
+  },
+  {
+   "metric": "sampi_wait_correlation",
+   "a": "fcfs",
+   "b": "greedy",
+   "mean_diff": 0.1130827067669173,
+   "t": 3.1528681641900245,
+   "p": 0.01168350128247813,
+   "p_bonferroni": 0.07010100769486878,
+   "cohens_dz": 0.9970244561074204
+  },
+  {
+   "metric": "sampi_wait_correlation",
+   "a": "fcfs",
+   "b": "genetic",
+   "mean_diff": 0.036691729323308296,
+   "t": 1.8199947800696383,
+   "p": 0.10210410424906126,
+   "p_bonferroni": 0.6126246254943676,
+   "cohens_dz": 0.575532883463728
+  },
+  {
+   "metric": "sampi_wait_correlation",
+   "a": "fcfs",
+   "b": "hybrid",
+   "mean_diff": 0.2837593984962406,
+   "t": 5.120192706381267,
+   "p": 0.0006278154829079753,
+   "p_bonferroni": 0.003766892897447852,
+   "cohens_dz": 1.6191471011146554
+  },
+  {
+   "metric": "sampi_wait_correlation",
+   "a": "greedy",
+   "b": "genetic",
+   "mean_diff": -0.07639097744360901,
+   "t": -1.8689105363921878,
+   "p": 0.09446253601152196,
+   "p_bonferroni": 0.5667752160691317,
+   "cohens_dz": -0.5910014038086318
+  },
+  {
+   "metric": "sampi_wait_correlation",
+   "a": "greedy",
+   "b": "hybrid",
+   "mean_diff": 0.1706766917293233,
+   "t": 3.823610776413161,
+   "p": 0.004067343449368992,
+   "p_bonferroni": 0.024404060696213953,
+   "cohens_dz": 1.209131893943041
+  },
+  {
+   "metric": "sampi_wait_correlation",
+   "a": "genetic",
+   "b": "hybrid",
+   "mean_diff": 0.24706766917293232,
+   "t": 4.788369307624254,
+   "p": 0.0009896437821018654,
+   "p_bonferroni": 0.005937862692611193,
+   "cohens_dz": 1.5142153290136109
+  },
+  {
+   "metric": "mean_leg_km",
+   "a": "fcfs",
+   "b": "greedy",
+   "mean_diff": 0.503496915113402,
+   "t": 6.782812203909089,
+   "p": 8.060167891407854e-05,
+   "p_bonferroni": 0.00048361007348447126,
+   "cohens_dz": 2.144913550553916
+  },
+  {
+   "metric": "mean_leg_km",
+   "a": "fcfs",
+   "b": "genetic",
+   "mean_diff": 0.6940000400167878,
+   "t": 11.15971837451348,
+   "p": 1.4254934302129653e-06,
+   "p_bonferroni": 8.552960581277791e-06,
+   "cohens_dz": 3.529012810949456
+  },
+  {
+   "metric": "mean_leg_km",
+   "a": "fcfs",
+   "b": "hybrid",
+   "mean_diff": 0.3925977589513712,
+   "t": 9.09829282826909,
+   "p": 7.811420349956181e-06,
+   "p_bonferroni": 4.6868522099737086e-05,
+   "cohens_dz": 2.877132815650552
+  },
+  {
+   "metric": "mean_leg_km",
+   "a": "greedy",
+   "b": "genetic",
+   "mean_diff": 0.19050312490338578,
+   "t": 3.2142750004754004,
+   "p": 0.010586103260150945,
+   "p_bonferroni": 0.06351661956090568,
+   "cohens_dz": 1.0164430027641067
+  },
+  {
+   "metric": "mean_leg_km",
+   "a": "greedy",
+   "b": "hybrid",
+   "mean_diff": -0.1108991561620308,
+   "t": -2.185979522987782,
+   "p": 0.056620075118856375,
+   "p_bonferroni": 0.3397204507131383,
+   "cohens_dz": -0.6912674211129793
+  },
+  {
+   "metric": "mean_leg_km",
+   "a": "genetic",
+   "b": "hybrid",
+   "mean_diff": -0.30140228106541656,
+   "t": -5.258060406759072,
+   "p": 0.0005220767368914595,
+   "p_bonferroni": 0.003132460421348757,
+   "cohens_dz": -1.6627446960110077
+  }
+ ],
+ "alpha_sensitivity": [
+  {
+   "alpha": 0.0,
+   "metrics": {
+    "gini_coefficient": {
+     "mean": 0.31124,
+     "sd": 0.09961119080371107,
+     "min": 0.1752,
+     "max": 0.4659,
+     "n": 10
+    },
+    "avg_response_time_estimate": {
+     "mean": 309.18199999999996,
+     "sd": 91.76775793030772,
+     "min": 210.34,
+     "max": 454.75,
+     "n": 10
+    },
+    "high_severity_rate": {
+     "mean": 0.44521,
+     "sd": 0.03521121822500449,
+     "min": 0.3864,
+     "max": 0.5,
+     "n": 10
+    },
+    "low_income_coverage": {
+     "mean": 0.49655000000000005,
+     "sd": 0.029524537817438124,
+     "min": 0.4522,
+     "max": 0.5379,
+     "n": 10
+    },
+    "computational_time_ms": {
+     "mean": 9.466999999999999,
+     "sd": 0.6133489128456076,
+     "min": 8.811,
+     "max": 10.4,
+     "n": 10
+    },
+    "sampi_wait_correlation": {
+     "mean": 0.22917293233082708,
+     "sd": 0.35502822057625777,
+     "min": -0.21954887218045113,
+     "max": 0.7022556390977444,
+     "n": 10
+    },
+    "mean_leg_km": {
+     "mean": 4.557136138552793,
+     "sd": 0.32411821111306105,
+     "min": 4.076199514831777,
+     "max": 5.108751204260733,
+     "n": 10
+    }
+   }
+  },
+  {
+   "alpha": 0.2,
+   "metrics": {
+    "gini_coefficient": {
+     "mean": 0.3206,
+     "sd": 0.09453856356006263,
+     "min": 0.2022,
+     "max": 0.4699,
+     "n": 10
+    },
+    "avg_response_time_estimate": {
+     "mean": 310.261,
+     "sd": 96.07985329922188,
+     "min": 209.97,
+     "max": 455.89,
+     "n": 10
+    },
+    "high_severity_rate": {
+     "mean": 0.42507,
+     "sd": 0.02774747435954006,
+     "min": 0.3864,
+     "max": 0.4551,
+     "n": 10
+    },
+    "low_income_coverage": {
+     "mean": 0.5963700000000001,
+     "sd": 0.03146684498537046,
+     "min": 0.5478,
+     "max": 0.6414,
+     "n": 10
+    },
+    "computational_time_ms": {
+     "mean": 9.3681,
+     "sd": 0.22251014958124188,
+     "min": 9.15,
+     "max": 9.939,
+     "n": 10
+    },
+    "sampi_wait_correlation": {
+     "mean": 0.1330827067669173,
+     "sd": 0.36238296220665184,
+     "min": -0.33082706766917286,
+     "max": 0.6451127819548872,
+     "n": 10
+    },
+    "mean_leg_km": {
+     "mean": 4.5412063344164295,
+     "sd": 0.37192542316917,
+     "min": 3.985566234954178,
+     "max": 5.18280725088952,
+     "n": 10
+    }
+   }
+  },
+  {
+   "alpha": 0.4,
+   "metrics": {
+    "gini_coefficient": {
+     "mean": 0.34120000000000006,
+     "sd": 0.09114652428309536,
+     "min": 0.2233,
+     "max": 0.4809,
+     "n": 10
+    },
+    "avg_response_time_estimate": {
+     "mean": 300.41200000000003,
+     "sd": 99.63310034543964,
+     "min": 203.07,
+     "max": 462.91,
+     "n": 10
+    },
+    "high_severity_rate": {
+     "mean": 0.3638,
+     "sd": 0.029890280843258885,
+     "min": 0.297,
+     "max": 0.3974,
+     "n": 10
+    },
+    "low_income_coverage": {
+     "mean": 0.7131800000000001,
+     "sd": 0.030358992810112232,
+     "min": 0.6688,
+     "max": 0.7586,
+     "n": 10
+    },
+    "computational_time_ms": {
+     "mean": 9.6813,
+     "sd": 0.9465577460813827,
+     "min": 8.968,
+     "max": 12.127,
+     "n": 10
+    },
+    "sampi_wait_correlation": {
+     "mean": 0.023007518796992466,
+     "sd": 0.36476080609493905,
+     "min": -0.4285714285714286,
+     "max": 0.5473684210526315,
+     "n": 10
+    },
+    "mean_leg_km": {
+     "mean": 4.372352170377536,
+     "sd": 0.3960704346537189,
+     "min": 3.8125878966245454,
+     "max": 5.11498148656667,
+     "n": 10
+    }
+   }
+  },
+  {
+   "alpha": 0.6,
+   "metrics": {
+    "gini_coefficient": {
+     "mean": 0.38305,
+     "sd": 0.09612847017287739,
+     "min": 0.2638,
+     "max": 0.547,
+     "n": 10
+    },
+    "avg_response_time_estimate": {
+     "mean": 297.329,
+     "sd": 119.51688290316514,
+     "min": 185.59,
+     "max": 492.65,
+     "n": 10
+    },
+    "high_severity_rate": {
+     "mean": 0.30454000000000003,
+     "sd": 0.03635342563714671,
+     "min": 0.2242,
+     "max": 0.3563,
+     "n": 10
+    },
+    "low_income_coverage": {
+     "mean": 0.7974399999999999,
+     "sd": 0.030477430629529418,
+     "min": 0.7531,
+     "max": 0.8379,
+     "n": 10
+    },
+    "computational_time_ms": {
+     "mean": 11.566600000000001,
+     "sd": 5.863839246697602,
+     "min": 8.916,
+     "max": 28.105,
+     "n": 10
+    },
+    "sampi_wait_correlation": {
+     "mean": -0.03127819548872181,
+     "sd": 0.349815651639505,
+     "min": -0.4977443609022556,
+     "max": 0.5097744360902255,
+     "n": 10
+    },
+    "mean_leg_km": {
+     "mean": 4.131192010942296,
+     "sd": 0.4721973070917301,
+     "min": 3.588139383410784,
+     "max": 5.003685134076347,
+     "n": 10
+    }
+   }
+  },
+  {
+   "alpha": 0.8,
+   "metrics": {
+    "gini_coefficient": {
+     "mean": 0.40832999999999997,
+     "sd": 0.08583011709184604,
+     "min": 0.3034,
+     "max": 0.5449,
+     "n": 10
+    },
+    "avg_response_time_estimate": {
+     "mean": 258.51300000000003,
+     "sd": 105.72935407076987,
+     "min": 160.38,
+     "max": 466.65,
+     "n": 10
+    },
+    "high_severity_rate": {
+     "mean": 0.23290000000000002,
+     "sd": 0.02635636123932471,
+     "min": 0.1818,
+     "max": 0.2746,
+     "n": 10
+    },
+    "low_income_coverage": {
+     "mean": 0.8192300000000001,
+     "sd": 0.03323786495349343,
+     "min": 0.7716,
+     "max": 0.8621,
+     "n": 10
+    },
+    "computational_time_ms": {
+     "mean": 9.502799999999999,
+     "sd": 0.5684843005747828,
+     "min": 8.795,
+     "max": 10.611,
+     "n": 10
+    },
+    "sampi_wait_correlation": {
+     "mean": -0.10842105263157893,
+     "sd": 0.3229948938787182,
+     "min": -0.47518796992481205,
+     "max": 0.4285714285714286,
+     "n": 10
+    },
+    "mean_leg_km": {
+     "mean": 3.572045965028002,
+     "sd": 0.35399519251358924,
+     "min": 3.086828463942091,
+     "max": 4.058727059045846,
+     "n": 10
+    }
+   }
+  },
+  {
+   "alpha": 1.0,
+   "metrics": {
+    "gini_coefficient": {
+     "mean": 0.36896999999999996,
+     "sd": 0.05537020959966751,
+     "min": 0.3117,
+     "max": 0.4586,
+     "n": 10
+    },
+    "avg_response_time_estimate": {
+     "mean": 195.008,
+     "sd": 45.053214905635016,
+     "min": 145.13,
+     "max": 276.95,
+     "n": 10
+    },
+    "high_severity_rate": {
+     "mean": 0.18997,
+     "sd": 0.019781419452495203,
+     "min": 0.1576,
+     "max": 0.2183,
+     "n": 10
+    },
+    "low_income_coverage": {
+     "mean": 0.81957,
+     "sd": 0.03334566605189413,
+     "min": 0.7716,
+     "max": 0.8621,
+     "n": 10
+    },
+    "computational_time_ms": {
+     "mean": 9.675699999999997,
+     "sd": 0.4911836158143351,
+     "min": 9.067,
+     "max": 10.529,
+     "n": 10
+    },
+    "sampi_wait_correlation": {
+     "mean": -0.19593984962406016,
+     "sd": 0.29506490360782844,
+     "min": -0.5849624060150376,
+     "max": 0.35037593984962395,
+     "n": 10
+    },
+    "mean_leg_km": {
+     "mean": 2.9405987261112263,
+     "sd": 0.10461598792057028,
+     "min": 2.8170883727541653,
+     "max": 3.145471263227806,
+     "n": 10
+    }
+   }
+  }
+ ]
+}

@@ -11,6 +11,8 @@ from main import (
     app,
     build_ga_toolbox,
     gini,
+    high_severity_rate,
+    low_income_coverage,
     reset_config,
     simulate_response_times,
 )
@@ -482,6 +484,82 @@ def test_compare_returns_all_four_with_metrics():
 def test_compare_with_a_single_report():
     payload = {"reports": [make_report(1)], "workers": [{"id": "w1", "lat": -33.93, "lng": 18.43, "available": True}]}
     assert client.post("/prioritise/compare", json=payload).status_code == 200
+
+
+# ------------------------------------------------------- queue-order metrics
+
+def queue(severities=None, equities=None):
+    n = len(severities or equities)
+    return [
+        Report(
+            id=f"r{i}",
+            category="water",
+            severity=(severities or [3] * n)[i],
+            created_at="2026-10-01T00:00:00Z",
+            lat=-33.9,
+            lng=18.4,
+            ward_id="W1",
+            equity_weight=None if equities is None else equities[i],
+        )
+        for i in range(n)
+    ]
+
+
+def test_high_severity_rate_all_at_the_front():
+    # 10 reports: the top 20% is the first 2 places.
+    assert high_severity_rate(queue([5, 4] + [1] * 8)) == pytest.approx(1.0)
+
+
+def test_high_severity_rate_all_at_the_back():
+    assert high_severity_rate(queue([1] * 8 + [5, 4])) == pytest.approx(0.0)
+
+
+def test_high_severity_rate_partial():
+    assert high_severity_rate(queue([5, 1, 1, 1, 1, 1, 1, 1, 1, 5])) == pytest.approx(0.5)
+
+
+def test_high_severity_rate_none_without_high_severity_reports():
+    assert high_severity_rate(queue([1, 2, 3, 3])) is None
+
+
+def test_low_income_coverage_all_in_the_top_half():
+    assert low_income_coverage(queue(equities=[0.8, 0.7, 0.6, 0.1, 0.2, 0.3])) == pytest.approx(1.0)
+
+
+def test_low_income_coverage_all_in_the_bottom_half():
+    assert low_income_coverage(queue(equities=[0.1, 0.2, 0.3, 0.8, 0.7, 0.6])) == pytest.approx(0.0)
+
+
+def test_low_income_threshold_is_inclusive():
+    assert low_income_coverage(queue(equities=[0.5, 0.1, 0.1, 0.1])) == pytest.approx(1.0)
+    assert low_income_coverage(queue(equities=[0.49, 0.1, 0.1, 0.1])) is None
+
+
+def test_low_income_coverage_none_without_equity_weights():
+    assert low_income_coverage(queue(severities=[3, 3, 3])) is None
+
+
+def test_every_algorithm_now_returns_the_two_queue_metrics():
+    p = make_problem(30)
+    for r in p["reports"]:
+        r["equity_weight"] = 0.7
+        r["severity"] = max(r["severity"], 4) if r["id"] == "r0" else r["severity"]
+    for name in ("fcfs", "greedy", "genetic", "hybrid"):
+        m = client.post(f"/prioritise/{name}", json={**p, "seed": 1}).json()["metrics"]
+        assert 0 <= m["high_severity_rate"] <= 1, name
+        assert 0 <= m["low_income_coverage"] <= 1, name
+
+
+def test_hybrid_moves_low_income_reports_forward_as_alpha_rises():
+    p = make_problem(100, seed=2)
+    for r in p["reports"]:
+        r["equity_weight"] = 0.78 if int(r["id"][1:]) % 2 else 0.12
+    coverage = [
+        client.post("/prioritise/hybrid", json={**p, "alpha": a}).json()["metrics"]["low_income_coverage"]
+        for a in (0.0, 0.5, 1.0)
+    ]
+    assert coverage[0] < coverage[1] <= coverage[2]
+    assert coverage[2] == pytest.approx(1.0)
 
 
 # --------------------------------------------------------------------- helpers
