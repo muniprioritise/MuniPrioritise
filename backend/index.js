@@ -307,7 +307,7 @@ app.post(
       return res.status(400).json({ errors: errors.array() });
     }
     const { category, description, severity, lat, lng } = req.body;
-    const photoUrls = req.files ? req.files.map(file => `/uploads/${file.filename}`) : [];
+    const photoUrls = req.files ? req.files.map(file => file.url) : [];
     const userId = req.user.id;
 
     try {
@@ -388,7 +388,7 @@ app.post(
   async (req, res) => {
     const { id } = req.params;
     const { notes } = req.body;
-    const evidenceUrls = req.files ? req.files.map(file => `/uploads/${file.filename}`) : [];
+    const evidenceUrls = req.files ? req.files.map(file => file.url) : [];
     const workerId = req.user.id;
 
     if (evidenceUrls.length === 0) {
@@ -641,7 +641,7 @@ app.patch('/api/jobs/:id/resolve', verifyToken, requireRole(['worker']), upload.
     const jobId = req.params.id;
     const workerId = req.user.id;
     const { notes } = req.body;
-    const evidenceUrls = req.files ? req.files.map(file => `/uploads/${file.filename}`) : [];
+    const evidenceUrls = req.files ? req.files.map(file => file.url) : [];
 
     if (evidenceUrls.length === 0) {
       return res.status(400).json({ error: 'Evidence photos are required to resolve a job' });

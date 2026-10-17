@@ -9,8 +9,14 @@ import type {
   ReportStatusEvent,
 } from "@/types/report";
 
-// Photos are served from the host root (/uploads/...), not under /api.
+// Photos are either a full https URL (Cloudinary) or a path on the backend
+// host (/uploads/..., local development), which is served from the host root,
+// not under /api.
 const HOST_URL = (api.defaults.baseURL ?? "").replace(/\/api\/?$/, "");
+
+function toPhotoUrl(photo: string): string {
+  return /^https?:\/\//.test(photo) ? photo : `${HOST_URL}${photo}`;
+}
 
 // A photo upload to a cold-started free-tier server can outlast the default
 // 10 s axios timeout.
@@ -101,7 +107,7 @@ function toReport(row: ApiReport): Report {
     description: row.description ?? "",
     severity: row.severity ?? 1,
     status: toClientStatus(row.status),
-    photoUrl: firstPhoto ? `${HOST_URL}${firstPhoto}` : undefined,
+    photoUrl: firstPhoto ? toPhotoUrl(firstPhoto) : undefined,
     latitude: Number(row.lat),
     longitude: Number(row.lng),
     createdAt: row.created_at,
@@ -183,4 +189,3 @@ export async function createReport(input: CreateReportInput): Promise<Report> {
 export async function rateReport(id: string, rating: number): Promise<void> {
   await api.patch(`/reports/${id}/rating`, { rating });
 }
-
