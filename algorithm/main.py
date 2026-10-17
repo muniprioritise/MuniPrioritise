@@ -1,6 +1,7 @@
 import time
 import math
 import random
+from datetime import datetime, timezone
 
 import numpy as np
 from fastapi import FastAPI, HTTPException
@@ -46,6 +47,9 @@ class Assignment(BaseModel):
     report_id: str
     worker_id: str
     score: float
+    # Hybrid only (null for the baselines): the two parts of the final score.
+    efficiency_score: float | None = None
+    equity_score: float | None = None
 
 
 class Metrics(BaseModel):
@@ -55,6 +59,8 @@ class Metrics(BaseModel):
     # Defined in Phase 3 (P3-05). Kept here so the output matches docs/api-contracts.md.
     high_severity_rate: float | None = None
     low_income_coverage: float | None = None
+    # Hybrid only: reports that arrived with no equity_weight and were given Q = 0.
+    equity_missing_count: int | None = None
 
 
 class PrioritiseResponse(BaseModel):
@@ -62,6 +68,8 @@ class PrioritiseResponse(BaseModel):
     prioritised_order: list[str]
     assignments: list[Assignment]
     metrics: Metrics
+    # Hybrid only: the alpha this run actually used, so a result describes itself.
+    alpha_used: float | None = None
 
 
 # ---------------------------------------------------------------------------
@@ -92,6 +100,40 @@ def nearest_available_worker(report: Report, workers: list[Worker]) -> Worker | 
         available,
         key=lambda w: euclidean_distance(report.lat, report.lng, w.lat, w.lng),
     )
+
+
+def proximity_scores(reports: list[Report], workers: list[Worker]) -> dict[str, float]:
+    """Proximity of each report to its nearest available worker, scaled 0 to 1.
+
+    1 is the closest report in the batch, 0 the furthest. A report with no
+    available worker scores 0. If every report is equally far, all score 1.
+    Greedy and Hybrid both use this, so the benchmark compares them on the
+    same definition of "close".
+    """
+    distances: dict[str, float | None] = {}
+    for report in reports:
+        worker = nearest_available_worker(report, workers)
+        distances[report.id] = (
+            None
+            if worker is None
+            else euclidean_distance(report.lat, report.lng, worker.lat, worker.lng)
+        )
+
+    known = [d for d in distances.values() if d is not None]
+    d_min = min(known) if known else 0.0
+    d_max = max(known) if known else 0.0
+    spread = d_max - d_min
+
+    scores: dict[str, float] = {}
+    for report in reports:
+        d = distances[report.id]
+        if d is None:
+            scores[report.id] = 0.0
+        elif spread <= 1e-9:
+            scores[report.id] = 1.0
+        else:
+            scores[report.id] = 1.0 - (d - d_min) / spread
+    return scores
 
 
 def gini(values: list[float]) -> float:
@@ -204,33 +246,12 @@ def prioritise_greedy(payload: PrioritiseRequest):
     # Both terms are scaled to 0-1 first. The original 1/distance term is
     # unbounded and unit dependent (about 100 for a 0.01 degree gap), so it
     # swamped severity (1-5) and the ordering ignored severity. Here severity
-    # is severity/5 and proximity is 1 for the closest report in the batch and
-    # 0 for the furthest. Reports with no available worker get proximity 0.
-    distances: dict[str, float | None] = {}
-    for report in payload.reports:
-        worker = nearest_available_worker(report, payload.workers)
-        distances[report.id] = (
-            None
-            if worker is None
-            else euclidean_distance(report.lat, report.lng, worker.lat, worker.lng)
-        )
-
-    known = [d for d in distances.values() if d is not None]
-    d_min = min(known) if known else 0.0
-    d_max = max(known) if known else 0.0
-    spread = d_max - d_min
-
-    def greedy_score(report: Report) -> float:
-        d = distances[report.id]
-        if d is None:
-            proximity = 0.0
-        elif spread <= 1e-9:
-            proximity = 1.0
-        else:
-            proximity = 1.0 - (d - d_min) / spread
-        return (min(report.severity, 5) / 5) * 0.5 + proximity * 0.5
-
-    scores = {r.id: greedy_score(r) for r in payload.reports}
+    # is severity/5 and proximity comes from proximity_scores (see above).
+    proximity = proximity_scores(payload.reports, payload.workers)
+    scores = {
+        r.id: (min(r.severity, 5) / 5) * 0.5 + proximity[r.id] * 0.5
+        for r in payload.reports
+    }
     sorted_reports = sorted(payload.reports, key=lambda r: scores[r.id], reverse=True)
 
     assignments: list[Assignment] = []
@@ -447,10 +468,121 @@ def prioritise_genetic(payload: PrioritiseRequest):
     )
 
 
+# ---------------------------------------------------------------------------
+# Hybrid (equity-aware)
+# ---------------------------------------------------------------------------
+
+DEFAULT_ALPHA = 0.4
+# Efficiency weights from the agreed design: E = 0.4*severity + 0.3*waiting + 0.3*proximity.
+EFFICIENCY_WEIGHTS = {"severity": 0.4, "waiting": 0.3, "proximity": 0.3}
+# A report that has waited this long scores 1 on the waiting term. Fixed (not
+# relative to the batch) so a lone old report is not stretched to look urgent.
+WAIT_HORIZON_HOURS = 168.0  # 7 days, the length of the benchmark dataset
+
+
+def parse_timestamp(value: str) -> datetime:
+    try:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError:
+        raise HTTPException(status_code=422, detail=f"created_at is not an ISO 8601 timestamp: {value!r}")
+    return parsed if parsed.tzinfo else parsed.replace(tzinfo=timezone.utc)
+
+
+def resolve_alpha(alpha: float | None) -> float:
+    if alpha is None:
+        return DEFAULT_ALPHA
+    if not 0.0 <= alpha <= 1.0:
+        raise HTTPException(status_code=422, detail="alpha must be between 0.0 and 1.0")
+    return alpha
+
+
+def waiting_scores(reports: list[Report]) -> dict[str, float]:
+    """Hours waited as a share of WAIT_HORIZON_HOURS, capped at 1.
+
+    "Now" is the newest created_at in the batch, not the system clock, so the
+    same input always gives the same scores (benchmark runs are reproducible).
+    """
+    stamps = {r.id: parse_timestamp(r.created_at) for r in reports}
+    now = max(stamps.values())
+    return {
+        rid: min(((now - ts).total_seconds() / 3600) / WAIT_HORIZON_HOURS, 1.0)
+        for rid, ts in stamps.items()
+    }
+
+
+@app.post("/prioritise/hybrid", response_model=PrioritiseResponse)
+def prioritise_hybrid(payload: PrioritiseRequest):
+    start = time.perf_counter()
+    alpha = resolve_alpha(payload.alpha)
+
+    if not payload.reports:
+        return PrioritiseResponse(
+            algorithm="hybrid",
+            prioritised_order=[],
+            assignments=[],
+            metrics=Metrics(processing_time_ms=0.0, equity_missing_count=0),
+            alpha_used=alpha,
+        )
+
+    # Every term is on a 0 to 1 scale, so the weights mean what they say.
+    proximity = proximity_scores(payload.reports, payload.workers)
+    waiting = waiting_scores(payload.reports)
+
+    efficiency: dict[str, float] = {}
+    equity: dict[str, float] = {}
+    final: dict[str, float] = {}
+    missing = 0
+    for r in payload.reports:
+        efficiency[r.id] = (
+            EFFICIENCY_WEIGHTS["severity"] * (min(r.severity, 5) / 5)
+            + EFFICIENCY_WEIGHTS["waiting"] * waiting[r.id]
+            + EFFICIENCY_WEIGHTS["proximity"] * proximity[r.id]
+        )
+        # Q is the ward's SAMPI score. No ward evidence means no equity boost.
+        if r.equity_weight is None:
+            missing += 1
+            equity[r.id] = 0.0
+        else:
+            equity[r.id] = min(max(r.equity_weight, 0.0), 1.0)
+        final[r.id] = (1 - alpha) * efficiency[r.id] + alpha * equity[r.id]
+
+    # Highest score first. Ties go to the older report, then the id, so the order is deterministic.
+    sorted_reports = sorted(
+        payload.reports, key=lambda r: (-final[r.id], r.created_at, r.id)
+    )
+
+    assignments: list[Assignment] = []
+    for report in sorted_reports:
+        worker = nearest_available_worker(report, payload.workers)
+        if worker is not None:
+            assignments.append(
+                Assignment(
+                    report_id=report.id,
+                    worker_id=worker.id,
+                    score=round(final[report.id], 6),
+                    efficiency_score=round(efficiency[report.id], 6),
+                    equity_score=round(equity[report.id], 6),
+                )
+            )
+
+    processing_time_ms = (time.perf_counter() - start) * 1000
+    metrics = build_metrics(sorted_reports, payload.workers, processing_time_ms)
+    metrics.equity_missing_count = missing
+
+    return PrioritiseResponse(
+        algorithm="hybrid",
+        prioritised_order=[r.id for r in sorted_reports],
+        assignments=assignments,
+        metrics=metrics,
+        alpha_used=alpha,
+    )
+
+
 @app.post("/prioritise/compare")
 def prioritise_compare(payload: PrioritiseRequest):
     return {
         "fcfs": prioritise_fcfs(payload),
         "greedy": prioritise_greedy(payload),
         "genetic": prioritise_genetic(payload),
+        "hybrid": prioritise_hybrid(payload),
     }
