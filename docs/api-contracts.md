@@ -254,8 +254,11 @@ Holds the live alpha. A hybrid request with no `alpha` uses this value; an `alph
 
 ### Metric definitions
 - `avg_response_time_estimate` is in **minutes**. Each report goes to its nearest available worker, each worker serves their reports in the prioritised order, and travel is estimated at 30 km/h with no on-site time.
-- `gini_coefficient` is the inequality of the **average response time between wards** (0 = every ward waits the same time on average).
-- `high_severity_rate` and `low_income_coverage` are `null` until they are defined and implemented in Phase 3 (P3-05).
+- `gini_coefficient` is the inequality of the **average response time between wards** (0 = every ward waits the same time on average). It measures sameness, not fairness: an algorithm that deliberately serves deprived wards faster will raise it. Read it together with `low_income_coverage`.
+- `high_severity_rate` is the share of severity 4/5 reports that sit in the **top 20% of the queue**. A queue in random order scores about 0.2. It is `null` if the request has no severity 4/5 reports.
+- `low_income_coverage` is the share of low-income-ward reports that sit in the **top 50% of the queue**. A report is low-income if its `equity_weight` (ward SAMPI score) is **0.5 or more**. A queue in random order scores about 0.5. It is `null` if no report has a qualifying `equity_weight`.
+- Both queue metrics depend only on the order of `prioritised_order`, not on the workers. The 20%, 50% and 0.5 values are constants in `algorithm/main.py`.
+- The benchmark (`algorithm/benchmark.py`) reports these metrics, plus two diagnostics that are not part of the API output: the Spearman correlation between ward SAMPI and ward average wait, and the mean distance a worker travels between jobs.
 
 ### Output schema (all algorithms)
 ```json

@@ -178,6 +178,43 @@ def simulate_response_times(
     return result
 
 
+HIGH_SEVERITY_TOP_SHARE = 0.20  # "the top of the queue" for high_severity_rate
+LOW_INCOME_TOP_SHARE = 0.50  # "the top half of the queue" for low_income_coverage
+LOW_INCOME_SAMPI_THRESHOLD = 0.5  # a report counts as low-income if its ward SAMPI is at least this
+
+
+def high_severity_rate(ordered_reports: list[Report]) -> float | None:
+    """Share of severity 4/5 reports that sit in the top 20% of the queue.
+
+    1.0 means every high-severity report is near the front. A queue in random
+    order scores about 0.2. None if the batch has no high-severity reports.
+    (HIGH_SEVERITY_THRESHOLD is defined with the genetic algorithm below.)
+    """
+    high = [i for i, r in enumerate(ordered_reports) if r.severity >= HIGH_SEVERITY_THRESHOLD]
+    if not high:
+        return None
+    cutoff = math.ceil(len(ordered_reports) * HIGH_SEVERITY_TOP_SHARE)
+    return sum(1 for i in high if i < cutoff) / len(high)
+
+
+def low_income_coverage(ordered_reports: list[Report]) -> float | None:
+    """Share of low-income-ward reports that sit in the top half of the queue.
+
+    A report is low-income if its equity_weight (the ward SAMPI score) is at
+    least LOW_INCOME_SAMPI_THRESHOLD. A queue in random order scores about 0.5,
+    so read the result against that. None if no report has a qualifying weight.
+    """
+    low = [
+        i
+        for i, r in enumerate(ordered_reports)
+        if r.equity_weight is not None and r.equity_weight >= LOW_INCOME_SAMPI_THRESHOLD
+    ]
+    if not low:
+        return None
+    cutoff = math.ceil(len(ordered_reports) * LOW_INCOME_TOP_SHARE)
+    return sum(1 for i in low if i < cutoff) / len(low)
+
+
 def build_metrics(
     ordered_reports: list[Report], workers: list[Worker], processing_time_ms: float
 ) -> Metrics:
@@ -185,11 +222,22 @@ def build_metrics(
 
     avg_response_time_estimate: mean minutes until a worker reaches each report.
     gini_coefficient: inequality of the *average* response time between wards
-    (0 = every ward waits the same time on average).
+    (0 = every ward waits the same time on average). It measures sameness, not
+    fairness: an algorithm that serves deprived wards faster on purpose raises it.
+    high_severity_rate and low_income_coverage describe the queue order only,
+    so they do not depend on workers.
     """
+    queue_metrics = {
+        "high_severity_rate": high_severity_rate(ordered_reports),
+        "low_income_coverage": low_income_coverage(ordered_reports),
+    }
+    for key, value in queue_metrics.items():
+        if value is not None:
+            queue_metrics[key] = round(value, 4)
+
     served = simulate_response_times(ordered_reports, workers)
     if not served:
-        return Metrics(processing_time_ms=round(processing_time_ms, 3))
+        return Metrics(processing_time_ms=round(processing_time_ms, 3), **queue_metrics)
 
     minutes = [m for _, _, m in served]
     by_ward: dict[str, list[float]] = {}
@@ -201,6 +249,7 @@ def build_metrics(
         processing_time_ms=round(processing_time_ms, 3),
         gini_coefficient=round(gini(ward_means), 4),
         avg_response_time_estimate=round(sum(minutes) / len(minutes), 2),
+        **queue_metrics,
     )
 
 
