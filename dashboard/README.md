@@ -1,16 +1,45 @@
-# React + Vite
+# Supervisor dashboard
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React and Vite web app for municipal supervisors. It shows the open request queue, the map, analytics, the override audit trail and the algorithm benchmark. Supervisors can reassign a job to another worker, with a reason that is logged.
 
-Currently, two official plugins are available:
+Only accounts with the `supervisor` role can sign in. Residents and workers use the mobile app.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Live: https://muni-prioritise.vercel.app
 
-## React Compiler
+## Run it
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Node.js 20, from this folder:
 
-## Expanding the ESLint configuration
+```
+npm install
+npm run dev
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Create a `.env` file with the backend address. Do not add `/api`, the app adds it:
+
+```
+VITE_API_BASE_URL=http://localhost:3000
+```
+
+Vite reads this at build time, so rebuild after changing it.
+
+## Scripts
+
+| Command | Purpose |
+|---|---|
+| `npm run dev` | Development server |
+| `npm run build` | Production build into `dist` |
+| `npm run lint` | ESLint |
+| `npm run sync:benchmark` | Copy `database/seed/benchmark_results.json` into `src/utils` for the benchmark page |
+
+## Pages
+
+| Route | Content |
+|---|---|
+| `/overview` | KPI cards |
+| `/request-table` | Request table with filters and CSV export |
+| `/request-map` | Requests on a map |
+| `/analytics` | Response time, requests over time, ward equity |
+| `/reports` | Summary with PDF export |
+| `/prioritisation-override` | Prioritised queue, worker reassignment, audit log |
+| `/benchmarks` | Benchmark comparison of the four algorithms |

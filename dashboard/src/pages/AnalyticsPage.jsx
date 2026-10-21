@@ -12,7 +12,7 @@ import {
   YAxis,
 } from 'recharts';
 import { useAuth } from '../context/AuthContext.jsx';
-import { fetchAnalytics, fetchReports } from '../services/dashboardApi.js';
+import { fetchAnalytics } from '../services/dashboardApi.js';
 
 function AnalyticsPage() {
   const { token } = useAuth();
@@ -27,8 +27,7 @@ function AnalyticsPage() {
       setError('');
       setIsLoading(true);
       try {
-        const reports = await fetchReports(token);
-        const payload = await fetchAnalytics(token, reports);
+        const payload = await fetchAnalytics(token);
         if (mounted) {
           setAnalytics(payload);
         }

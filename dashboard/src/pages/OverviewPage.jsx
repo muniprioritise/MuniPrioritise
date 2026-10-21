@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext.jsx';
-import { fetchOverview, fetchReports } from '../services/dashboardApi.js';
+import { fetchOverview } from '../services/dashboardApi.js';
 
 function StatCard({ label, value, tone = 'neutral', hint }) {
   return (
@@ -24,8 +24,7 @@ function OverviewPage() {
       setError('');
       setIsLoading(true);
       try {
-        const reports = await fetchReports(token);
-        const overview = await fetchOverview(token, reports);
+        const overview = await fetchOverview(token);
         if (mounted) {
           setMetrics(overview);
         }
