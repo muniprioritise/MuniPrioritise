@@ -31,10 +31,9 @@ app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok', message: 'Backend is live' });
 });
 
-// A report is assigned to the nearest ward centroid, so a resident cannot
-// choose a more deprived ward to jump the queue. Beyond this distance from
-// every ward the report gets no ward (null) instead of a misleading one.
-// Keep in sync with the 25 in database/migrations/003_ward_centroids.sql.
+// Reports get the nearest ward centroid, so a resident cannot pick a more
+// deprived ward to jump the queue. Further than this from every ward, the
+// report gets no ward. Keep in step with database/migrations/003_ward_centroids.sql.
 const MAX_WARD_DISTANCE_KM = 25;
 
 async function findNearestWardId(lat, lng) {
@@ -325,9 +324,7 @@ app.post(
 );
 
 // PATCH /api/reports/:id/status (worker updates status)
-// Allowed values match the reports.status CHECK constraint in the database.
-// ('rejected' used to be accepted here, which made Postgres reject the update
-// and the caller got a 500.)
+// Allowed values match the reports.status CHECK constraint.
 app.patch(
   '/api/reports/:id/status',
   verifyToken,
@@ -347,8 +344,7 @@ app.patch(
 
       const oldStatus = current.rows[0].status;
 
-      // Already in that status (e.g. the mobile app re-sends in_progress right
-      // after accepting a job): nothing to change, log or push.
+      // Already in that status (the app re-sends in_progress after accept).
       if (oldStatus === status) {
         const same = await pool.query('SELECT * FROM reports WHERE id = $1', [id]);
         return res.status(200).json(same.rows[0]);
@@ -461,9 +457,8 @@ app.patch(
 );
 
 // GET /api/jobs
-// Persists each assignment into job_assignments (upsert on report_id) so
-// accept/resolve/escalate/override have a real row to act on.
-// Staff only: residents have no use for the queue and this call writes to the DB.
+// Runs the hybrid algorithm and upserts each assignment into job_assignments.
+// Staff only, because the call writes to the database.
 app.get('/api/jobs', verifyToken, requireRole(['worker', 'supervisor']), async (req, res) => {
   try {
     const reportsResult = await pool.query(
@@ -475,10 +470,8 @@ app.get('/api/jobs', verifyToken, requireRole(['worker', 'supervisor']), async (
     );
     const pendingReports = reportsResult.rows;
 
-    // A report with no ward is sent as 'UNASSIGNED' with no equity weight. It
-    // used to be relabelled CPT-001 (SAMPI 0.78), which gave every unlocated
-    // report a high equity score. equity_weight is the ward's SAMPI score (the
-    // algorithm's Q term); the hybrid endpoint reads it. A null weight gives Q = 0.
+    // equity_weight is the ward's SAMPI score. A report with no ward has no
+    // weight, so the algorithm gives it no equity boost.
     const reportsForAlgorithm = pendingReports.map(r => ({
       ...r,
       ward_id: r.ward_id ?? 'UNASSIGNED',
@@ -509,10 +502,8 @@ app.get('/api/jobs', verifyToken, requireRole(['worker', 'supervisor']), async (
 
       const persistedJobs = [];
       for (const a of algoResult.assignments) {
-        // A supervisor override (override_by set) is final: re-running the
-        // algorithm must not move the job back. The WHERE below makes Postgres
-        // skip the update for those rows, so RETURNING gives nothing and we
-        // read the stored (overridden) row instead.
+        // A supervisor override is final. The WHERE skips overridden rows, so
+        // RETURNING is empty and the stored row is read instead.
         const upserted = await pool.query(
           `INSERT INTO job_assignments
              (report_id, worker_id, algorithm_used, priority_score, efficiency_score, equity_score)
@@ -784,9 +775,8 @@ app.post('/api/supervisor/override', verifyToken, requireRole(['supervisor']), a
   }
 });
 
-// Time a report was resolved: the first 'resolved' entry in status_events,
-// or updated_at when there is none. Expects the reports table aliased as r.
-// (updated_at alone is wrong: anything that touches the row later moves it.)
+// When a report was resolved: the first 'resolved' entry in status_events,
+// or updated_at if there is none. Expects the reports table aliased as r.
 const RESOLVED_AT_SQL = `COALESCE(
   (SELECT MIN(se.occurred_at) FROM status_events se
    WHERE se.report_id = r.id AND se.new_status = 'resolved'),
@@ -817,8 +807,6 @@ app.get('/api/supervisor/overview', verifyToken, requireRole(['supervisor']), as
     );
 
     // Average hours from creation to resolution, resolved reports only.
-    // Resolution time comes from the status_events log, falling back to
-    // updated_at for reports resolved before events were logged.
     const avgResponse = await pool.query(
       `SELECT AVG(EXTRACT(EPOCH FROM (${RESOLVED_AT_SQL} - r.created_at)) / 3600.0) AS avg_hours
        FROM reports r
@@ -918,8 +906,7 @@ app.get('/api/supervisor/audit', verifyToken, requireRole(['supervisor']), async
   }
 });
 
-// Error handler. Without it, a rejected upload (wrong file type, file too
-// large) came back as an HTML 500 page instead of a JSON 400.
+// Turns upload errors (wrong file type, file too large) into a JSON 400.
 app.use((err, req, res, next) => {
   if (err.name === 'MulterError') {
     const message = err.code === 'LIMIT_FILE_SIZE' ? 'Each photo must be 5MB or smaller' : err.message;
