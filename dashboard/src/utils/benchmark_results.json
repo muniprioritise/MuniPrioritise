@@ -27,32 +27,32 @@
       "name": "FCFS",
       "metrics": {
         "gini_coefficient": {
-          "mean": 0.2872,
-          "sd": 0.1172
+          "mean": 0.28723,
+          "sd": 0.117199
         },
         "avg_response_time_estimate": {
           "mean": 346.707,
-          "sd": 111.4025
+          "sd": 111.402536
         },
         "high_severity_rate": {
-          "mean": 0.1875,
-          "sd": 0.0258
+          "mean": 0.18752,
+          "sd": 0.025771
         },
         "low_income_coverage": {
           "mean": 0.4891,
-          "sd": 0.013
+          "sd": 0.012982
         },
         "computational_time_ms": {
           "mean": 6.1009,
-          "sd": 0.6796
+          "sd": 0.679571
         },
         "sampi_wait_correlation": {
-          "mean": 0.3068,
-          "sd": 0.3734
+          "mean": 0.306767,
+          "sd": 0.373351
         },
         "mean_leg_km": {
-          "mean": 4.7649,
-          "sd": 0.4727
+          "mean": 4.76495,
+          "sd": 0.472724
         }
       }
     },
@@ -61,32 +61,32 @@
       "name": "Greedy",
       "metrics": {
         "gini_coefficient": {
-          "mean": 0.3387,
-          "sd": 0.0839
+          "mean": 0.33875,
+          "sd": 0.083923
         },
         "avg_response_time_estimate": {
           "mean": 278.185,
-          "sd": 79.9272
+          "sd": 79.927221
         },
         "high_severity_rate": {
-          "mean": 0.5903,
-          "sd": 0.0375
+          "mean": 0.59026,
+          "sd": 0.037506
         },
         "low_income_coverage": {
-          "mean": 0.5005,
-          "sd": 0.0412
+          "mean": 0.50048,
+          "sd": 0.041158
         },
         "computational_time_ms": {
           "mean": 9.1553,
-          "sd": 2.0315
+          "sd": 2.031481
         },
         "sampi_wait_correlation": {
-          "mean": 0.1937,
-          "sd": 0.3522
+          "mean": 0.193684,
+          "sd": 0.352172
         },
         "mean_leg_km": {
-          "mean": 4.2615,
-          "sd": 0.247
+          "mean": 4.261453,
+          "sd": 0.246972
         }
       }
     },
@@ -95,32 +95,32 @@
       "name": "Genetic",
       "metrics": {
         "gini_coefficient": {
-          "mean": 0.262,
-          "sd": 0.094
+          "mean": 0.26201,
+          "sd": 0.093962
         },
         "avg_response_time_estimate": {
           "mean": 269.457,
-          "sd": 75.7691
+          "sd": 75.769098
         },
         "high_severity_rate": {
-          "mean": 0.2388,
-          "sd": 0.0257
+          "mean": 0.23876,
+          "sd": 0.025725
         },
         "low_income_coverage": {
-          "mean": 0.494,
-          "sd": 0.0264
+          "mean": 0.49396,
+          "sd": 0.026442
         },
         "computational_time_ms": {
           "mean": 1186.0744,
-          "sd": 83.0504
+          "sd": 83.05037
         },
         "sampi_wait_correlation": {
-          "mean": 0.2701,
-          "sd": 0.3778
+          "mean": 0.270075,
+          "sd": 0.377778
         },
         "mean_leg_km": {
-          "mean": 4.0709,
-          "sd": 0.3733
+          "mean": 4.07095,
+          "sd": 0.373292
         }
       }
     },
@@ -130,7 +130,7 @@
       "metrics": {
         "gini_coefficient": {
           "mean": 0.3412,
-          "sd": 0.0911
+          "sd": 0.091147
         },
         "avg_response_time_estimate": {
           "mean": 300.412,
@@ -138,23 +138,23 @@
         },
         "high_severity_rate": {
           "mean": 0.3638,
-          "sd": 0.0299
+          "sd": 0.02989
         },
         "low_income_coverage": {
-          "mean": 0.7132,
-          "sd": 0.0304
+          "mean": 0.71318,
+          "sd": 0.030359
         },
         "computational_time_ms": {
           "mean": 11.6192,
-          "sd": 1.4242
+          "sd": 1.424214
         },
         "sampi_wait_correlation": {
-          "mean": 0.023,
-          "sd": 0.3648
+          "mean": 0.023008,
+          "sd": 0.364761
         },
         "mean_leg_km": {
-          "mean": 4.3724,
-          "sd": 0.3961
+          "mean": 4.372352,
+          "sd": 0.39607
         }
       }
     }
@@ -164,32 +164,32 @@
       "alpha": 0,
       "metrics": {
         "gini_coefficient": {
-          "mean": 0.3112,
-          "sd": 0.0996
+          "mean": 0.31124,
+          "sd": 0.099611
         },
         "avg_response_time_estimate": {
           "mean": 309.182,
-          "sd": 91.7678
+          "sd": 91.767758
         },
         "high_severity_rate": {
-          "mean": 0.4452,
-          "sd": 0.0352
+          "mean": 0.44521,
+          "sd": 0.035211
         },
         "low_income_coverage": {
-          "mean": 0.4966,
-          "sd": 0.0295
+          "mean": 0.49655,
+          "sd": 0.029525
         },
         "computational_time_ms": {
           "mean": 9.467,
-          "sd": 0.6133
+          "sd": 0.613349
         },
         "sampi_wait_correlation": {
-          "mean": 0.2292,
-          "sd": 0.355
+          "mean": 0.229173,
+          "sd": 0.355028
         },
         "mean_leg_km": {
-          "mean": 4.5571,
-          "sd": 0.3241
+          "mean": 4.557136,
+          "sd": 0.324118
         }
       }
     },
@@ -198,31 +198,31 @@
       "metrics": {
         "gini_coefficient": {
           "mean": 0.3206,
-          "sd": 0.0945
+          "sd": 0.094539
         },
         "avg_response_time_estimate": {
           "mean": 310.261,
-          "sd": 96.0799
+          "sd": 96.079853
         },
         "high_severity_rate": {
-          "mean": 0.4251,
-          "sd": 0.0277
+          "mean": 0.42507,
+          "sd": 0.027747
         },
         "low_income_coverage": {
-          "mean": 0.5964,
-          "sd": 0.0315
+          "mean": 0.59637,
+          "sd": 0.031467
         },
         "computational_time_ms": {
           "mean": 9.3681,
-          "sd": 0.2225
+          "sd": 0.22251
         },
         "sampi_wait_correlation": {
-          "mean": 0.1331,
-          "sd": 0.3624
+          "mean": 0.133083,
+          "sd": 0.362383
         },
         "mean_leg_km": {
-          "mean": 4.5412,
-          "sd": 0.3719
+          "mean": 4.541206,
+          "sd": 0.371925
         }
       }
     },
@@ -231,7 +231,7 @@
       "metrics": {
         "gini_coefficient": {
           "mean": 0.3412,
-          "sd": 0.0911
+          "sd": 0.091147
         },
         "avg_response_time_estimate": {
           "mean": 300.412,
@@ -239,23 +239,23 @@
         },
         "high_severity_rate": {
           "mean": 0.3638,
-          "sd": 0.0299
+          "sd": 0.02989
         },
         "low_income_coverage": {
-          "mean": 0.7132,
-          "sd": 0.0304
+          "mean": 0.71318,
+          "sd": 0.030359
         },
         "computational_time_ms": {
           "mean": 9.6813,
-          "sd": 0.9466
+          "sd": 0.946558
         },
         "sampi_wait_correlation": {
-          "mean": 0.023,
-          "sd": 0.3648
+          "mean": 0.023008,
+          "sd": 0.364761
         },
         "mean_leg_km": {
-          "mean": 4.3724,
-          "sd": 0.3961
+          "mean": 4.372352,
+          "sd": 0.39607
         }
       }
     },
@@ -263,32 +263,32 @@
       "alpha": 0.6,
       "metrics": {
         "gini_coefficient": {
-          "mean": 0.3831,
-          "sd": 0.0961
+          "mean": 0.38305,
+          "sd": 0.096128
         },
         "avg_response_time_estimate": {
           "mean": 297.329,
-          "sd": 119.5169
+          "sd": 119.516883
         },
         "high_severity_rate": {
-          "mean": 0.3045,
-          "sd": 0.0364
+          "mean": 0.30454,
+          "sd": 0.036353
         },
         "low_income_coverage": {
-          "mean": 0.7974,
-          "sd": 0.0305
+          "mean": 0.79744,
+          "sd": 0.030477
         },
         "computational_time_ms": {
           "mean": 11.5666,
-          "sd": 5.8638
+          "sd": 5.863839
         },
         "sampi_wait_correlation": {
-          "mean": -0.0313,
-          "sd": 0.3498
+          "mean": -0.031278,
+          "sd": 0.349816
         },
         "mean_leg_km": {
-          "mean": 4.1312,
-          "sd": 0.4722
+          "mean": 4.131192,
+          "sd": 0.472197
         }
       }
     },
@@ -296,32 +296,32 @@
       "alpha": 0.8,
       "metrics": {
         "gini_coefficient": {
-          "mean": 0.4083,
-          "sd": 0.0858
+          "mean": 0.40833,
+          "sd": 0.08583
         },
         "avg_response_time_estimate": {
           "mean": 258.513,
-          "sd": 105.7294
+          "sd": 105.729354
         },
         "high_severity_rate": {
           "mean": 0.2329,
-          "sd": 0.0264
+          "sd": 0.026356
         },
         "low_income_coverage": {
-          "mean": 0.8192,
-          "sd": 0.0332
+          "mean": 0.81923,
+          "sd": 0.033238
         },
         "computational_time_ms": {
           "mean": 9.5028,
-          "sd": 0.5685
+          "sd": 0.568484
         },
         "sampi_wait_correlation": {
-          "mean": -0.1084,
-          "sd": 0.323
+          "mean": -0.108421,
+          "sd": 0.322995
         },
         "mean_leg_km": {
-          "mean": 3.572,
-          "sd": 0.354
+          "mean": 3.572046,
+          "sd": 0.353995
         }
       }
     },
@@ -329,32 +329,32 @@
       "alpha": 1,
       "metrics": {
         "gini_coefficient": {
-          "mean": 0.369,
-          "sd": 0.0554
+          "mean": 0.36897,
+          "sd": 0.05537
         },
         "avg_response_time_estimate": {
           "mean": 195.008,
-          "sd": 45.0532
+          "sd": 45.053215
         },
         "high_severity_rate": {
-          "mean": 0.19,
-          "sd": 0.0198
+          "mean": 0.18997,
+          "sd": 0.019781
         },
         "low_income_coverage": {
-          "mean": 0.8196,
-          "sd": 0.0333
+          "mean": 0.81957,
+          "sd": 0.033346
         },
         "computational_time_ms": {
           "mean": 9.6757,
-          "sd": 0.4912
+          "sd": 0.491184
         },
         "sampi_wait_correlation": {
-          "mean": -0.1959,
-          "sd": 0.2951
+          "mean": -0.19594,
+          "sd": 0.295065
         },
         "mean_leg_km": {
-          "mean": 2.9406,
-          "sd": 0.1046
+          "mean": 2.940599,
+          "sd": 0.104616
         }
       }
     }
