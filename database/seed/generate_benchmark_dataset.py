@@ -1,4 +1,4 @@
-"""Generate database/seed/benchmark_dataset.json (issue P3-03).
+"""Generate database/seed/benchmark_dataset.json.
 
 Run from the repo root:
 
@@ -124,7 +124,7 @@ def build(seed=SEED):
         workers.append({"id": f"w{i + 1:02d}", "lat": round(lat, 6), "lng": round(lng, 6), "available": True})
 
     return {
-        "_note": "SYNTHETIC benchmark dataset (issue P3-03). Regenerate with database/seed/generate_benchmark_dataset.py.",
+        "_note": "SYNTHETIC benchmark dataset. Regenerate with database/seed/generate_benchmark_dataset.py.",
         "seed": seed,
         "wards": [
             {k: w[k] for k in ("id", "name", "lat", "lng", "sampi_score", "population")} for w in wards

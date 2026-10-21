@@ -44,10 +44,10 @@ RESULTS_PATH = SEED_DIR / "benchmark_results.json"
 ALPHA_CSV_PATH = SEED_DIR / "alpha_sensitivity.csv"
 
 FIRST_SEED = 42  # the seed of the committed benchmark_dataset.json
-DEFAULT_DATASETS = 10  # issue P3-05: minimum 10 iterations
+DEFAULT_DATASETS = 10  # minimum 10 iterations
 BENCHMARK_GENERATIONS = 100  # Genetic "benchmark mode" (live mode is 50)
 HYBRID_ALPHA = 0.4  # the live default
-ALPHAS = [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]  # issue P3-06
+ALPHAS = [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]
 
 ALGORITHMS = {
     "fcfs": main.prioritise_fcfs,

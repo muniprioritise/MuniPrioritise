@@ -1,5 +1,5 @@
 {
- "_note": "SYNTHETIC benchmark dataset (issue P3-03). Regenerate with database/seed/generate_benchmark_dataset.py.",
+ "_note": "SYNTHETIC benchmark dataset. Regenerate with database/seed/generate_benchmark_dataset.py.",
  "seed": 42,
  "wards": [
   {

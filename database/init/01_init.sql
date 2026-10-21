@@ -125,7 +125,7 @@ CREATE TABLE IF NOT EXISTS benchmark_runs (
 -- ============================================================
 -- SEED DATA: 20 Cape Town wards plus 2 Johannesburg wards.
 -- SYNTHETIC: centroids are approximate suburb centres, sampi_score and
--- population are invented for the prototype (range 0.12-0.78, issue P3-03).
+-- population are invented for the prototype (range 0.12-0.78).
 -- Same data as database/seed/wards.json and migrations/003_ward_centroids.sql.
 -- The JHB wards have no centroid, so they are never chosen as a nearest ward.
 -- ============================================================
