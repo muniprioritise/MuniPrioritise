@@ -43,9 +43,7 @@ export default function EscalationScreen() {
       try {
         setSubmitting(true);
 
-        // Backend's /jobs/:id/escalate already updates the report's
-        // status and inserts the status_events row server-side —
-        // no separate updateReportStatus call needed.
+        // The backend updates the report status and logs the event.
         await escalateJob(
           params.jobId,
           notes.trim()

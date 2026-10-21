@@ -1,59 +1,37 @@
-# mobile/ — merge notes (read before pushing)
+# Mobile app
 
-This folder was reconciled from two separately-scaffolded Expo projects
-(Jan's and Michael's). Here's exactly what changed and what's still missing.
+Expo (React Native) app for residents and workers. Both sign in on the same screen and land on different home screens.
 
-## What was merged
-- **package.json** — union of both. Kept the newer Expo SDK patch versions
-  (Jan's: `expo ~57.0.11`, `react-native 0.86.2`, etc.) and added Michael's
-  screen back on top. Michael's version had no deps Jan's didn't already have.
-- **app.json** — kept the `expo-image` plugin (Jan had it, Michael didn't).
-  Set `typedRoutes: false` — Michael's had it `true`, but that enforces
-  stricter route typing than this project is ready for yet. Flip it on later
-  once routes are stable.
-- **Routing** — this is Expo Router with `NativeTabs` (Home / Explore / Jobs),
-  wired from the root `app/_layout.tsx` via `components/app-tabs.tsx`. Screens
-  live directly under `app/` (`index.tsx`, `explore.tsx`, `jobs.tsx`) as
-  siblings of `_layout.tsx` — that's what the tab trigger names require.
+- **Residents** submit a report with a category, severity, location and photos, follow its status, get notified of changes and rate the resolution.
+- **Workers** see their prioritised job queue, accept a job, resolve it with photo evidence, or escalate it with a note.
 
-## What I fixed
-- `app/index.tsx` (the Report screen) imported `../../config/api` — a
-  relative path that only resolves if the file sits two directories deep.
-  At the actual route location (`app/index.tsx`) that path escapes the
-  project. Changed it to `@/config/api` to match how every other file
-  imports.
+Supervisors use the [web dashboard](../dashboard/README.md). A supervisor account that signs in here is sent to a page that points them to the dashboard.
 
-## What was missing and had to be stubbed
-These were referenced by uploaded files but never provided. They exist now
-as minimal placeholders — **replace them, don't ship them**:
+## Run it
 
-- `config/api.ts` — axios instance, hardcoded to `http://10.0.2.2:3000/api`
-  (Android emulator loopback). **Note:** `services/jobsService.ts` has its
-  own separate `API_BASE_URL` constant using `fetch` instead of this axios
-  instance. Two sources of truth for the backend URL right now — pick one.
-- `constants/theme.ts` — bare-minimum `Colors.light` / `Colors.dark` so
-  `app-tabs.tsx` doesn't crash. No design system behind it.
-- `components/animated-icon.tsx` — just hides the native splash screen.
-  The real animated transition wasn't uploaded.
-- `app/explore.tsx` — nobody's built this tab. Per the build plan, this is
-  probably either the resident's Nearby Map or Notifications screen.
-- **All image assets** (`assets/images/*.png`, `tabIcons/*.png`) — generated
-  as flat placeholder squares just so the bundler doesn't fail on missing
-  `require()` paths. `ios.icon` (`./assets/expo.icon`) wasn't regenerated —
-  that's Expo's Icon Composer format, not a plain image; someone needs to
-  create it properly in Xcode/Icon Composer or drop the ios.icon key.
+Node.js 20, from this folder:
 
-## Before running
-```powershell
-cd mobile
+```
 npm install
 npx expo start
 ```
-Confirm it boots on Android emulator/Expo Go before building on top of it.
 
-## Next steps
-1. Reconcile `config/api.ts` vs `jobsService.ts`'s `API_BASE_URL` into one place.
-2. Assign `explore.tsx` to someone.
-3. Replace placeholder assets with real icons/splash art.
-4. Once this is confirmed running, commit directly to `develop` — no more
-   separate scaffolds per person.
+Press `a` for an Android emulator, or scan the QR code with Expo Go. The app talks to the live backend at `https://muniprioritise-1vgj.onrender.com`. To use a local backend, change `API_BASE_URL` in `config/api.ts`.
+
+The first request after a quiet period can take up to a minute while the free-tier server wakes up.
+
+## Structure
+
+| Folder | Content |
+|---|---|
+| `app/` | Screens, using Expo Router file-based routes. `(tabs)` is the resident area, `jobs` is the worker area |
+| `components/` | Shared UI |
+| `services/` | API calls for auth, reports, jobs and notifications |
+| `contexts/` | Auth state |
+| `config/api.ts` | Axios instance that attaches the login token |
+| `types/`, `utils/`, `constants/` | Types, helpers and theme |
+
+## Limitations
+
+- Push notifications need a development or production build. They do not work in Expo Go.
+- The notification list is built from the status changes on the resident's own reports. The backend does not store notifications.

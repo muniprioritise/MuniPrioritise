@@ -47,8 +47,8 @@ export async function login(
   return { token, user };
 }
 
-// The backend returns the created user row, not a token, so callers must
-// log in afterwards. Residents only: role is fixed here on purpose.
+// The backend returns the created user, not a token, so log in afterwards.
+// Only residents can register here.
 export async function register(
   fullName: string,
   email: string,

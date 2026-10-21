@@ -29,9 +29,8 @@ export default function StatusScreen() {
       status?: string;
     }>();
 
-  // The backend marks a job in_progress the moment it is accepted, so a job
-  // that is no longer pending has already been accepted. Starting from
-  // "pending" every time let the worker accept the same job twice (a 404).
+  // The backend marks a job in_progress when it is accepted, so a job that is
+  // no longer pending has already been accepted.
   const [currentStep, setCurrentStep] =
     useState<
       | "pending"
