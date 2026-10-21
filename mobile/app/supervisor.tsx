@@ -27,21 +27,9 @@ export default function SupervisorScreen() {
         </Text>
 
         <Text style={styles.description}>
-          Supervisor authentication was successful.
-          Supervisor operational screens are outside
-          the current worker-screen implementation.
+          Supervisors use the web dashboard to review
+          the queue, reassign jobs and read analytics.
         </Text>
-
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>
-            Supervisor
-          </Text>
-
-          <Text style={styles.cardText}>
-            This route confirms that role-based
-            navigation is working correctly.
-          </Text>
-        </View>
 
         <TouchableOpacity
           style={styles.logoutButton}
@@ -86,26 +74,6 @@ const styles = StyleSheet.create({
     marginTop: 8,
     fontSize: 15,
     lineHeight: 22,
-    color: "#6B6B6B",
-  },
-
-  card: {
-    backgroundColor: "#FFFFFF",
-    padding: 20,
-    borderRadius: 12,
-    marginTop: 28,
-  },
-
-  cardTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#1A1A1A",
-  },
-
-  cardText: {
-    marginTop: 8,
-    fontSize: 14,
-    lineHeight: 20,
     color: "#6B6B6B",
   },
 

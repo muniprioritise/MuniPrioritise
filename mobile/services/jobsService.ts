@@ -1,12 +1,9 @@
 import { api } from "@/config/api";
-import { mockJobs } from "@/data/mockJobs";
 import type {
   Job,
   JobSeverity,
   JobStatus,
 } from "@/types/job";
-
-const USE_MOCK_JOBS = false;
 
 const CATEGORY_LABELS: Record<string, string> = {
   water: "Water",
@@ -22,8 +19,7 @@ function mapCategory(value: unknown): string {
   return CATEGORY_LABELS[key] ?? String(value ?? "Unknown");
 }
 
-// Reports are rated 1-5. Severity 5 used to fall through to "low", so the most
-// urgent jobs were shown as the least urgent.
+// Reports are rated 1-5.
 function mapSeverity(value: unknown): JobSeverity {
   switch (Number(value)) {
     case 5:
@@ -143,19 +139,9 @@ function mapJob(rawJob: Record<string, any>): Job {
 }
 
 export async function getJobs(): Promise<Job[]> {
-  if (USE_MOCK_JOBS) {
-    await new Promise((resolve) =>
-      setTimeout(resolve, 500)
-    );
-
-    return mockJobs;
-  }
-
-  // GET /jobs runs the prioritisation algorithm and stores the assignments.
-  // It returns every worker's jobs and only reports that are still pending,
-  // so it cannot be the worker's list: other people's jobs would show up
-  // (accepting them fails) and a job disappears once it is accepted.
-  // Call it to refresh the assignments, then read this worker's own queue.
+  // GET /jobs runs the prioritisation algorithm and stores the assignments,
+  // but it lists every worker's pending jobs. Call it to refresh the
+  // assignments, then read this worker's own queue.
   try {
     await api.get("/jobs");
   } catch (error) {
@@ -231,10 +217,8 @@ export async function escalateJob(
   return response.data;
 }
 
-// PATCH /jobs/:id/resolve — the single, atomic resolve action.
-// Backend does evidence insert + report status update + status_events
-// insert as one unit, keyed off the job id (not the report id).
-// Accepts up to 5 photos under the "evidence" field (upload.array('evidence', 5)).
+// PATCH /jobs/:id/resolve saves the evidence, updates the report status and
+// logs the event in one step. Takes up to 5 photos in the "evidence" field.
 export async function resolveJob(
   jobId: string,
   imageUris: string[],
