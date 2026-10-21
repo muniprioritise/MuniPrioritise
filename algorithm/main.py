@@ -14,12 +14,11 @@ from deap import base, creator, tools
 
 app = FastAPI()
 
-# DEAP requires these to be created once at module level, not per-request.
-# FitnessMin because we're minimising severity-weighted response time.
+# DEAP needs these created once at module level. Fitness is minimised.
 creator.create("FitnessMin", base.Fitness, weights=(-1.0,))
 creator.create("Individual", list, fitness=creator.FitnessMin)
 
-# Schemas below must match docs/api-contracts.md. Update that file if these change.
+# Keep these models in step with docs/api-contracts.md.
 
 class Report(BaseModel):
     id: str
@@ -43,15 +42,15 @@ class PrioritiseRequest(BaseModel):
     reports: list[Report]
     workers: list[Worker]
     alpha: float | None = None
-    generations: int | None = None  # GA only. Defaults to 50 (live mode). Pass 100 for benchmark mode.
-    seed: int | None = None  # GA only. Set for reproducible benchmark runs.
+    generations: int | None = None  # genetic only
+    seed: int | None = None  # genetic only, for reproducible runs
 
 
 class Assignment(BaseModel):
     report_id: str
     worker_id: str
     score: float
-    # Hybrid only (null for the baselines): the two parts of the final score.
+    # Hybrid only
     efficiency_score: float | None = None
     equity_score: float | None = None
 
@@ -60,10 +59,9 @@ class Metrics(BaseModel):
     processing_time_ms: float
     gini_coefficient: float | None = None
     avg_response_time_estimate: float | None = None  # minutes
-    # Defined in Phase 3 (P3-05). Kept here so the output matches docs/api-contracts.md.
     high_severity_rate: float | None = None
     low_income_coverage: float | None = None
-    # Hybrid only: reports that arrived with no equity_weight and were given Q = 0.
+    # Hybrid only: reports with no equity_weight, which get Q = 0
     equity_missing_count: int | None = None
 
 
@@ -72,24 +70,16 @@ class PrioritiseResponse(BaseModel):
     prioritised_order: list[str]
     assignments: list[Assignment]
     metrics: Metrics
-    # Hybrid only: the alpha this run actually used, so a result describes itself.
+    # Hybrid only
     alpha_used: float | None = None
 
 
-# ---------------------------------------------------------------------------
-# Shared helpers used by every algorithm endpoint
-# ---------------------------------------------------------------------------
-
 KM_PER_DEGREE = 111.0
-TRAVEL_SPEED_KMH = 30.0  # assumed average urban travel speed for response-time estimates
+TRAVEL_SPEED_KMH = 30.0  # assumed urban travel speed
 
 
 def euclidean_distance(lat1: float, lng1: float, lat2: float, lng2: float) -> float:
-    """Straight-line distance in km on a locally flat projection.
-
-    Longitude degrees shrink with latitude, so raw degrees would distort
-    distances. The result is still plain Euclidean, just in kilometres.
-    """
+    """Straight-line distance in km. Longitude is scaled by latitude."""
     mid_lat = math.radians((lat1 + lat2) / 2)
     dy = (lat1 - lat2) * KM_PER_DEGREE
     dx = (lng1 - lng2) * KM_PER_DEGREE * math.cos(mid_lat)
@@ -107,12 +97,9 @@ def nearest_available_worker(report: Report, workers: list[Worker]) -> Worker | 
 
 
 def proximity_scores(reports: list[Report], workers: list[Worker]) -> dict[str, float]:
-    """Proximity of each report to its nearest available worker, scaled 0 to 1.
+    """Distance to the nearest available worker, min-max scaled so 1 is closest.
 
-    1 is the closest report in the batch, 0 the furthest. A report with no
-    available worker scores 0. If every report is equally far, all score 1.
-    Greedy and Hybrid both use this, so the benchmark compares them on the
-    same definition of "close".
+    A report with no available worker scores 0. If all are equally far, all score 1.
     """
     distances: dict[str, float | None] = {}
     for report in reports:
@@ -141,7 +128,7 @@ def proximity_scores(reports: list[Report], workers: list[Worker]) -> dict[str, 
 
 
 def gini(values: list[float]) -> float:
-    """Gini coefficient. 0 = perfectly equal, towards 1 = highly unequal."""
+    """Gini coefficient: 0 is perfectly equal, towards 1 is highly unequal."""
     xs = sorted(values)
     n = len(xs)
     total = sum(xs)
@@ -154,12 +141,10 @@ def gini(values: list[float]) -> float:
 def simulate_response_times(
     ordered_reports: list[Report], workers: list[Worker]
 ) -> list[tuple[Report, Worker, float]]:
-    """Walk the prioritised order and estimate when each report is reached.
+    """Minutes until a worker reaches each report, in prioritised order.
 
-    Each report goes to its nearest available worker. A worker serves their
-    reports in the prioritised order, travelling from wherever they last were.
-    Only travel time is counted (service time on site is assumed to be zero).
-    Returns (report, worker, minutes_until_arrival) for every served report.
+    Each report goes to its nearest available worker, who travels on from their
+    last job. Only travel time counts. Returns (report, worker, minutes).
     """
     position = {w.id: (w.lat, w.lng) for w in workers if w.available}
     elapsed = {w.id: 0.0 for w in workers if w.available}
@@ -178,18 +163,14 @@ def simulate_response_times(
     return result
 
 
-HIGH_SEVERITY_TOP_SHARE = 0.20  # "the top of the queue" for high_severity_rate
-LOW_INCOME_TOP_SHARE = 0.50  # "the top half of the queue" for low_income_coverage
-LOW_INCOME_SAMPI_THRESHOLD = 0.5  # a report counts as low-income if its ward SAMPI is at least this
+HIGH_SEVERITY_THRESHOLD = 4
+HIGH_SEVERITY_TOP_SHARE = 0.20
+LOW_INCOME_TOP_SHARE = 0.50
+LOW_INCOME_SAMPI_THRESHOLD = 0.5
 
 
 def high_severity_rate(ordered_reports: list[Report]) -> float | None:
-    """Share of severity 4/5 reports that sit in the top 20% of the queue.
-
-    1.0 means every high-severity report is near the front. A queue in random
-    order scores about 0.2. None if the batch has no high-severity reports.
-    (HIGH_SEVERITY_THRESHOLD is defined with the genetic algorithm below.)
-    """
+    """Share of severity 4/5 reports in the top 20% of the queue (random is about 0.2)."""
     high = [i for i, r in enumerate(ordered_reports) if r.severity >= HIGH_SEVERITY_THRESHOLD]
     if not high:
         return None
@@ -198,12 +179,7 @@ def high_severity_rate(ordered_reports: list[Report]) -> float | None:
 
 
 def low_income_coverage(ordered_reports: list[Report]) -> float | None:
-    """Share of low-income-ward reports that sit in the top half of the queue.
-
-    A report is low-income if its equity_weight (the ward SAMPI score) is at
-    least LOW_INCOME_SAMPI_THRESHOLD. A queue in random order scores about 0.5,
-    so read the result against that. None if no report has a qualifying weight.
-    """
+    """Share of low-income-ward reports in the top half of the queue (random is about 0.5)."""
     low = [
         i
         for i, r in enumerate(ordered_reports)
@@ -218,14 +194,10 @@ def low_income_coverage(ordered_reports: list[Report]) -> float | None:
 def build_metrics(
     ordered_reports: list[Report], workers: list[Worker], processing_time_ms: float
 ) -> Metrics:
-    """Metrics shared by every algorithm so they can be compared like for like.
+    """Metrics shared by all four algorithms.
 
-    avg_response_time_estimate: mean minutes until a worker reaches each report.
-    gini_coefficient: inequality of the *average* response time between wards
-    (0 = every ward waits the same time on average). It measures sameness, not
-    fairness: an algorithm that serves deprived wards faster on purpose raises it.
-    high_severity_rate and low_income_coverage describe the queue order only,
-    so they do not depend on workers.
+    The Gini is the inequality of average response time between wards. It
+    measures sameness, not fairness.
     """
     queue_metrics = {
         "high_severity_rate": high_severity_rate(ordered_reports),
@@ -258,10 +230,6 @@ def health():
     return {"status": "ok"}
 
 
-# ---------------------------------------------------------------------------
-# FCFS
-# ---------------------------------------------------------------------------
-
 @app.post("/prioritise/fcfs", response_model=PrioritiseResponse)
 def prioritise_fcfs(payload: PrioritiseRequest):
     start = time.perf_counter()
@@ -286,20 +254,11 @@ def prioritise_fcfs(payload: PrioritiseRequest):
     )
 
 
-# ---------------------------------------------------------------------------
-# Greedy
-# ---------------------------------------------------------------------------
-
 @app.post("/prioritise/greedy", response_model=PrioritiseResponse)
 def prioritise_greedy(payload: PrioritiseRequest):
     start = time.perf_counter()
 
-    # score = (severity * 0.5) + (proximity * 0.5)
-    #
-    # Both terms are scaled to 0-1 first. The original 1/distance term is
-    # unbounded and unit dependent (about 100 for a 0.01 degree gap), so it
-    # swamped severity (1-5) and the ordering ignored severity. Here severity
-    # is severity/5 and proximity comes from proximity_scores (see above).
+    # Both terms are scaled 0 to 1 so that neither dominates.
     proximity = proximity_scores(payload.reports, payload.workers)
     scores = {
         r.id: (min(r.severity, 5) / 5) * 0.5 + proximity[r.id] * 0.5
@@ -325,41 +284,26 @@ def prioritise_greedy(payload: PrioritiseRequest):
     )
 
 
-# ---------------------------------------------------------------------------
-# Genetic algorithm (DEAP)
-# ---------------------------------------------------------------------------
-
-# High severity threshold used by the GA penalty term (severity 4 or 5 counts as high)
-HIGH_SEVERITY_THRESHOLD = 4
-UNSERVED_PENALTY = 1000.0  # large constant so unserved high-severity reports dominate fitness
-
+UNSERVED_PENALTY = 1000.0
 POPULATION_SIZE = 50
 DEFAULT_GENERATIONS = 50
 MAX_GENERATIONS = 500
-MAX_GA_REPORTS = 2000  # the pairwise distance matrix is n x n
+MAX_GA_REPORTS = 2000  # the distance matrix is n x n
 CX_PROBABILITY = 0.7
 MUT_PROBABILITY = 0.2
 
 
 def build_ga_toolbox(reports: list[Report], workers: list[Worker]) -> base.Toolbox:
-    """Chromosome: a permutation of report indices (the order reports are served).
+    """A chromosome is the order in which reports are served.
 
-    Fitness (minimised): sum over served reports of severity * minutes until a
-    worker arrives, plus UNSERVED_PENALTY for every high-severity report with
-    no available worker. Minutes accumulate travel along each worker's route,
-    so the order of the chromosome changes the fitness: serving a severe
-    report late, or zig-zagging between far apart reports, both cost more.
-
-    Each report is attached to its nearest available worker (same rule as
-    FCFS and Greedy), so the GA only decides the order.
-
-    (The previous version summed each report's distance to its nearest worker,
-    which is identical for every permutation, so the GA could not improve.)
+    Fitness is the sum of severity times minutes until arrival, plus a penalty
+    for each high-severity report with no available worker. Reports keep their
+    nearest worker, so the search only decides the order.
     """
     n = len(reports)
     toolbox = base.Toolbox()
 
-    # Locally flat km coordinates for the whole batch.
+    # Flat km coordinates.
     mean_lat = sum(r.lat for r in reports) / n
     scale_x = KM_PER_DEGREE * math.cos(math.radians(mean_lat))
     xs = np.array([r.lng * scale_x for r in reports])
@@ -430,7 +374,7 @@ def run_genetic_algorithm(
 ) -> list[int]:
     n = len(reports)
     if n < 3:
-        # Too small to evolve (cxOrdered needs 2+ cut points). Try every order.
+        # Too small for ordered crossover, so try every order.
         toolbox = build_ga_toolbox(reports, workers)
         candidates = [list(range(n))] if n == 1 else [[0, 1], [1, 0]]
         return min(candidates, key=lambda c: toolbox.evaluate(c)[0])
@@ -441,7 +385,7 @@ def run_genetic_algorithm(
     for individual in population:
         individual.fitness.values = toolbox.evaluate(individual)
 
-    # Elitism: the best order found so far is never lost.
+    # Keep the best order found so far.
     hall_of_fame = tools.HallOfFame(1)
     hall_of_fame.update(population)
 
@@ -505,7 +449,7 @@ def prioritise_genetic(payload: PrioritiseRequest):
         worker = nearest_available_worker(report, payload.workers)
         if worker is not None:
             distance = euclidean_distance(report.lat, report.lng, worker.lat, worker.lng)
-            # score kept consistent with a "higher is better" convention like the other endpoints
+            # Higher is better, like the other endpoints.
             score = 1 / distance if distance > 1e-9 else 1 / 1e-9
             assignments.append(
                 Assignment(report_id=report.id, worker_id=worker.id, score=score)
@@ -521,20 +465,11 @@ def prioritise_genetic(payload: PrioritiseRequest):
     )
 
 
-# ---------------------------------------------------------------------------
-# Hybrid (equity-aware)
-# ---------------------------------------------------------------------------
-
 DEFAULT_ALPHA = 0.4
-# Efficiency weights from the agreed design: E = 0.4*severity + 0.3*waiting + 0.3*proximity.
 EFFICIENCY_WEIGHTS = {"severity": 0.4, "waiting": 0.3, "proximity": 0.3}
-# A report that has waited this long scores 1 on the waiting term. Fixed (not
-# relative to the batch) so a lone old report is not stretched to look urgent.
-WAIT_HORIZON_HOURS = 168.0  # 7 days, the length of the benchmark dataset
+WAIT_HORIZON_HOURS = 168.0  # a 7 day wait scores 1
 
-# Live alpha, changed through PATCH /prioritise/config. It is held in memory, so
-# it returns to DEFAULT_ALPHA whenever the service restarts (Render free tier
-# sleeps and redeploys). Every change is logged with a timestamp.
+# The live alpha is kept in memory, so it resets to the default on a restart.
 CONFIG_HISTORY_LIMIT = 100
 config_logger = logging.getLogger("muniprioritise.config")
 _config_lock = threading.Lock()
@@ -548,7 +483,7 @@ def current_alpha() -> float:
 
 
 def reset_config() -> None:
-    """Back to the start-up state. Used by the tests."""
+    """Reset to the default alpha. Used by the tests."""
     with _config_lock:
         _config["alpha"] = DEFAULT_ALPHA
         _config_history.clear()
@@ -563,7 +498,7 @@ def parse_timestamp(value: str) -> datetime:
 
 
 def resolve_alpha(alpha: float | None) -> float:
-    """A request's own alpha wins. Otherwise use the live config value."""
+    """Use the request's alpha if it has one, otherwise the live value."""
     if alpha is None:
         return current_alpha()
     if not 0.0 <= alpha <= 1.0:
@@ -574,8 +509,7 @@ def resolve_alpha(alpha: float | None) -> float:
 def waiting_scores(reports: list[Report]) -> dict[str, float]:
     """Hours waited as a share of WAIT_HORIZON_HOURS, capped at 1.
 
-    "Now" is the newest created_at in the batch, not the system clock, so the
-    same input always gives the same scores (benchmark runs are reproducible).
+    "Now" is the newest created_at in the batch, so runs are reproducible.
     """
     stamps = {r.id: parse_timestamp(r.created_at) for r in reports}
     now = max(stamps.values())
@@ -599,7 +533,6 @@ def prioritise_hybrid(payload: PrioritiseRequest):
             alpha_used=alpha,
         )
 
-    # Every term is on a 0 to 1 scale, so the weights mean what they say.
     proximity = proximity_scores(payload.reports, payload.workers)
     waiting = waiting_scores(payload.reports)
 
@@ -613,7 +546,7 @@ def prioritise_hybrid(payload: PrioritiseRequest):
             + EFFICIENCY_WEIGHTS["waiting"] * waiting[r.id]
             + EFFICIENCY_WEIGHTS["proximity"] * proximity[r.id]
         )
-        # Q is the ward's SAMPI score. No ward evidence means no equity boost.
+        # Q is the ward's SAMPI score. No score means no equity boost.
         if r.equity_weight is None:
             missing += 1
             equity[r.id] = 0.0
@@ -621,7 +554,7 @@ def prioritise_hybrid(payload: PrioritiseRequest):
             equity[r.id] = min(max(r.equity_weight, 0.0), 1.0)
         final[r.id] = (1 - alpha) * efficiency[r.id] + alpha * equity[r.id]
 
-    # Highest score first. Ties go to the older report, then the id, so the order is deterministic.
+    # Highest score first. Ties go to the older report, then the id.
     sorted_reports = sorted(
         payload.reports, key=lambda r: (-final[r.id], r.created_at, r.id)
     )
@@ -655,7 +588,7 @@ def prioritise_hybrid(payload: PrioritiseRequest):
 
 class ConfigUpdate(BaseModel):
     alpha: float = Field(ge=0.0, le=1.0)
-    changed_by: str | None = None  # who asked, for the log (the backend passes the supervisor id)
+    changed_by: str | None = None  # recorded in the log
 
 
 def config_view() -> dict:
@@ -676,8 +609,7 @@ def get_config():
 
 @app.patch("/prioritise/config")
 def patch_config(update: ConfigUpdate, x_config_key: str | None = Header(default=None)):
-    # The service URL is public. If CONFIG_API_KEY is set (it should be on Render),
-    # only callers that send the same value in X-Config-Key may change alpha.
+    # If CONFIG_API_KEY is set, the caller must send it in X-Config-Key.
     required_key = os.environ.get("CONFIG_API_KEY")
     if required_key and not secrets.compare_digest(x_config_key or "", required_key):
         raise HTTPException(status_code=403, detail="missing or invalid X-Config-Key")

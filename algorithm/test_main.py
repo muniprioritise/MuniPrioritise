@@ -22,7 +22,7 @@ client = TestClient(app)
 
 @pytest.fixture(autouse=True)
 def fresh_config():
-    # The live alpha is module state, so put it back before and after every test.
+    # The live alpha is module state, so reset it around every test.
     reset_config()
     yield
     reset_config()
@@ -68,8 +68,7 @@ def make_problem(n, workers=5, seed=1):
     return {"reports": reports, "workers": worker_list}
 
 
-# ---------------------------------------------------------------- health + FCFS
-
+# health + FCFS
 def test_health():
     response = client.get("/health")
     assert response.status_code == 200
@@ -113,8 +112,7 @@ def test_fcfs_skips_reports_when_no_worker_available():
     assert body["assignments"] == []
 
 
-# ---------------------------------------------------------------------- greedy
-
+# greedy
 def test_greedy_higher_severity_first_when_equally_close():
     # Same location for all reports, so only severity can separate them.
     payload = {
@@ -141,7 +139,7 @@ def test_greedy_closer_first_when_equal_severity():
 
 
 def test_greedy_severity_is_not_swamped_by_distance():
-    # Regression: the old 1/distance term (in degrees) made severity irrelevant.
+    # Severity must still matter when distances differ a lot.
     payload = make_problem(60, seed=3)
     body = client.post("/prioritise/greedy", json=payload).json()
     sev = {r["id"]: r["severity"] for r in payload["reports"]}
@@ -157,11 +155,9 @@ def test_greedy_reports_gini_and_response_time():
     assert m["avg_response_time_estimate"] is not None and m["avg_response_time_estimate"] > 0
 
 
-# --------------------------------------------------------------------- genetic
-
+# genetic
 def test_genetic_fitness_depends_on_order():
-    # Regression: fitness used to be identical for every permutation, so the
-    # GA could not improve anything and returned a random order.
+    # The fitness must depend on the order, otherwise the search cannot improve.
     p = make_problem(30)
     reports = [Report(**r) for r in p["reports"]]
     workers = [Worker(**w) for w in p["workers"]]
@@ -215,7 +211,7 @@ def test_genetic_beats_random_ordering():
 
 
 def test_genetic_puts_severe_reports_ahead_of_minor_ones():
-    # One worker, everything equally close: the best order is simply severity descending.
+    # One worker and equal distances: the best order is severity descending.
     severities = [1, 5, 2, 4, 3, 5, 1, 4]
     payload = {
         "reports": [make_report(i, severity=s, lat=-33.92 + i * 1e-5) for i, s in enumerate(severities)],
@@ -238,7 +234,7 @@ def test_genetic_same_seed_same_result():
 
 @pytest.mark.parametrize("n", [0, 1, 2, 3])
 def test_genetic_handles_tiny_inputs(n):
-    # Regression: a single report used to return a 500.
+    # A single report must not fail.
     payload = {
         "reports": [make_report(i) for i in range(n)],
         "workers": [{"id": "w1", "lat": -33.93, "lng": 18.43, "available": True}],
@@ -266,8 +262,7 @@ def test_genetic_generations_are_clamped():
     assert time.perf_counter() - start < 10
 
 
-# ---------------------------------------------------------------------- hybrid
-
+# hybrid
 ONE_WORKER = [{"id": "w1", "lat": -33.93, "lng": 18.43, "available": True}]
 
 
@@ -338,8 +333,8 @@ def test_hybrid_older_report_first_when_otherwise_equal():
 
 
 def test_hybrid_waiting_is_not_stretched_across_a_short_batch():
-    # Regression guard for the design choice: the waiting term uses a fixed
-    # horizon. Five minutes apart must not look like oldest-vs-newest.
+    # The waiting term uses a fixed horizon, so reports five minutes apart
+    # must not look like the oldest against the newest.
     reports = [
         make_report(1, created="2026-10-05T08:00:00Z"),
         make_report(2, created="2026-10-05T08:05:00Z"),
@@ -368,7 +363,7 @@ def test_hybrid_rejects_a_bad_timestamp():
 
 
 def test_hybrid_accepts_millisecond_timestamps_from_the_backend():
-    # Postgres/Node timestamps arrive as 2026-10-13T10:00:00.000Z
+    # Node sends timestamps like 2026-10-13T10:00:00.000Z.
     reports = [make_report(1, created="2026-10-13T10:00:00.000Z")]
     assert hybrid(reports).status_code == 200
 
@@ -400,8 +395,7 @@ def test_hybrid_reports_gini_and_response_time():
     assert m["avg_response_time_estimate"] is not None and m["avg_response_time_estimate"] > 0
 
 
-# ---------------------------------------------------------------------- config
-
+# config
 def test_config_get_returns_defaults():
     body = client.get("/prioritise/config").json()
     assert body["alpha"] == pytest.approx(0.4)
@@ -466,12 +460,11 @@ def test_config_patch_needs_the_key_when_one_is_set(monkeypatch):
     assert client.patch("/prioritise/config", json=body, headers={"X-Config-Key": "wrong"}).status_code == 403
     assert client.get("/prioritise/config").json()["alpha"] == pytest.approx(0.4)
     assert client.patch("/prioritise/config", json=body, headers={"X-Config-Key": "s3cret"}).status_code == 200
-    # Reading stays open: the backend and dashboard need it.
+    # Reading is open because the backend and dashboard need it.
     assert client.get("/prioritise/config").status_code == 200
 
 
-# --------------------------------------------------------------------- compare
-
+# compare
 def test_compare_returns_all_four_with_metrics():
     body = client.post("/prioritise/compare", json=make_problem(30)).json()
     assert set(body) == {"fcfs", "greedy", "genetic", "hybrid"}
@@ -486,8 +479,7 @@ def test_compare_with_a_single_report():
     assert client.post("/prioritise/compare", json=payload).status_code == 200
 
 
-# ------------------------------------------------------- queue-order metrics
-
+# queue-order metrics
 def queue(severities=None, equities=None):
     n = len(severities or equities)
     return [
@@ -562,16 +554,14 @@ def test_hybrid_moves_low_income_reports_forward_as_alpha_rises():
     assert coverage[2] == pytest.approx(1.0)
 
 
-# --------------------------------------------------------------------- helpers
-
+# helpers
 def test_gini_basics():
     assert gini([5, 5, 5, 5]) == pytest.approx(0.0)
     assert gini([0, 0, 0, 10]) == pytest.approx(0.75)
     assert gini([]) == 0.0
 
 
-# ----------------------------------------------------------------------- NFR-02
-
+# NFR-02
 def test_nfr02_1000_reports_within_5_seconds_for_every_algorithm():
     payload = {**make_problem(1000, workers=10), "seed": 1}
     for name in ("fcfs", "greedy", "genetic", "hybrid"):
