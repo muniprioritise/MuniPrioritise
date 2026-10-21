@@ -1,26 +1,15 @@
-"""Benchmark module (P3-05) and alpha sensitivity analysis (P3-06).
+"""Benchmark all four algorithms and run the alpha sensitivity analysis.
 
 Run from the algorithm folder:
 
-    python benchmark.py                 # full run, writes the result files
-    python benchmark.py --quick         # 3 datasets, short Genetic runs, writes nothing
+    python benchmark.py             # full run, writes the result files
+    python benchmark.py --quick     # 3 datasets, short Genetic runs, writes nothing
 
-Design
-------
-FCFS, Greedy and Hybrid are deterministic, so repeating them on one dataset
-gives the same numbers every time and a t-test on those repeats would mean
-nothing. Instead every algorithm is run on the same N independent synthetic
-datasets (seeds 42 to 42 + N - 1, same 20 wards, different requests and
-workers). That is a paired design: each dataset is one pair of observations,
-which is what the paired t-tests need. The Genetic algorithm gets a fixed seed
-per dataset so the whole run is reproducible.
+Every algorithm runs on the same N synthetic datasets (seeds 42 to 42 + N - 1),
+so each dataset gives one pair of observations for the paired t-tests. Genetic
+gets a fixed seed per dataset, so a run can be repeated exactly.
 
-Algorithms are called directly as Python functions (no HTTP), with the same
-request objects the API uses.
-
-Outputs (full run):
-    database/seed/benchmark_results.json   runs, summaries, ANOVA, paired t-tests, alpha sensitivity
-    database/seed/alpha_sensitivity.csv    the alpha table, ready for dissertation charts
+Writes database/seed/benchmark_results.json and database/seed/alpha_sensitivity.csv.
 """
 
 import argparse
@@ -67,7 +56,7 @@ ALGORITHMS = {
     "hybrid": main.prioritise_hybrid,
 }
 
-# The five metrics from the proposal, then two diagnostics that help explain them.
+# The five metrics from the proposal, then two diagnostics.
 PRIMARY_METRICS = [
     "gini_coefficient",
     "avg_response_time_estimate",
@@ -99,15 +88,11 @@ def clean(value):
     return None if math.isnan(value) or math.isinf(value) else value
 
 
-# ---------------------------------------------------------------------------
-# One algorithm on one dataset
-# ---------------------------------------------------------------------------
-
 def diagnostics(ordered: list[Report], workers: list[Worker]) -> dict:
-    """Extra measures that explain the main metrics. Not part of the API output."""
+    """Extra measures that help explain the main metrics."""
     served = simulate_response_times(ordered, workers)
 
-    # Average leg length: replay each worker's route and measure every hop.
+    # Average distance between consecutive jobs.
     position = {w.id: (w.lat, w.lng) for w in workers if w.available}
     legs = []
     for report, worker, _ in served:
@@ -115,7 +100,7 @@ def diagnostics(ordered: list[Report], workers: list[Worker]) -> dict:
         legs.append(euclidean_distance(lat, lng, report.lat, report.lng))
         position[worker.id] = (report.lat, report.lng)
 
-    # Do wards with a higher SAMPI score wait less on average?
+    # SAMPI against average wait, per ward.
     by_ward: dict[str, list[float]] = {}
     sampi: dict[str, float] = {}
     for report, _, minutes in served:
@@ -156,16 +141,11 @@ def run_once(name: str, data: dict, seed: int, alpha: float, generations: int) -
         "avg_response_time_estimate": m.avg_response_time_estimate,
         "high_severity_rate": m.high_severity_rate,
         "low_income_coverage": m.low_income_coverage,
-        # Wall clock around the whole call, metric calculation included, the same for all four.
         "computational_time_ms": round(elapsed_ms, 3),
     }
     result.update(diagnostics(ordered, workers))
     return result
 
-
-# ---------------------------------------------------------------------------
-# Statistics
-# ---------------------------------------------------------------------------
 
 def describe(values: list) -> dict:
     xs = [v for v in values if v is not None]
@@ -181,11 +161,7 @@ def describe(values: list) -> dict:
 
 
 def anova(groups: dict[str, list]) -> dict:
-    """One-way ANOVA across the algorithms, as the issue specifies.
-
-    The datasets are shared between algorithms, so this ignores the pairing.
-    Treat the paired t-tests as the main test and this as the overall check.
-    """
+    """One-way ANOVA across the algorithms. It ignores the pairing, so the paired t-tests are the main test."""
     samples = list(groups.values())
     if any(None in g or len(g) < 2 for g in samples):
         return {"F": None, "p": None}
@@ -222,10 +198,6 @@ def paired_tests(metric: str, groups: dict[str, list]) -> list[dict]:
     return rows
 
 
-# ---------------------------------------------------------------------------
-# The whole benchmark
-# ---------------------------------------------------------------------------
-
 def run_benchmark(
     n_datasets: int = DEFAULT_DATASETS,
     generations: int = BENCHMARK_GENERATIONS,
@@ -236,7 +208,7 @@ def run_benchmark(
     seeds = [FIRST_SEED + i for i in range(n_datasets)]
     datasets = {s: generator.build(s) for s in seeds}
 
-    # The committed dataset should be exactly what seed 42 generates.
+    # The committed dataset should match what seed 42 generates.
     committed_path = SEED_DIR / "benchmark_dataset.json"
     matches_committed = None
     if committed_path.exists() and FIRST_SEED in datasets:
