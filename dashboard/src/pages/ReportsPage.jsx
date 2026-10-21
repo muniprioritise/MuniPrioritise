@@ -21,8 +21,8 @@ function ReportsPage() {
       try {
         const reportRows = await fetchReports(token);
         const [overviewData, analyticsData] = await Promise.all([
-          fetchOverview(token, reportRows),
-          fetchAnalytics(token, reportRows),
+          fetchOverview(token),
+          fetchAnalytics(token),
         ]);
         if (!mounted) {
           return;

@@ -3,7 +3,6 @@ import { useAuth } from '../context/AuthContext.jsx';
 import {
   fetchOverrideAudit,
   fetchQueue,
-  fetchReports,
   fetchWorkers,
   submitOverride,
 } from '../services/dashboardApi.js';
@@ -27,9 +26,8 @@ function PrioritisationOverridePage() {
       setError('');
       setIsLoading(true);
       try {
-        const reports = await fetchReports(token);
         const [queueData, auditData, workerData] = await Promise.all([
-          fetchQueue(token, reports),
+          fetchQueue(token),
           fetchOverrideAudit(token),
           fetchWorkers(token),
         ]);
@@ -56,7 +54,7 @@ function PrioritisationOverridePage() {
     };
   }, [token]);
 
-  // Worker ids are UUIDs, so show the person's name wherever we have it.
+  // Show the worker's name instead of their UUID.
   const workerNames = useMemo(
     () =>
       Object.fromEntries(

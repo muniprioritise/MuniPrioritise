@@ -31,12 +31,10 @@ function format(entry, metric, digits) {
   return sd === null ? m.toFixed(digits) : `${m.toFixed(digits)} (${sd.toFixed(digits)})`;
 }
 
-// One row per algorithm, flat, so each chart reads straight from it. The fill
-// colour is in the row: the hybrid stands out from the three baselines.
+// One flat row per algorithm. The hybrid gets its own fill colour.
 const rows = algorithms.map((algo) => ({
   key: algo.key,
-  // Short name for chart axes: "Hybrid (alpha 0.4)" is too long and makes the
-  // axis drop labels. The table keeps the full name.
+  // Short axis label. The table keeps the full name.
   name: algo.key === 'hybrid' ? 'Hybrid' : algo.name,
   fill: algo.key === 'hybrid' ? HYBRID_COLOUR : BASELINE_COLOUR,
   gini: mean(algo, 'gini_coefficient'),
@@ -46,8 +44,7 @@ const rows = algorithms.map((algo) => ({
   compTime: mean(algo, 'computational_time_ms'),
 }));
 
-// The grouped chart colours bars by series (severity or low-income), so its rows
-// must not carry the per-algorithm fill.
+// The grouped chart colours bars by series, so these rows carry no fill.
 const queueRows = rows.map((row) => ({
   name: row.name,
   highSeverity: row.highSeverity,
