@@ -1,4 +1,4 @@
-"""Checks the generated benchmark dataset against issue P3-03.
+"""Checks the generated benchmark dataset against its specification.
 
 Run from the repo root:  python -m pytest database/seed -q
 """

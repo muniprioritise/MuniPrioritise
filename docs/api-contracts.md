@@ -307,4 +307,4 @@ Authorization: Bearer <your-jwt-token>
 
 ---
 
-*Last updated: Phase 0 setup. Update this document whenever endpoints change — do not let it drift from the actual implementation.*
+*Keep this document in step with the implementation whenever an endpoint changes.*
