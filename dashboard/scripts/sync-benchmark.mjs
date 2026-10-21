@@ -36,7 +36,7 @@ const METRICS = [
   'mean_leg_km',
 ];
 
-const round = (value) => (value === null || value === undefined ? null : Number(value.toFixed(4)));
+const round = (value) => (value === null || value === undefined ? null : Number(value.toFixed(6)));
 const pick = (stats) => Object.fromEntries(METRICS.map((m) => [m, { mean: round(stats[m].mean), sd: round(stats[m].sd) }]));
 
 const cfg = results.config;
