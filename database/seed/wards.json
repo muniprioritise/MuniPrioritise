@@ -1,5 +1,5 @@
 {
-  "_note": "SYNTHETIC. Centroids are approximate suburb centres; sampi_score and population are invented for the prototype and benchmark, scaled to the 0.12-0.78 range in issue P3-03. They are not published StatsSA values.",
+  "_note": "SYNTHETIC. Centroids are approximate suburb centres; sampi_score and population are invented for the prototype and benchmark, scaled to the 0.12-0.78 range. They are not published StatsSA values.",
   "wards": [
     {
       "id": "CPT-001",
