@@ -12,7 +12,7 @@ const isExpoGo = Constants.appOwnership === "expo";
 // optional field on login, so callers must treat null as normal.
 export async function registerForPushNotifications(): Promise<string | null> {
   if (isExpoGo) {
-    console.log("Push notifications are not supported in Expo Go — requires a development build.");
+    console.log("Push notifications are not supported in Expo Go. It requires a development build.");
     return null;
   }
 

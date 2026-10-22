@@ -1,4 +1,4 @@
--- MuniPrioritise — Database Initialisation Script
+-- MuniPrioritise: Database Initialisation Script
 -- This runs automatically when the Docker container first starts.
 -- If you need to reset: docker compose down -v && docker compose up
 

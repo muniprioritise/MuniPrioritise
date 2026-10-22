@@ -1,8 +1,8 @@
-# MuniPrioritise — API Contracts
+# MuniPrioritise: API Contracts
 
 > This document is the source of truth for all API endpoint shapes.
 > Before building any API call in mobile or dashboard, check here first.
-> Do not invent endpoint shapes — if something is missing, add it here and notify the team.
+> Do not invent endpoint shapes. If something is missing, add it here and notify the team.
 
 Base URL (local): `http://localhost:3000`
 
@@ -16,7 +16,7 @@ Base URL (local): `http://localhost:3000`
 | POST | `/auth/login` | No | Login, returns JWT access token |
 | GET | `/auth/me` | Yes | Get own profile |
 
-### POST /auth/register — Request body
+### POST /auth/register: Request body
 ```json
 {
   "email": "user@example.com",
@@ -27,7 +27,7 @@ Base URL (local): `http://localhost:3000`
 }
 ```
 
-### POST /auth/login — Request body
+### POST /auth/login: Request body
 ```json
 {
   "email": "user@example.com",
@@ -35,7 +35,7 @@ Base URL (local): `http://localhost:3000`
 }
 ```
 
-### POST /auth/login — Response
+### POST /auth/login: Response
 ```json
 {
   "token": "eyJhbGciOiJIUzI1NiJ9...",
@@ -61,7 +61,7 @@ Base URL (local): `http://localhost:3000`
 | POST | `/reports/:id/evidence` | Yes (worker) | Upload completion photos and notes |
 | PATCH | `/reports/:id/rating` | Yes (resident) | Submit resolution rating (1–5) |
 
-### POST /reports — Request body
+### POST /reports: Request body
 ```json
 {
   "category": "water",
@@ -73,7 +73,7 @@ Base URL (local): `http://localhost:3000`
 }
 ```
 
-### GET /reports — Query parameters (all optional)
+### GET /reports: Query parameters (all optional)
 ```
 ?status=pending
 ?category=water
@@ -101,7 +101,7 @@ Base URL (local): `http://localhost:3000`
 }
 ```
 
-### PATCH /reports/:id/status — Request body
+### PATCH /reports/:id/status: Request body
 ```json
 {
   "status": "in_progress",
@@ -120,7 +120,7 @@ Valid statuses: `pending` → `assigned` → `in_progress` → `resolved` / `esc
 | PATCH | `/jobs/:id/accept` | Yes (worker) | Accept a job |
 | PATCH | `/jobs/:id/escalate` | Yes (worker) | Flag job for escalation |
 
-### GET /jobs — Response
+### GET /jobs: Response
 ```json
 {
   "algorithm": "hybrid",
@@ -148,7 +148,7 @@ Valid statuses: `pending` → `assigned` → `in_progress` → `resolved` / `esc
 | GET | `/supervisor/analytics` | Yes (supervisor) | Time-series and distribution data |
 | GET | `/supervisor/audit` | Yes (supervisor) | Log of all overrides and prioritisation decisions |
 
-### GET /supervisor/overview — Response
+### GET /supervisor/overview: Response
 ```json
 {
   "total_open": 142,
@@ -158,7 +158,7 @@ Valid statuses: `pending` → `assigned` → `in_progress` → `resolved` / `esc
 }
 ```
 
-### POST /supervisor/override — Request body
+### POST /supervisor/override: Request body
 ```json
 {
   "job_id": "uuid",
@@ -171,7 +171,7 @@ Valid statuses: `pending` → `assigned` → `in_progress` → `resolved` / `esc
 
 ## Algorithm Service
 
-> These endpoints are called internally by the Node.js backend — not directly by mobile or dashboard.
+> These endpoints are called internally by the Node.js backend, not directly by mobile or dashboard.
 
 Base URL (local): `http://localhost:8000`
 
@@ -290,9 +290,9 @@ Holds the live alpha. A hybrid request with no `alpha` uses this value; an `alph
 |---|---|
 | 200 | Success |
 | 201 | Created successfully |
-| 400 | Bad request — missing or invalid fields |
-| 401 | Unauthorised — missing or invalid JWT |
-| 403 | Forbidden — correct JWT but wrong role |
+| 400 | Bad request: missing or invalid fields |
+| 401 | Unauthorised: missing or invalid JWT |
+| 403 | Forbidden: correct JWT but wrong role |
 | 404 | Resource not found |
 | 500 | Internal server error |
 
