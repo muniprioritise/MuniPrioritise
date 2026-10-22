@@ -12,6 +12,8 @@ Capstone project for ITDMA3-22 and ITMDA3-34 at Eduvos.
 | Backend API | https://muniprioritise-1vgj.onrender.com (`GET /health`) |
 | Algorithm service | https://muniprioritise.onrender.com (`GET /health`, `/docs`) |
 
+Demo video: https://youtu.be/KZBVOa8-HuQ
+
 The backend and algorithm service run on a free tier. The first request after a quiet period can take up to a minute.
 
 ## What it does
