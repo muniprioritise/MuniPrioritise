@@ -60,6 +60,7 @@ Base URL (local): `http://localhost:3000`
 | PATCH | `/reports/:id/status` | Yes (worker) | Update report status |
 | POST | `/reports/:id/evidence` | Yes (worker) | Upload completion photos and notes |
 | PATCH | `/reports/:id/rating` | Yes (resident) | Submit resolution rating (1–5) |
+| DELETE | `/reports/:id` | Yes (resident, supervisor) | A resident deletes their own report while it is `pending`. A supervisor can delete any report. Returns 204 |
 
 ### POST /reports: Request body
 ```json

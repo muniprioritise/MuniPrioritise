@@ -46,6 +46,10 @@ async function requestJson(path, { method = 'GET', token = '', body } = {}) {
     );
   }
 
+  if (response.status === 204) {
+    return null;
+  }
+
   return response.json();
 }
 
@@ -72,6 +76,10 @@ export async function fetchReports(token) {
     throw new Error('Unexpected reports response');
   }
   return normaliseReports(reports);
+}
+
+export async function deleteReport(token, id) {
+  await requestJson(`/api/reports/${id}`, { method: 'DELETE', token });
 }
 
 export async function fetchOverview(token) {

@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useState } from "react";
 import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { Image } from "expo-image";
 
 import StatusBadge from "@/components/StatusBadge";
 import StatusTimeline from "@/components/StatusTimeLine";
 import RateResolutionModal from "@/components/RateResolutionModal";
 import { getApiErrorMessage } from "@/services/apiError";
-import { getReportById, rateReport } from "@/services/reportsService";
+import { deleteReport, getReportById, rateReport } from "@/services/reportsService";
 import type { Report } from "@/types/report";
 
 export default function ReportDetailScreen() {
@@ -53,6 +53,28 @@ export default function ReportDetailScreen() {
         getApiErrorMessage(err, "Could not save your rating. Please try again.")
       );
     }
+  };
+
+  const handleDelete = async () => {
+    if (!report) return;
+
+    try {
+      await deleteReport(report.id);
+      router.back();
+    } catch (err) {
+      console.error("Failed to delete report:", err);
+      Alert.alert(
+        "Delete failed",
+        getApiErrorMessage(err, "Could not delete this report. Please try again.")
+      );
+    }
+  };
+
+  const confirmDelete = () => {
+    Alert.alert("Delete this report?", "This cannot be undone.", [
+      { text: "Cancel", style: "cancel" },
+      { text: "Delete", style: "destructive", onPress: handleDelete },
+    ]);
   };
 
   if (loading) {
@@ -108,6 +130,12 @@ export default function ReportDetailScreen() {
 
       {report.rating ? <Text style={styles.ratedText}>You rated this resolution {report.rating}/5</Text> : null}
 
+      {report.status === "submitted" ? (
+        <TouchableOpacity style={styles.deleteButton} onPress={confirmDelete}>
+          <Text style={styles.deleteText}>Delete report</Text>
+        </TouchableOpacity>
+      ) : null}
+
       <RateResolutionModal visible={rateModalVisible} onClose={() => setRateModalVisible(false)} onSubmit={handleRate} />
     </ScrollView>
   );
@@ -129,6 +157,8 @@ const styles = StyleSheet.create({
   rateSection: { marginTop: 24, alignItems: "center" },
   rateSectionText: { fontSize: 14, color: "#3A3A3A", marginBottom: 8 },
   rateButton: { color: "#2563eb", fontWeight: "700" },
+  deleteButton: { marginTop: 32, borderWidth: 1, borderColor: "#A61212", borderRadius: 4, paddingVertical: 12, alignItems: "center" },
+  deleteText: { color: "#A61212", fontWeight: "600" },
   ratedText: { marginTop: 24, fontSize: 14, color: "#1E7A1E", textAlign: "center" },
 });
 

@@ -456,6 +456,56 @@ app.patch(
   }
 );
 
+// DELETE /api/reports/:id
+// A resident can delete their own report until work starts. A supervisor can
+// delete any report, for example a false one.
+app.delete('/api/reports/:id', verifyToken, async (req, res) => {
+  const { id } = req.params;
+  const isSupervisor = req.user.role === 'supervisor';
+  const client = await pool.connect();
+
+  try {
+    await client.query('BEGIN');
+
+    // FOR UPDATE stops a worker accepting the job while it is being deleted.
+    const report = await client.query('SELECT user_id, status FROM reports WHERE id = $1 FOR UPDATE', [id]);
+    if (report.rows.length === 0) {
+      await client.query('ROLLBACK');
+      return res.status(404).json({ error: 'Report not found' });
+    }
+    if (!isSupervisor && report.rows[0].user_id !== req.user.id) {
+      await client.query('ROLLBACK');
+      return res.status(403).json({ error: 'Unauthorized to delete this report' });
+    }
+    if (!isSupervisor && report.rows[0].status !== 'pending') {
+      await client.query('ROLLBACK');
+      return res.status(400).json({ error: 'Only reports that have not been started can be deleted' });
+    }
+
+    // status_events and job_assignments reference each other, so the events go first.
+    await client.query(
+      `DELETE FROM status_events
+       WHERE report_id = $1 OR job_id IN (SELECT id FROM job_assignments WHERE report_id = $1)`,
+      [id]
+    );
+    await client.query('DELETE FROM evidence WHERE report_id = $1', [id]);
+    await client.query('DELETE FROM job_assignments WHERE report_id = $1', [id]);
+    await client.query('DELETE FROM reports WHERE id = $1', [id]);
+
+    await client.query('COMMIT');
+    res.status(204).send();
+  } catch (err) {
+    await client.query('ROLLBACK').catch(() => {});
+    if (err.code === '22P02') {
+      return res.status(404).json({ error: 'Report not found' });
+    }
+    console.error('Error deleting report:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  } finally {
+    client.release();
+  }
+});
+
 // GET /api/jobs
 // Runs the hybrid algorithm and upserts each assignment into job_assignments.
 // Staff only, because the call writes to the database.

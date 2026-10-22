@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useAuth } from '../context/AuthContext.jsx';
-import { fetchReports } from '../services/dashboardApi.js';
+import { deleteReport, fetchReports } from '../services/dashboardApi.js';
 import { formatDateTime, shortId, toCsv } from '../utils/dashboardData.js';
 
 const tableColumns = [
@@ -22,6 +22,7 @@ function RequestTablePage() {
   const [sortDir, setSortDir] = useState('desc');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
+  const [deleteError, setDeleteError] = useState('');
 
   useEffect(() => {
     let mounted = true;
@@ -84,6 +85,20 @@ function RequestTablePage() {
 
   const categories = useMemo(() => [...new Set(reports.map((report) => report.category))], [reports]);
   const statuses = useMemo(() => [...new Set(reports.map((report) => report.status))], [reports]);
+
+  const onDelete = async (report) => {
+    if (!window.confirm(`Delete request ${shortId(report.id)}? This cannot be undone.`)) {
+      return;
+    }
+
+    setDeleteError('');
+    try {
+      await deleteReport(token, report.id);
+      setReports((current) => current.filter((row) => row.id !== report.id));
+    } catch (requestError) {
+      setDeleteError(requestError.message || 'Unable to delete the request.');
+    }
+  };
 
   const exportCsv = () => {
     const csvRows = filtered.map((report) => ({
@@ -149,6 +164,7 @@ function RequestTablePage() {
 
       {isLoading && <p className="panel-message">Loading requests...</p>}
       {error && <p className="panel-message panel-error">{error}</p>}
+      {deleteError && <p className="panel-message panel-error">{deleteError}</p>}
 
       {!isLoading && !error && (
         <div className="table-wrap">
@@ -161,6 +177,7 @@ function RequestTablePage() {
                 <th>Status</th>
                 <th>Ward</th>
                 <th>Created at</th>
+                <th>Action</th>
               </tr>
             </thead>
             <tbody>
@@ -172,6 +189,11 @@ function RequestTablePage() {
                   <td>{report.status}</td>
                   <td>{report.ward_id}</td>
                   <td>{formatDateTime(report.created_at)}</td>
+                  <td>
+                    <button type="button" className="danger-btn" onClick={() => onDelete(report)}>
+                      Delete
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
