@@ -111,6 +111,7 @@ a {
 
 .primary-btn,
 .secondary-btn,
+.danger-btn,
 .logout-btn {
   border: 1px solid transparent;
   border-radius: 10px;
@@ -142,6 +143,18 @@ a {
 
 .secondary-btn:hover {
   background: #e6ecef;
+}
+
+.danger-btn {
+  padding: 6px 12px;
+  border-color: var(--danger);
+  background: transparent;
+  color: var(--danger);
+}
+
+.danger-btn:hover {
+  background: var(--danger);
+  color: #fff;
 }
 
 .form-error,

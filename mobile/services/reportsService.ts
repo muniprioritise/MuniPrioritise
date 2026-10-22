@@ -189,3 +189,7 @@ export async function createReport(input: CreateReportInput): Promise<Report> {
 export async function rateReport(id: string, rating: number): Promise<void> {
   await api.patch(`/reports/${id}/rating`, { rating });
 }
+
+export async function deleteReport(id: string): Promise<void> {
+  await api.delete(`/reports/${id}`);
+}
