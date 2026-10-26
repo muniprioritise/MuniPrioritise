@@ -15,6 +15,23 @@ Capstone project for ITDMA3-22 and ITMDA3-34 at Eduvos.
 Demo video: https://youtu.be/KZBVOa8-HuQ
 
 The backend and algorithm service run on a free tier. The first request after a quiet period can take up to a minute.
+## Screenshots
+
+**Benchmark.** The supervisor dashboard runs all four algorithms on the same synthetic datasets. The hybrid at alpha 0.4 puts 71% of low-income-ward requests in the top half of the queue. First come first served, Greedy and Genetic sit at about 50%. Greedy still serves the most severe requests first.
+
+![Algorithm benchmark table and chart](docs/screenshots/benchmark.png)
+
+**Supervisor override.** A supervisor can reassign a job to another worker. Every override is written to the audit log with a reason.
+
+![Prioritisation override and audit log](docs/screenshots/override.png)
+
+**Request map.** Requests plotted on a map with a heatmap overlay and a detail panel.
+
+![Request map with heatmap overlay](docs/screenshots/map.png)
+
+**Resident app.** A resident reports an issue with a category, severity, photo and location.
+
+<img src="docs/screenshots/report-issue.png" alt="Report an Issue screen in the mobile app" width="280">
 
 ## What it does
 
