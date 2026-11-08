@@ -528,3 +528,374 @@ a {
     height: 420px;
   }
 }
+
+/* Requests page */
+.requests-toolbar {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) 160px 160px auto;
+  gap: 10px;
+  align-items: center;
+}
+
+.requests-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.table-meta {
+  margin: 12px 0 8px;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.link-btn {
+  margin-left: 10px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--brand);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.sort-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.sort-arrow {
+  display: inline-block;
+  min-width: 10px;
+  font-size: 0.65rem;
+  color: var(--brand);
+}
+
+.mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.85rem;
+}
+
+.row-actions {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+  white-space: nowrap;
+}
+
+.status-badge,
+.sev-chip {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  background: var(--surface-soft);
+  color: var(--text);
+}
+
+.sev-chip {
+  min-width: 28px;
+  text-align: center;
+}
+
+.status-pending { background: #eef2f3; color: #3f5359; }
+.status-assigned { background: #e3ecf5; color: #1d3557; }
+.status-in_progress { background: #fdf1d6; color: var(--warning); }
+.status-resolved { background: #e1f1e8; color: var(--ok); }
+.status-escalated { background: #f6e1e1; color: var(--danger); }
+
+.sev-low { background: #e1f1e8; color: var(--ok); }
+.sev-mid { background: #fdf1d6; color: var(--warning); }
+.sev-high { background: #f6e1e1; color: var(--danger); }
+
+@media (max-width: 1100px) {
+  .requests-toolbar {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .requests-search {
+    grid-column: 1 / -1;
+  }
+
+  .requests-actions {
+    grid-column: 1 / -1;
+  }
+}
+
+/* Shared page states */
+.page-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 48px 16px;
+  border: 1px solid var(--stroke);
+  border-radius: 16px;
+  background: var(--surface);
+  color: var(--muted);
+}
+
+.page-state p {
+  margin: 0;
+}
+
+.page-state-error {
+  color: var(--danger);
+}
+
+.spinner {
+  width: 28px;
+  height: 28px;
+  border: 3px solid var(--surface-soft);
+  border-top-color: var(--brand);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Stat card accents */
+.stat-card {
+  border-left-width: 4px;
+}
+
+.stat-alert { border-left-color: var(--danger); }
+.stat-info { border-left-color: #1d3557; }
+.stat-positive { border-left-color: var(--ok); }
+.stat-neutral { border-left-color: var(--brand); }
+
+/* Overview cards */
+.overview-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: 14px;
+}
+
+.card-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.card-link {
+  color: var(--brand);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.card-link:hover {
+  text-decoration: underline;
+}
+
+.status-bar {
+  display: flex;
+  height: 14px;
+  margin: 8px 0 14px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--surface-soft);
+}
+
+.status-bar-segment {
+  min-width: 6px;
+}
+
+.status-bar-segment.status-pending { background: #9aa9ae; }
+.status-bar-segment.status-assigned { background: #1d3557; }
+.status-bar-segment.status-in_progress { background: #e0a21b; }
+.status-bar-segment.status-escalated { background: var(--danger); }
+.status-bar-segment.status-resolved { background: var(--ok); }
+
+.status-legend {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.status-legend li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+}
+
+.status-legend strong {
+  margin-left: auto;
+}
+
+.status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.status-dot.status-pending { background: #9aa9ae; }
+.status-dot.status-assigned { background: #1d3557; }
+.status-dot.status-in_progress { background: #e0a21b; }
+.status-dot.status-escalated { background: var(--danger); }
+.status-dot.status-resolved { background: var(--ok); }
+
+.attention-list {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.attention-list li {
+  display: grid;
+  grid-template-columns: 80px 1fr auto auto;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--surface-soft);
+  font-size: 0.9rem;
+}
+
+.attention-list li:last-child {
+  border-bottom: 0;
+}
+
+.attention-date {
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+@media (max-width: 1100px) {
+  .overview-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Simulation page */
+.sim-banner {
+  padding: 12px 16px;
+  border: 1px solid #e0c35a;
+  border-left-width: 4px;
+  border-radius: 12px;
+  background: #fdf6dc;
+  color: var(--text);
+  font-size: 0.9rem;
+}
+
+.sim-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: flex-end;
+}
+
+.sim-field {
+  display: grid;
+  gap: 4px;
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.sim-slider {
+  margin: 14px 0;
+}
+
+.sim-slider input {
+  width: 100%;
+  accent-color: var(--brand);
+}
+
+.sim-slider p {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.sim-tag {
+  margin-left: 10px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--surface-soft);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.sim-tag-on {
+  background: #e1f1e8;
+  color: var(--ok);
+}
+
+.sim-maps {
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.sim-map-card h4 {
+  margin: 0 0 8px;
+  font-size: 0.95rem;
+}
+
+.sim-map {
+  height: 380px;
+  border-radius: 12px;
+}
+
+/* Mute the basemap so the ward colours carry the picture. */
+.sim-map .leaflet-tile-pane {
+  filter: grayscale(1) brightness(1.1) contrast(0.85);
+}
+
+.sim-legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.sim-gradient {
+  width: 120px;
+  height: 10px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #e8f0ee, #f2b705, #8d2d2d);
+}
+
+@media (max-width: 1100px) {
+  .sim-maps {
+    grid-template-columns: 1fr;
+  }
+}
+
+.sim-map-subtitle {
+  margin: -4px 0 8px;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.sim-gradient-change {
+  background: linear-gradient(90deg, #276749, #f1f4f5, #8d2d2d);
+}
+
+.sim-delta-good { color: var(--ok); font-weight: 600; }
+.sim-delta-bad { color: var(--danger); font-weight: 600; }
+
+.stat-value small {
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 500;
+}
