@@ -47,7 +47,9 @@ export function formatDateTime(value) {
   if (!parsed) {
     return 'Unknown';
   }
-  return parsed.toLocaleString();
+  const pad = (number) => String(number).padStart(2, '0');
+  const date = `${pad(parsed.getDate())}/${pad(parsed.getMonth() + 1)}/${parsed.getFullYear()}`;
+  return `${date} ${pad(parsed.getHours())}:${pad(parsed.getMinutes())}`;
 }
 
 export function toCsv(rows, headers) {
@@ -64,4 +66,13 @@ export function toCsv(rows, headers) {
     csvRows.push(headers.map((header) => escaped(row[header.key])).join(','));
   });
   return csvRows.join('\n');
+}
+
+export function titleCase(value) {
+  const text = String(value ?? '').replaceAll('_', ' ');
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
+export function statusLabel(status) {
+  return titleCase(status);
 }

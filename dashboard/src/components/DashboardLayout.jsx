@@ -4,11 +4,11 @@ import { useAuth } from '../context/AuthContext.jsx';
 const navItems = [
   { to: '/overview', label: 'Overview' },
   { to: '/request-map', label: 'Request Map' },
-  { to: '/request-table', label: 'Request Table' },
+  { to: '/requests', label: 'Requests' },
   { to: '/prioritisation-override', label: 'Prioritisation Override' },
   { to: '/analytics', label: 'Analytics' },
-  { to: '/reports', label: 'Reports' },
   { to: '/benchmarks', label: 'Algorithm Benchmarks' },
+  { to: '/simulation', label: 'Equity Simulation' },
 ];
 
 function getPageTitle(pathname) {

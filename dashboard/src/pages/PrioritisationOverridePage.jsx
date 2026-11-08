@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useAuth } from '../context/AuthContext.jsx';
+import { ErrorState } from '../components/PageState.jsx';
 import {
   fetchOverrideAudit,
   fetchQueue,
@@ -25,18 +26,23 @@ function PrioritisationOverridePage() {
     const load = async () => {
       setError('');
       setIsLoading(true);
-      try {
-        const [queueData, auditData, workerData] = await Promise.all([
-          fetchQueue(token),
-          fetchOverrideAudit(token),
-          fetchWorkers(token),
-        ]);
-        if (!mounted) {
-          return;
+      // Workers and the audit log are quick; the queue runs the algorithm and
+      // can be slow, so each loads on its own and the page fills in as they arrive.
+      const fast = Promise.all([fetchOverrideAudit(token), fetchWorkers(token)])
+        .then(([auditData, workerData]) => {
+          if (mounted) {
+            setAudit(auditData);
+            setWorkers(workerData);
+          }
+        });
+      const slow = fetchQueue(token).then((queueData) => {
+        if (mounted) {
+          setQueue(queueData);
         }
-        setQueue(queueData);
-        setAudit(auditData);
-        setWorkers(workerData);
+      });
+
+      try {
+        await Promise.all([fast, slow]);
       } catch (requestError) {
         if (mounted) {
           setError(requestError.message || 'Unable to load override queue.');
@@ -106,12 +112,8 @@ function PrioritisationOverridePage() {
     }
   };
 
-  if (isLoading) {
-    return <p className="panel-message">Loading prioritisation queue...</p>;
-  }
-
   if (error) {
-    return <p className="panel-message panel-error">{error}</p>;
+    return <ErrorState message={error} />;
   }
 
   return (
@@ -192,7 +194,10 @@ function PrioritisationOverridePage() {
               ))}
             </tbody>
           </table>
-          {!queue.length && <p className="panel-message">No pending requests in the queue.</p>}
+          {isLoading && (
+            <p className="panel-message">Ranking requests. This can take a moment if the algorithm service was idle.</p>
+          )}
+          {!isLoading && !queue.length && <p className="panel-message">No pending requests in the queue.</p>}
         </div>
       </article>
 

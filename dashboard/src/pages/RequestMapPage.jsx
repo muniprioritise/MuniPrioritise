@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Circle, CircleMarker, MapContainer, Popup, TileLayer } from 'react-leaflet';
 import { useAuth } from '../context/AuthContext.jsx';
+import { ErrorState, LoadingState } from '../components/PageState.jsx';
 import { fetchReports } from '../services/dashboardApi.js';
 import { CATEGORY_COLORS, formatDateTime } from '../utils/dashboardData.js';
 
@@ -57,11 +58,11 @@ function RequestMapPage() {
   const selected = reports.find((report) => report.id === selectedId);
 
   if (isLoading) {
-    return <p className="panel-message">Loading request map...</p>;
+    return <LoadingState label="Loading request map..." />;
   }
 
   if (error) {
-    return <p className="panel-message panel-error">{error}</p>;
+    return <ErrorState message={error} />;
   }
 
   return (
