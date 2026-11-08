@@ -1,198 +1,92 @@
-import {
-  Alert,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
-
-import {
-  router,
-  useLocalSearchParams,
-} from "expo-router";
-
 import { useState } from "react";
+import { Alert, StyleSheet, Text, View } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { router, useLocalSearchParams } from "expo-router";
 
+import Button from "@/components/Button";
+import Screen, { CONTENT_EDGES } from "@/components/Screen";
+import TextField from "@/components/TextField";
+import { theme } from "@/constants/theme";
 import { escalateJob } from "@/services/jobsService";
 
+const { colors, spacing } = theme;
+
 export default function EscalationScreen() {
-  const params =
-    useLocalSearchParams<{
-      id: string;
-      jobId: string;
-    }>();
+  const params = useLocalSearchParams<{
+    id: string;
+    jobId: string;
+  }>();
 
-  const [notes, setNotes] =
-    useState("");
+  const [notes, setNotes] = useState("");
 
-  const [submitting, setSubmitting] =
-    useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
-  const submitEscalation =
-    async () => {
-      if (!notes.trim()) {
-        Alert.alert(
-          "Notes required",
-          "Please explain why this job needs escalation."
-        );
+  const submitEscalation = async () => {
+    if (!notes.trim()) {
+      Alert.alert("Notes required", "Please explain why this job needs escalation.");
 
-        return;
-      }
+      return;
+    }
 
-      try {
-        setSubmitting(true);
+    try {
+      setSubmitting(true);
 
-        // The backend updates the report status and logs the event.
-        await escalateJob(
-          params.jobId,
-          notes.trim()
-        );
+      // The backend updates the report status and logs the event.
+      await escalateJob(params.jobId, notes.trim());
 
-        Alert.alert(
-          "Job escalated",
-          "The supervisor can now review this job.",
-          [
-            {
-              text: "Done",
+      Alert.alert("Job escalated", "The supervisor can now review this job.", [
+        {
+          text: "Done",
 
-              onPress: () =>
-                router.replace(
-                  "/jobs"
-                ),
-            },
-          ]
-        );
-      } catch (error) {
-        console.error(
-          error
-        );
+          onPress: () => router.replace("/jobs"),
+        },
+      ]);
+    } catch (error) {
+      console.error(error);
 
-        Alert.alert(
-          "Escalation failed",
-          "The job could not be escalated."
-        );
-      } finally {
-        setSubmitting(false);
-      }
-    };
+      Alert.alert("Escalation failed", "The job could not be escalated.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
-    <View
-      style={styles.container}
-    >
-      <Text
-        style={styles.title}
-      >
-        Escalate Job
-      </Text>
+    <Screen scroll edges={CONTENT_EDGES} contentContainerStyle={styles.content}>
+      <Text style={styles.title}>Escalate job</Text>
 
-      <Text
-        style={
-          styles.subtitle
-        }
-      >
-        Explain why this job
-        cannot be completed normally
-        or requires supervisor
-        intervention.
-      </Text>
+      <View style={styles.notice}>
+        <Ionicons name="alert-circle" size={22} color={colors.warning} />
+        <Text style={styles.noticeText}>
+          Explain why this job cannot be completed normally or requires supervisor intervention.
+        </Text>
+      </View>
 
-      <Text
-        style={styles.label}
-      >
-        Escalation Notes
-      </Text>
-
-      <TextInput
-        style={styles.input}
+      <TextField
+        label="Escalation notes"
         placeholder="Example: specialist equipment is required..."
+        value={notes}
+        onChangeText={setNotes}
         multiline
         numberOfLines={6}
-        value={notes}
-        onChangeText={
-          setNotes
-        }
+        style={styles.notes}
       />
 
-      <TouchableOpacity
-        style={
-          styles.button
-        }
-        onPress={
-          submitEscalation
-        }
-        disabled={
-          submitting
-        }
-      >
-        <Text
-          style={
-            styles.buttonText
-          }
-        >
-          {submitting
-            ? "Escalating..."
-            : "Confirm Escalation"}
-        </Text>
-      </TouchableOpacity>
-    </View>
+      <Button title="Confirm Escalation" icon="arrow-up-circle-outline" variant="danger" onPress={submitEscalation} loading={submitting} />
+    </Screen>
   );
 }
 
-const styles =
-  StyleSheet.create({
-    container: {
-      flex: 1,
-      padding: 18,
-      backgroundColor:
-        "#F5F6F8",
-    },
-
-    title: {
-      fontSize: 26,
-      fontWeight: "700",
-      color: "#1A1A1A",
-    },
-
-    subtitle: {
-      marginTop: 6,
-      marginBottom: 24,
-      color: "#6B6B6B",
-      lineHeight: 20,
-    },
-
-    label: {
-      fontSize: 15,
-      fontWeight: "600",
-      marginBottom: 8,
-    },
-
-    input: {
-      backgroundColor:
-        "#FFFFFF",
-      borderWidth: 1,
-      borderColor:
-        "#D1D5DB",
-      borderRadius: 10,
-      padding: 14,
-      minHeight: 150,
-      textAlignVertical:
-        "top",
-    },
-
-    button: {
-      backgroundColor:
-        "#A61212",
-      padding: 16,
-      alignItems: "center",
-      borderRadius: 10,
-      marginTop: 20,
-    },
-
-    buttonText: {
-      color: "#FFFFFF",
-      fontSize: 16,
-      fontWeight: "700",
-    },
-  });
+const styles = StyleSheet.create({
+  content: { padding: spacing.xl, paddingBottom: spacing.xxl * 2 },
+  title: { fontSize: theme.font.title, fontWeight: "800", color: colors.text, marginBottom: spacing.lg },
+  notice: {
+    flexDirection: "row",
+    gap: spacing.md,
+    backgroundColor: colors.warningSoft,
+    borderRadius: theme.radius.md,
+    padding: spacing.lg,
+    marginBottom: spacing.xl,
+  },
+  noticeText: { flex: 1, fontSize: theme.font.small, color: colors.text, lineHeight: 20 },
+  notes: { minHeight: 150, paddingTop: spacing.md, textAlignVertical: "top" },
+});

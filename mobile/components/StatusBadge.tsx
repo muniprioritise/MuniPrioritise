@@ -1,24 +1,38 @@
 import { StyleSheet, Text, View } from "react-native";
+
+import { theme } from "@/constants/theme";
 import type { ReportStatus } from "@/types/report";
 
-const STATUS_STYLES: Record<ReportStatus, { backgroundColor: string; textColor: string; label: string }> = {
-  submitted: { backgroundColor: "#E3EAFB", textColor: "#2545B5", label: "Submitted" },
-  assigned: { backgroundColor: "#FFF4D9", textColor: "#8A6100", label: "Assigned" },
-  in_progress: { backgroundColor: "#FFE3D1", textColor: "#B5460A", label: "In Progress" },
-  resolved: { backgroundColor: "#E3F2E3", textColor: "#1E7A1E", label: "Resolved" },
-  rejected: { backgroundColor: "#FBDADA", textColor: "#A61212", label: "Rejected" },
+const { colors } = theme;
+
+const STATUS_STYLES: Record<ReportStatus, { background: string; color: string; label: string }> = {
+  submitted: { background: colors.infoSoft, color: colors.info, label: "Submitted" },
+  assigned: { background: colors.warningSoft, color: colors.warning, label: "Assigned" },
+  in_progress: { background: colors.brandSoft, color: colors.brand, label: "In progress" },
+  resolved: { background: colors.okSoft, color: colors.ok, label: "Resolved" },
+  rejected: { background: colors.dangerSoft, color: colors.danger, label: "Rejected" },
 };
 
 export default function StatusBadge({ status }: { status: ReportStatus }) {
   const style = STATUS_STYLES[status];
+
   return (
-    <View style={[styles.badge, { backgroundColor: style.backgroundColor }]}>
-      <Text style={[styles.text, { color: style.textColor }]}>{style.label}</Text>
+    <View style={[styles.badge, { backgroundColor: style.background }]} accessibilityLabel={`Status: ${style.label}`}>
+      <View style={[styles.dot, { backgroundColor: style.color }]} />
+      <Text style={[styles.text, { color: style.color }]}>{style.label}</Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  badge: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 4, alignSelf: "flex-start" },
-  text: { fontSize: 11, fontWeight: "700", letterSpacing: 0.3 },
+  badge: {
+    flexDirection: "row",
+    alignItems: "center",
+    alignSelf: "flex-start",
+    paddingHorizontal: theme.spacing.md,
+    paddingVertical: 5,
+    borderRadius: theme.radius.pill,
+  },
+  dot: { width: 7, height: 7, borderRadius: 4, marginRight: 6 },
+  text: { fontSize: theme.font.caption, fontWeight: "700" },
 });

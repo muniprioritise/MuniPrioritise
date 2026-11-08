@@ -1,14 +1,25 @@
 import { useCallback, useEffect, useState } from "react";
-import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Alert, StyleSheet, Text, View } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import { Image } from "expo-image";
 
+import Button from "@/components/Button";
+import Card from "@/components/Card";
+import CategoryIcon from "@/components/CategoryIcon";
+import RateResolutionModal from "@/components/RateResolutionModal";
+import Screen from "@/components/Screen";
 import StatusBadge from "@/components/StatusBadge";
 import StatusTimeline from "@/components/StatusTimeLine";
-import RateResolutionModal from "@/components/RateResolutionModal";
+import { severityLevel } from "@/constants/severity";
+import { theme } from "@/constants/theme";
 import { getApiErrorMessage } from "@/services/apiError";
 import { deleteReport, getReportById, rateReport } from "@/services/reportsService";
 import type { Report } from "@/types/report";
+import { formatDateTime } from "@/utils/format";
+
+const { colors, spacing } = theme;
+const CONTENT_EDGES = ["left", "right", "bottom"] as const;
 
 export default function ReportDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -79,86 +90,122 @@ export default function ReportDetailScreen() {
 
   if (loading) {
     return (
-      <View style={styles.centered}>
-        <ActivityIndicator size="large" />
-      </View>
+      <Screen edges={[...CONTENT_EDGES]}>
+        <View style={styles.centered}>
+          <ActivityIndicator size="large" color={colors.brand} />
+        </View>
+      </Screen>
     );
   }
 
   if (error) {
     return (
-      <View style={styles.centered}>
-        <Text style={styles.errorText}>{error}</Text>
-        <TouchableOpacity style={styles.retryButton} onPress={loadReport}>
-          <Text style={styles.retryText}>Try again</Text>
-        </TouchableOpacity>
-      </View>
+      <Screen edges={[...CONTENT_EDGES]}>
+        <View style={styles.centered}>
+          <Ionicons name="alert-circle-outline" size={40} color={colors.danger} />
+          <Text style={styles.errorText}>{error}</Text>
+          <Button title="Try again" variant="secondary" onPress={loadReport} />
+        </View>
+      </Screen>
     );
   }
 
   if (!report) {
     return (
-      <View style={styles.centered}>
-        <Text>Report not found.</Text>
-      </View>
+      <Screen edges={[...CONTENT_EDGES]}>
+        <View style={styles.centered}>
+          <Text style={styles.errorText}>Report not found.</Text>
+        </View>
+      </Screen>
     );
   }
 
+  const level = severityLevel(report.severity);
+
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <View style={styles.headerRow}>
-        <Text style={styles.category}>{report.category}</Text>
-        <StatusBadge status={report.status} />
-      </View>
+    <Screen scroll edges={[...CONTENT_EDGES]} contentContainerStyle={styles.content}>
+      <Card style={styles.block}>
+        <View style={styles.headerRow}>
+          <View style={styles.iconWrap}>
+            <CategoryIcon category={report.category} size={24} color={colors.brand} />
+          </View>
+          <Text style={styles.category}>{report.category}</Text>
+          <StatusBadge status={report.status} />
+        </View>
 
-      {report.photoUrl ? <Image source={{ uri: report.photoUrl }} style={styles.photo} contentFit="cover" /> : null}
+        {report.photoUrl ? <Image source={{ uri: report.photoUrl }} style={styles.photo} contentFit="cover" /> : null}
 
-      <Text style={styles.description}>{report.description}</Text>
-      <Text style={styles.meta}>Severity: {report.severity}/5</Text>
-      {report.address ? <Text style={styles.meta}>{report.address}</Text> : null}
-      <Text style={styles.meta}>Submitted {new Date(report.createdAt).toLocaleString()}</Text>
+        <Text style={styles.description}>{report.description}</Text>
 
-      <Text style={styles.sectionTitle}>Status Timeline</Text>
-      <StatusTimeline events={report.statusHistory} />
+        <View style={styles.metaRow}>
+          <Ionicons name="speedometer-outline" size={18} color={level.color} />
+          <Text style={[styles.metaText, { color: level.color }]}>
+            {level.label} severity ({report.severity}/5)
+          </Text>
+        </View>
+        {report.address ? (
+          <View style={styles.metaRow}>
+            <Ionicons name="location-outline" size={18} color={colors.muted} />
+            <Text style={styles.metaText}>{report.address}</Text>
+          </View>
+        ) : null}
+        <View style={styles.metaRow}>
+          <Ionicons name="calendar-outline" size={18} color={colors.muted} />
+          <Text style={styles.metaText}>Submitted {formatDateTime(report.createdAt)}</Text>
+        </View>
+      </Card>
+
+      <Card style={styles.block}>
+        <Text style={styles.sectionTitle}>Progress</Text>
+        <StatusTimeline events={report.statusHistory} />
+      </Card>
 
       {report.status === "resolved" && !report.rating ? (
-        <View style={styles.rateSection}>
-          <Text style={styles.rateSectionText}>How was this resolved?</Text>
-          <Text style={styles.rateButton} onPress={() => setRateModalVisible(true)}>Rate this resolution</Text>
+        <Card style={styles.block}>
+          <Text style={styles.rateText}>How was this resolved?</Text>
+          <Button title="Rate this resolution" icon="star-outline" onPress={() => setRateModalVisible(true)} />
+        </Card>
+      ) : null}
+
+      {report.rating ? (
+        <View style={styles.rated}>
+          <Ionicons name="checkmark-circle" size={20} color={colors.ok} />
+          <Text style={styles.ratedText}>You rated this resolution {report.rating}/5</Text>
         </View>
       ) : null}
 
-      {report.rating ? <Text style={styles.ratedText}>You rated this resolution {report.rating}/5</Text> : null}
-
       {report.status === "submitted" ? (
-        <TouchableOpacity style={styles.deleteButton} onPress={confirmDelete}>
-          <Text style={styles.deleteText}>Delete report</Text>
-        </TouchableOpacity>
+        <Button title="Delete report" icon="trash-outline" variant="danger" onPress={confirmDelete} style={styles.delete} />
       ) : null}
 
       <RateResolutionModal visible={rateModalVisible} onClose={() => setRateModalVisible(false)} onSubmit={handleRate} />
-    </ScrollView>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff" },
-  content: { padding: 20 },
-  centered: { flex: 1, justifyContent: "center", alignItems: "center", padding: 24 },
-  errorText: { color: "#A61212", textAlign: "center", marginBottom: 16 },
-  retryButton: { borderWidth: 1, borderColor: "#2563eb", borderRadius: 4, paddingVertical: 10, paddingHorizontal: 20 },
-  retryText: { color: "#2563eb", fontWeight: "600" },
-  headerRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 12 },
-  category: { fontSize: 20, fontWeight: "700", color: "#1A1A1A" },
-  photo: { width: "100%", height: 200, borderRadius: 4, marginBottom: 16 },
-  description: { fontSize: 15, color: "#3A3A3A", marginBottom: 8 },
-  meta: { fontSize: 13, color: "#6B6B6B", marginBottom: 4 },
-  sectionTitle: { fontSize: 16, fontWeight: "700", marginTop: 24, marginBottom: 12 },
-  rateSection: { marginTop: 24, alignItems: "center" },
-  rateSectionText: { fontSize: 14, color: "#3A3A3A", marginBottom: 8 },
-  rateButton: { color: "#2563eb", fontWeight: "700" },
-  deleteButton: { marginTop: 32, borderWidth: 1, borderColor: "#A61212", borderRadius: 4, paddingVertical: 12, alignItems: "center" },
-  deleteText: { color: "#A61212", fontWeight: "600" },
-  ratedText: { marginTop: 24, fontSize: 14, color: "#1E7A1E", textAlign: "center" },
+  content: { padding: spacing.lg, paddingBottom: spacing.xxl * 2 },
+  centered: { flex: 1, justifyContent: "center", alignItems: "center", padding: spacing.xl, gap: spacing.md },
+  errorText: { color: colors.danger, textAlign: "center", fontSize: theme.font.body },
+  block: { marginBottom: spacing.lg },
+  headerRow: { flexDirection: "row", alignItems: "center", marginBottom: spacing.lg },
+  iconWrap: {
+    width: 44,
+    height: 44,
+    borderRadius: theme.radius.md,
+    backgroundColor: colors.brandSoft,
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: spacing.md,
+  },
+  category: { flex: 1, fontSize: theme.font.heading, fontWeight: "800", color: colors.text },
+  photo: { width: "100%", height: 200, borderRadius: theme.radius.md, marginBottom: spacing.lg },
+  description: { fontSize: theme.font.body, color: colors.text, lineHeight: 24, marginBottom: spacing.lg },
+  metaRow: { flexDirection: "row", alignItems: "center", gap: spacing.sm, marginBottom: spacing.sm },
+  metaText: { flex: 1, fontSize: theme.font.small, color: colors.muted },
+  sectionTitle: { fontSize: theme.font.heading, fontWeight: "700", color: colors.text, marginBottom: spacing.lg },
+  rateText: { fontSize: theme.font.body, color: colors.text, marginBottom: spacing.md, textAlign: "center" },
+  rated: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: spacing.sm, marginBottom: spacing.lg },
+  ratedText: { fontSize: theme.font.small, color: colors.ok, fontWeight: "600" },
+  delete: { marginTop: spacing.sm },
 });
-

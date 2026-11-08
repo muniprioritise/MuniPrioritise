@@ -1,12 +1,21 @@
 import { useCallback, useState } from "react";
-import { ActivityIndicator, FlatList, RefreshControl, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { router, useFocusEffect } from "expo-router";
-import { SafeAreaView } from "react-native-safe-area-context";
 
+import Button from "@/components/Button";
+import CategoryIcon from "@/components/CategoryIcon";
+import Card from "@/components/Card";
+import Screen from "@/components/Screen";
 import StatusBadge from "@/components/StatusBadge";
+import { severityLevel } from "@/constants/severity";
+import { theme } from "@/constants/theme";
 import { getApiErrorMessage } from "@/services/apiError";
 import { getMyReports } from "@/services/reportsService";
 import type { Report } from "@/types/report";
+import { formatDate } from "@/utils/format";
+
+const { colors, spacing } = theme;
 
 export default function HomeScreen() {
   const [reports, setReports] = useState<Report[]>([]);
@@ -42,61 +51,151 @@ export default function HomeScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.centered}>
-        <ActivityIndicator size="large" />
-      </SafeAreaView>
+      <Screen>
+        <View style={styles.centered}>
+          <ActivityIndicator size="large" color={colors.brand} />
+        </View>
+      </Screen>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
+    <Screen>
       <View style={styles.header}>
-        <Text style={styles.title}>Your Reports</Text>
-        <Text style={styles.subtitle}>{reports.length} report{reports.length === 1 ? "" : "s"}</Text>
+        <View>
+          <Text style={styles.title}>Your reports</Text>
+          <Text style={styles.subtitle}>
+            {reports.length} report{reports.length === 1 ? "" : "s"}
+          </Text>
+        </View>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Notifications"
+          hitSlop={8}
+          onPress={() => router.push("/notifications")}
+          style={styles.bell}
+        >
+          <Ionicons name="notifications-outline" size={24} color={colors.brand} />
+        </Pressable>
       </View>
 
-      {error ? <Text style={styles.error}>{error}</Text> : null}
+      {error ? (
+        <View style={styles.errorBox}>
+          <Ionicons name="alert-circle" size={20} color={colors.danger} />
+          <Text style={styles.errorText}>{error}</Text>
+        </View>
+      ) : null}
 
       <FlatList
         data={reports}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.listContent}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} tintColor={colors.brand} />}
         renderItem={({ item }) => (
-          <TouchableOpacity style={styles.card} onPress={() => router.push(`/report/${item.id}`)}>
-            <View style={styles.cardHeader}>
-              <Text style={styles.category}>{item.category}</Text>
+          <Card
+            style={styles.card}
+            accessibilityLabel={`${item.category} report, ${item.status}`}
+            onPress={() => router.push(`/report/${item.id}`)}
+          >
+            <View style={styles.cardTop}>
+              <View style={styles.iconWrap}>
+                <CategoryIcon category={item.category} size={22} color={colors.brand} />
+              </View>
+              <View style={styles.cardTitleWrap}>
+                <Text style={styles.category}>{item.category}</Text>
+                <Text style={styles.date}>{formatDate(item.createdAt)}</Text>
+              </View>
               <StatusBadge status={item.status} />
             </View>
-            <Text style={styles.description} numberOfLines={2}>{item.description}</Text>
-            <Text style={styles.date}>{new Date(item.createdAt).toLocaleDateString()}</Text>
-          </TouchableOpacity>
+
+            <Text style={styles.description} numberOfLines={2}>
+              {item.description}
+            </Text>
+
+            <View style={styles.severityRow}>
+              <Ionicons name="speedometer-outline" size={16} color={severityLevel(item.severity).color} />
+              <Text style={[styles.severityText, { color: severityLevel(item.severity).color }]}>
+                Severity {item.severity}/5
+              </Text>
+            </View>
+          </Card>
         )}
         ListEmptyComponent={
           error ? null : (
-            <View style={styles.centered}>
-              <Text style={styles.emptyText}>You haven&apos;t submitted any reports yet.</Text>
+            <View style={styles.empty}>
+              <View style={styles.emptyIcon}>
+                <Ionicons name="document-text-outline" size={36} color={colors.brand} />
+              </View>
+              <Text style={styles.emptyTitle}>No reports yet</Text>
+              <Text style={styles.emptyText}>See a broken streetlight, a leak or a pothole? Tell your municipality.</Text>
+              <Button title="Report an issue" onPress={() => router.navigate("/(tabs)/submit")} style={styles.emptyButton} />
             </View>
           )
         }
       />
-    </SafeAreaView>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#F5F6F8" },
-  centered: { flex: 1, justifyContent: "center", alignItems: "center", padding: 24 },
-  header: { paddingHorizontal: 16, paddingTop: 16, paddingBottom: 8 },
-  title: { fontSize: 20, fontWeight: "700", color: "#1A1A1A" },
-  subtitle: { fontSize: 13, color: "#6B6B6B", marginTop: 2 },
-  error: { color: "#A61212", paddingHorizontal: 16, marginBottom: 8 },
-  listContent: { paddingBottom: 24 },
-  card: { backgroundColor: "#fff", borderRadius: 4, padding: 16, marginHorizontal: 16, marginVertical: 6, borderWidth: 1, borderColor: "#EAEAEA" },
-  cardHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 8 },
-  category: { fontSize: 16, fontWeight: "600", color: "#1A1A1A" },
-  description: { fontSize: 14, color: "#3A3A3A", marginBottom: 6 },
-  date: { fontSize: 12, color: "#9A9A9A" },
-  emptyText: { fontSize: 14, color: "#6B6B6B" },
+  centered: { flex: 1, justifyContent: "center", alignItems: "center", padding: spacing.xl },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: spacing.xl,
+    paddingTop: spacing.lg,
+    paddingBottom: spacing.md,
+  },
+  title: { fontSize: theme.font.title, fontWeight: "800", color: colors.text },
+  subtitle: { fontSize: theme.font.small, color: colors.muted, marginTop: 2 },
+  bell: {
+    width: theme.hit,
+    height: theme.hit,
+    borderRadius: theme.radius.pill,
+    backgroundColor: colors.brandSoft,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  errorBox: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.sm,
+    backgroundColor: colors.dangerSoft,
+    borderRadius: theme.radius.md,
+    padding: spacing.md,
+    marginHorizontal: spacing.xl,
+    marginBottom: spacing.sm,
+  },
+  errorText: { flex: 1, color: colors.danger, fontSize: theme.font.small },
+  listContent: { paddingHorizontal: spacing.xl, paddingBottom: spacing.xxl, flexGrow: 1 },
+  card: { marginBottom: spacing.md },
+  cardTop: { flexDirection: "row", alignItems: "center", marginBottom: spacing.md },
+  iconWrap: {
+    width: 44,
+    height: 44,
+    borderRadius: theme.radius.md,
+    backgroundColor: colors.brandSoft,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  cardTitleWrap: { flex: 1, marginLeft: spacing.md },
+  category: { fontSize: theme.font.body, fontWeight: "700", color: colors.text },
+  date: { fontSize: theme.font.caption, color: colors.muted, marginTop: 2 },
+  description: { fontSize: theme.font.small, color: colors.text, lineHeight: 20, marginBottom: spacing.md },
+  severityRow: { flexDirection: "row", alignItems: "center", gap: 6 },
+  severityText: { fontSize: theme.font.caption, fontWeight: "600" },
+  empty: { alignItems: "center", paddingTop: spacing.xxl * 2, paddingHorizontal: spacing.xl },
+  emptyIcon: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    backgroundColor: colors.brandSoft,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: spacing.lg,
+  },
+  emptyTitle: { fontSize: theme.font.heading, fontWeight: "700", color: colors.text },
+  emptyText: { fontSize: theme.font.small, color: colors.muted, textAlign: "center", marginTop: spacing.sm, lineHeight: 20 },
+  emptyButton: { marginTop: spacing.xl, alignSelf: "stretch" },
 });
-

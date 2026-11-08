@@ -1,13 +1,14 @@
 import { router } from "expo-router";
-import {
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { StyleSheet, Text, View } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 
+import Button from "@/components/Button";
+import Card from "@/components/Card";
+import Screen from "@/components/Screen";
+import { theme } from "@/constants/theme";
 import { logout } from "@/services/authService";
+
+const { colors, spacing } = theme;
 
 export default function SupervisorScreen() {
   const handleLogout = async () => {
@@ -16,79 +17,41 @@ export default function SupervisorScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <Screen>
       <View style={styles.content}>
-        <Text style={styles.brand}>
-          MuniPrioritise
-        </Text>
+        <View style={styles.logo}>
+          <Ionicons name="desktop-outline" size={32} color={colors.accent} />
+        </View>
 
-        <Text style={styles.title}>
-          Supervisor Portal
-        </Text>
+        <Text style={styles.brand}>MuniPrioritise</Text>
+        <Text style={styles.title}>Supervisor portal</Text>
 
-        <Text style={styles.description}>
-          Supervisors use the web dashboard to review
-          the queue, reassign jobs and read analytics.
-        </Text>
-
-        <TouchableOpacity
-          style={styles.logoutButton}
-          onPress={handleLogout}
-          activeOpacity={0.8}
-        >
-          <Text style={styles.logoutText}>
-            Log Out
+        <Card style={styles.card}>
+          <Text style={styles.description}>
+            Supervisors use the web dashboard to review the queue, reassign jobs and read analytics.
           </Text>
-        </TouchableOpacity>
+        </Card>
+
+        <Button title="Log Out" icon="log-out-outline" variant="danger" onPress={handleLogout} style={styles.logout} />
       </View>
-    </SafeAreaView>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#F5F6F8",
-  },
-
-  content: {
-    flex: 1,
-    padding: 24,
-    justifyContent: "center",
-  },
-
-  brand: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#3A6EA5",
-    marginBottom: 8,
-  },
-
-  title: {
-    fontSize: 28,
-    fontWeight: "800",
-    color: "#1A1A1A",
-  },
-
-  description: {
-    marginTop: 8,
-    fontSize: 15,
-    lineHeight: 22,
-    color: "#6B6B6B",
-  },
-
-  logoutButton: {
-    marginTop: 24,
-    borderWidth: 1,
-    borderColor: "#A61212",
-    borderRadius: 10,
-    paddingVertical: 14,
+  content: { flex: 1, padding: spacing.xl, justifyContent: "center" },
+  logo: {
+    width: 64,
+    height: 64,
+    borderRadius: theme.radius.lg,
+    backgroundColor: colors.brand,
     alignItems: "center",
+    justifyContent: "center",
+    marginBottom: spacing.lg,
   },
-
-  logoutText: {
-    color: "#A61212",
-    fontSize: 15,
-    fontWeight: "700",
-  },
+  brand: { fontSize: theme.font.small, fontWeight: "700", color: colors.brand, marginBottom: spacing.xs },
+  title: { fontSize: 28, fontWeight: "800", color: colors.text },
+  card: { marginTop: spacing.lg },
+  description: { fontSize: theme.font.body, lineHeight: 24, color: colors.muted },
+  logout: { marginTop: spacing.xl },
 });

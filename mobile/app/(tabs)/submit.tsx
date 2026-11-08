@@ -1,13 +1,23 @@
 import { useState } from "react";
-import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
 import * as Location from "expo-location";
 import { router } from "expo-router";
 
+import Button from "@/components/Button";
+import CategoryIcon from "@/components/CategoryIcon";
+import Screen from "@/components/Screen";
+import TextField from "@/components/TextField";
+import { SEVERITY_LEVELS, severityLevel } from "@/constants/severity";
+import { theme } from "@/constants/theme";
 import { getApiErrorMessage } from "@/services/apiError";
 import { createReport } from "@/services/reportsService";
 import type { ReportCategory } from "@/types/report";
+import { findNearbyDuplicate } from "@/utils/duplicates";
 
+const { colors, spacing } = theme;
 const CATEGORIES: ReportCategory[] = ["Water", "Electricity", "Roads", "Refuse", "Sanitation"];
 
 export default function SubmitReportScreen() {
@@ -65,10 +75,16 @@ export default function SubmitReportScreen() {
     }
   };
 
-  const handleSubmit = async () => {
-    if (!category) return Alert.alert("Missing category", "Please select an issue category.");
-    if (!description.trim()) return Alert.alert("Missing description", "Please describe the issue.");
-    if (!location) return Alert.alert("Missing location", "Tap 'Use my current location' first.");
+  const resetForm = () => {
+    setCategory(null);
+    setDescription("");
+    setSeverity(1);
+    setPhotoUri(null);
+    setLocation(null);
+  };
+
+  const sendReport = async () => {
+    if (!category || !location) return;
 
     try {
       setSubmitting(true);
@@ -81,11 +97,7 @@ export default function SubmitReportScreen() {
         longitude: location.longitude,
       });
       Alert.alert("Report submitted", "Your report was sent successfully.");
-      setCategory(null);
-      setDescription("");
-      setSeverity(1);
-      setPhotoUri(null);
-      setLocation(null);
+      resetForm();
       router.navigate("/(tabs)/home");
     } catch (error) {
       console.error("Failed to submit report:", error);
@@ -98,87 +110,173 @@ export default function SubmitReportScreen() {
     }
   };
 
+  const handleSubmit = async () => {
+    if (!category) return Alert.alert("Missing category", "Please select an issue category.");
+    if (!description.trim()) return Alert.alert("Missing description", "Please describe the issue.");
+    if (!location) return Alert.alert("Missing location", "Tap 'Use my current location' first.");
+
+    // Ask before filing a second report for a problem that is already open
+    // close by. The resident decides, because only they can tell a repeat
+    // from a second fault.
+    setSubmitting(true);
+    const duplicate = await findNearbyDuplicate(category, location.latitude, location.longitude);
+    setSubmitting(false);
+
+    if (duplicate) {
+      Alert.alert(
+        "Already reported nearby",
+        `An open ${category.toLowerCase()} report was logged about ${Math.round(duplicate.distanceM)} m from you:\n\n"${duplicate.report.description || "No description"}"\n\nIs yours the same problem?`,
+        [
+          {
+            text: "Yes, same problem",
+            onPress: () => {
+              Alert.alert("Thanks", "The municipality already has this one, so there is no need to report it again.");
+              resetForm();
+            },
+          },
+          { text: "No, a different problem", onPress: sendReport },
+          { text: "Cancel", style: "cancel" },
+        ]
+      );
+      return;
+    }
+
+    await sendReport();
+  };
+
+  const level = severityLevel(severity);
+
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Report an Issue</Text>
+    <Screen scroll contentContainerStyle={styles.content}>
+      <Text style={styles.title}>Report an issue</Text>
+      <Text style={styles.subtitle}>Tell your municipality what needs fixing.</Text>
 
-      <Text style={styles.label}>Category</Text>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoryRow}>
-        {CATEGORIES.map((cat) => (
-          <TouchableOpacity
-            key={cat}
-            style={[styles.categoryButton, category === cat && styles.categoryButtonSelected]}
-            onPress={() => setCategory(cat)}
-          >
-            <Text style={[styles.categoryText, category === cat && styles.categoryTextSelected]}>{cat}</Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
+      <Text style={styles.label}>What is the problem?</Text>
+      <View style={styles.categoryGrid}>
+        {CATEGORIES.map((cat) => {
+          const selected = category === cat;
+          return (
+            <Pressable
+              key={cat}
+              accessibilityRole="button"
+              accessibilityLabel={cat}
+              accessibilityState={{ selected }}
+              style={[styles.categoryTile, selected && styles.categoryTileSelected]}
+              onPress={() => setCategory(cat)}
+            >
+              <CategoryIcon category={cat} size={28} color={selected ? colors.onBrand : colors.brand} />
+              <Text style={[styles.categoryText, selected && styles.categoryTextSelected]}>{cat}</Text>
+            </Pressable>
+          );
+        })}
+      </View>
 
-      <Text style={styles.label}>Description</Text>
-      <TextInput
-        style={styles.textInput}
-        placeholder="Describe the issue..."
+      <TextField
+        label="Describe the issue"
+        placeholder="What is happening, and where exactly?"
         value={description}
         onChangeText={setDescription}
         multiline
         numberOfLines={4}
+        style={styles.textArea}
       />
 
-      <Text style={styles.label}>Severity ({severity}/5)</Text>
+      <Text style={styles.label}>How serious is it?</Text>
       <View style={styles.severityRow}>
-        {[1, 2, 3, 4, 5].map((value) => (
-          <TouchableOpacity
-            key={value}
-            style={[styles.severitySegment, value <= severity && styles.severitySegmentActive]}
-            onPress={() => setSeverity(value)}
-          >
-            <Text style={[styles.severityText, value <= severity && styles.severityTextActive]}>{value}</Text>
-          </TouchableOpacity>
-        ))}
+        {SEVERITY_LEVELS.map((item) => {
+          const active = item.value <= severity;
+          return (
+            <Pressable
+              key={item.value}
+              accessibilityRole="button"
+              accessibilityLabel={`Severity ${item.value}, ${item.label}`}
+              accessibilityState={{ selected: item.value === severity }}
+              style={[styles.severitySegment, active && { backgroundColor: level.color, borderColor: level.color }]}
+              onPress={() => setSeverity(item.value)}
+            >
+              <Text style={[styles.severityNumber, active && styles.severityNumberActive]}>{item.value}</Text>
+            </Pressable>
+          );
+        })}
       </View>
+      <Text style={[styles.severityLabel, { color: level.color }]}>
+        {level.label} ({severity}/5)
+      </Text>
 
       <Text style={styles.label}>Photo</Text>
-      <TouchableOpacity style={styles.actionButton} onPress={handlePickPhoto}>
-        <Text style={styles.actionButtonText}>{photoUri ? "Change photo" : "Add photo"}</Text>
-      </TouchableOpacity>
+      {photoUri ? <Image source={{ uri: photoUri }} style={styles.photo} contentFit="cover" /> : null}
+      <Button
+        title={photoUri ? "Change photo" : "Add photo"}
+        icon="camera-outline"
+        variant="secondary"
+        onPress={handlePickPhoto}
+      />
 
       <Text style={styles.label}>Location</Text>
-      <TouchableOpacity style={styles.actionButton} onPress={handleGetLocation} disabled={gettingLocation}>
-        {gettingLocation ? <ActivityIndicator /> : (
-          <Text style={styles.actionButtonText}>{location ? "Update my location" : "Use my current location"}</Text>
-        )}
-      </TouchableOpacity>
       {location ? (
-        <Text style={styles.locationText}>Lat: {location.latitude.toFixed(5)}, Lng: {location.longitude.toFixed(5)}</Text>
+        <View style={styles.locationOk}>
+          <Ionicons name="checkmark-circle" size={20} color={colors.ok} />
+          <Text style={styles.locationOkText}>Location captured</Text>
+        </View>
       ) : null}
+      <Button
+        title={location ? "Update my location" : "Use my current location"}
+        icon="locate"
+        variant="secondary"
+        loading={gettingLocation}
+        onPress={handleGetLocation}
+      />
 
-      <TouchableOpacity style={styles.submitButton} onPress={handleSubmit} disabled={submitting}>
-        <Text style={styles.submitText}>{submitting ? "Submitting..." : "Submit Report"}</Text>
-      </TouchableOpacity>
-    </ScrollView>
+      <Button title="Submit report" onPress={handleSubmit} loading={submitting} style={styles.submit} />
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { padding: 20, paddingTop: 60, paddingBottom: 60 },
-  title: { fontSize: 22, fontWeight: "700", marginBottom: 20 },
-  label: { fontSize: 15, fontWeight: "600", marginTop: 16, marginBottom: 8 },
-  categoryRow: { flexDirection: "row" },
-  categoryButton: { paddingVertical: 8, paddingHorizontal: 14, borderRadius: 4, borderWidth: 1, borderColor: "#999", marginRight: 8 },
-  categoryButtonSelected: { backgroundColor: "#2563eb", borderColor: "#2563eb" },
-  categoryText: { color: "#333" },
-  categoryTextSelected: { color: "#fff" },
-  textInput: { borderWidth: 1, borderColor: "#ccc", borderRadius: 4, padding: 12, textAlignVertical: "top", minHeight: 100 },
-  severityRow: { flexDirection: "row" },
-  severitySegment: { flex: 1, paddingVertical: 12, marginRight: 8, borderRadius: 4, borderWidth: 1, borderColor: "#999", alignItems: "center" },
-  severitySegmentActive: { backgroundColor: "#B5460A", borderColor: "#B5460A" },
-  severityText: { color: "#333", fontWeight: "600" },
-  severityTextActive: { color: "#fff" },
-  actionButton: { borderWidth: 1, borderColor: "#999", borderRadius: 4, padding: 12, alignItems: "center" },
-  actionButtonText: { color: "#333", fontWeight: "600" },
-  locationText: { fontSize: 13, color: "#6B6B6B", marginTop: 8 },
-  submitButton: { backgroundColor: "#16a34a", padding: 16, borderRadius: 4, alignItems: "center", marginTop: 32 },
-  submitText: { color: "#fff", fontSize: 16, fontWeight: "600" },
+  content: { padding: spacing.xl, paddingBottom: spacing.xxl * 2 },
+  title: { fontSize: theme.font.title, fontWeight: "800", color: colors.text },
+  subtitle: { fontSize: theme.font.small, color: colors.muted, marginTop: 2, marginBottom: spacing.sm },
+  label: { fontSize: theme.font.small, fontWeight: "600", color: colors.text, marginTop: spacing.lg, marginBottom: spacing.sm },
+  categoryGrid: { flexDirection: "row", flexWrap: "wrap", gap: 10, marginBottom: spacing.lg },
+  categoryTile: {
+    width: "31%",
+    minHeight: 84,
+    borderRadius: theme.radius.md,
+    borderWidth: 1.5,
+    borderColor: colors.stroke,
+    backgroundColor: colors.surface,
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+  },
+  categoryTileSelected: { backgroundColor: colors.brand, borderColor: colors.brand },
+  categoryText: { fontSize: theme.font.small, fontWeight: "600", color: colors.text },
+  categoryTextSelected: { color: colors.onBrand },
+  textArea: { minHeight: 110, paddingTop: spacing.md, textAlignVertical: "top" },
+  severityRow: { flexDirection: "row", gap: spacing.sm },
+  severitySegment: {
+    flex: 1,
+    minHeight: theme.hit,
+    borderRadius: theme.radius.md,
+    borderWidth: 1.5,
+    borderColor: colors.stroke,
+    backgroundColor: colors.surface,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  severityNumber: { fontSize: theme.font.body, fontWeight: "700", color: colors.muted },
+  severityNumberActive: { color: colors.onBrand },
+  severityLabel: { fontSize: theme.font.small, fontWeight: "700", marginTop: spacing.sm },
+  photo: { width: "100%", height: 180, borderRadius: theme.radius.md, marginBottom: spacing.md },
+  locationOk: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.sm,
+    backgroundColor: colors.okSoft,
+    borderRadius: theme.radius.md,
+    padding: spacing.md,
+    marginBottom: spacing.md,
+  },
+  locationOkText: { color: colors.ok, fontWeight: "600", fontSize: theme.font.small },
+  submit: { marginTop: spacing.xxl },
 });
-
