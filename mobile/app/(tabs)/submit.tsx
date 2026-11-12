@@ -18,12 +18,14 @@ import type { ReportCategory } from "@/types/report";
 import { findNearbyDuplicate } from "@/utils/duplicates";
 
 const { colors, spacing } = theme;
+const DESCRIPTION_MAX = 500;
+const MAX_PHOTO_BYTES = 5 * 1024 * 1024; // matches the backend upload limit
 const CATEGORIES: ReportCategory[] = ["Water", "Electricity", "Roads", "Refuse", "Sanitation"];
 
 export default function SubmitReportScreen() {
   const [category, setCategory] = useState<ReportCategory | null>(null);
   const [description, setDescription] = useState("");
-  const [severity, setSeverity] = useState(1);
+  const [severity, setSeverity] = useState<number | null>(null);
   const [photoUri, setPhotoUri] = useState<string | null>(null);
   const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   const [gettingLocation, setGettingLocation] = useState(false);
@@ -37,6 +39,16 @@ export default function SubmitReportScreen() {
     ]);
   };
 
+  // The backend rejects photos over 5MB, but on Android that surfaces as a
+  // vague network error, so check the size here and say what is wrong.
+  const acceptPhoto = (asset: ImagePicker.ImagePickerAsset) => {
+    if (asset.fileSize && asset.fileSize > MAX_PHOTO_BYTES) {
+      Alert.alert("Photo too large", "Each photo must be 5MB or smaller. Please choose a smaller photo or take a new one.");
+      return;
+    }
+    setPhotoUri(asset.uri);
+  };
+
   const takePhoto = async () => {
     const permission = await ImagePicker.requestCameraPermissionsAsync();
     if (!permission.granted) {
@@ -44,7 +56,7 @@ export default function SubmitReportScreen() {
       return;
     }
     const result = await ImagePicker.launchCameraAsync({ quality: 0.7 });
-    if (!result.canceled) setPhotoUri(result.assets[0].uri);
+    if (!result.canceled) acceptPhoto(result.assets[0]);
   };
 
   const pickFromGallery = async () => {
@@ -54,7 +66,7 @@ export default function SubmitReportScreen() {
       return;
     }
     const result = await ImagePicker.launchImageLibraryAsync({ quality: 0.7 });
-    if (!result.canceled) setPhotoUri(result.assets[0].uri);
+    if (!result.canceled) acceptPhoto(result.assets[0]);
   };
 
   const handleGetLocation = async () => {
@@ -68,7 +80,7 @@ export default function SubmitReportScreen() {
       const position = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.High });
       setLocation({ latitude: position.coords.latitude, longitude: position.coords.longitude });
     } catch (error) {
-      console.error("Failed to get location:", error);
+      console.log("Failed to get location:", error);
       Alert.alert("Couldn't get location", "Try again in an open area.");
     } finally {
       setGettingLocation(false);
@@ -78,13 +90,13 @@ export default function SubmitReportScreen() {
   const resetForm = () => {
     setCategory(null);
     setDescription("");
-    setSeverity(1);
+    setSeverity(null);
     setPhotoUri(null);
     setLocation(null);
   };
 
   const sendReport = async () => {
-    if (!category || !location) return;
+    if (!category || !location || severity === null) return;
 
     try {
       setSubmitting(true);
@@ -100,7 +112,7 @@ export default function SubmitReportScreen() {
       resetForm();
       router.navigate("/(tabs)/home");
     } catch (error) {
-      console.error("Failed to submit report:", error);
+      console.log("Failed to submit report:", error);
       Alert.alert(
         "Submission failed",
         getApiErrorMessage(error, "Could not send your report. Please try again.")
@@ -113,6 +125,7 @@ export default function SubmitReportScreen() {
   const handleSubmit = async () => {
     if (!category) return Alert.alert("Missing category", "Please select an issue category.");
     if (!description.trim()) return Alert.alert("Missing description", "Please describe the issue.");
+    if (severity === null) return Alert.alert("Missing severity", "Please choose how serious the issue is.");
     if (!location) return Alert.alert("Missing location", "Tap 'Use my current location' first.");
 
     // Ask before filing a second report for a problem that is already open
@@ -144,7 +157,7 @@ export default function SubmitReportScreen() {
     await sendReport();
   };
 
-  const level = severityLevel(severity);
+  const level = severity === null ? null : severityLevel(severity);
 
   return (
     <Screen scroll contentContainerStyle={styles.content}>
@@ -178,20 +191,24 @@ export default function SubmitReportScreen() {
         onChangeText={setDescription}
         multiline
         numberOfLines={4}
+        maxLength={DESCRIPTION_MAX}
         style={styles.textArea}
       />
+      <Text style={styles.counter}>
+        {description.length}/{DESCRIPTION_MAX}
+      </Text>
 
       <Text style={styles.label}>How serious is it?</Text>
       <View style={styles.severityRow}>
         {SEVERITY_LEVELS.map((item) => {
-          const active = item.value <= severity;
+          const active = severity !== null && item.value <= severity;
           return (
             <Pressable
               key={item.value}
               accessibilityRole="button"
               accessibilityLabel={`Severity ${item.value}, ${item.label}`}
               accessibilityState={{ selected: item.value === severity }}
-              style={[styles.severitySegment, active && { backgroundColor: level.color, borderColor: level.color }]}
+              style={[styles.severitySegment, active && level && { backgroundColor: level.color, borderColor: level.color }]}
               onPress={() => setSeverity(item.value)}
             >
               <Text style={[styles.severityNumber, active && styles.severityNumberActive]}>{item.value}</Text>
@@ -199,8 +216,8 @@ export default function SubmitReportScreen() {
           );
         })}
       </View>
-      <Text style={[styles.severityLabel, { color: level.color }]}>
-        {level.label} ({severity}/5)
+      <Text style={[styles.severityLabel, level ? { color: level.color } : { color: colors.muted }]}>
+        {level && severity !== null ? `${level.label} (${severity}/5)` : "Tap a number to choose"}
       </Text>
 
       <Text style={styles.label}>Photo</Text>
@@ -253,6 +270,7 @@ const styles = StyleSheet.create({
   categoryText: { fontSize: theme.font.small, fontWeight: "600", color: colors.text },
   categoryTextSelected: { color: colors.onBrand },
   textArea: { minHeight: 110, paddingTop: spacing.md, textAlignVertical: "top" },
+  counter: { fontSize: theme.font.small, color: colors.muted, textAlign: "right", marginTop: -spacing.md, marginBottom: spacing.lg },
   severityRow: { flexDirection: "row", gap: spacing.sm },
   severitySegment: {
     flex: 1,

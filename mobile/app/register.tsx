@@ -38,7 +38,7 @@ export default function RegisterScreen() {
       const user = await register(name.trim(), email.trim(), password);
       router.replace(homeRouteForRole(user.role));
     } catch (error) {
-      console.error("Registration failed:", error);
+      console.log("Registration failed:", error);
       Alert.alert(
         "Registration failed",
         getApiErrorMessage(error, "Could not create your account. Please try again.")

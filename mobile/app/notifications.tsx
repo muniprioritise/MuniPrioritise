@@ -26,7 +26,7 @@ export default function NotificationsScreen() {
       setLoading(true);
       setNotifications(await getNotifications());
     } catch (err) {
-      console.error("Failed to load notifications:", err);
+      console.log("Failed to load notifications:", err);
       setError(getApiErrorMessage(err, "Could not load notifications."));
     } finally {
       setLoading(false);

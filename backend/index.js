@@ -295,7 +295,7 @@ app.post(
   upload.array('photos', 5),
   [
     body('category').isIn(['water', 'electricity', 'roads', 'refuse', 'sanitation']).withMessage('Invalid category'),
-    body('description').notEmpty().withMessage('Description is required'),
+    body('description').trim().notEmpty().withMessage('Description is required').isLength({ max: 500 }).withMessage('Description must be 500 characters or fewer'),
     body('severity').isInt({ min: 1, max: 5 }).withMessage('Severity must be an integer between 1 and 5'),
     body('lat').isNumeric().withMessage('Latitude must be a valid number'),
     body('lng').isNumeric().withMessage('Longitude must be a valid number')

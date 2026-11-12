@@ -42,7 +42,7 @@ export default function EscalationScreen() {
         },
       ]);
     } catch (error) {
-      console.error(error);
+      console.log(error);
 
       Alert.alert("Escalation failed", "The job could not be escalated.");
     } finally {

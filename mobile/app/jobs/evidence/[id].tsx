@@ -113,7 +113,7 @@ export default function EvidenceScreen() {
         },
       ]);
     } catch (error) {
-      console.error(error);
+      console.log(error);
 
       Alert.alert("Upload failed", "Could not submit completion evidence.");
     } finally {

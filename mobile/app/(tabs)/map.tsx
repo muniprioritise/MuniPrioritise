@@ -49,7 +49,7 @@ export default function MapScreen() {
           });
         }
       } catch (err) {
-        console.error("Failed to get location:", err);
+        console.log("Failed to get location:", err);
 
         if (active) {
           setLocationError("Could not get your location. Check that location is turned on.");
@@ -75,7 +75,7 @@ export default function MapScreen() {
       setReportsError(null);
       setReports(await getNearbyReports(coords.latitude, coords.longitude));
     } catch (err) {
-      console.error("Failed to load nearby reports:", err);
+      console.log("Failed to load nearby reports:", err);
       setReportsError(getApiErrorMessage(err, "Could not load nearby reports."));
     }
   }, [coords]);
