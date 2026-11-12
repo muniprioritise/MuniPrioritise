@@ -39,7 +39,7 @@ export default function ReportDetailScreen() {
       setLoading(true);
       setReport(await getReportById(id));
     } catch (err) {
-      console.error("Failed to load report:", err);
+      console.log("Failed to load report:", err);
       setError(getApiErrorMessage(err, "Could not load this report."));
     } finally {
       setLoading(false);
@@ -58,7 +58,7 @@ export default function ReportDetailScreen() {
       setReport({ ...report, rating });
       setRateModalVisible(false);
     } catch (err) {
-      console.error("Failed to submit rating:", err);
+      console.log("Failed to submit rating:", err);
       Alert.alert(
         "Rating failed",
         getApiErrorMessage(err, "Could not save your rating. Please try again.")
@@ -73,7 +73,7 @@ export default function ReportDetailScreen() {
       await deleteReport(report.id);
       router.back();
     } catch (err) {
-      console.error("Failed to delete report:", err);
+      console.log("Failed to delete report:", err);
       Alert.alert(
         "Delete failed",
         getApiErrorMessage(err, "Could not delete this report. Please try again.")

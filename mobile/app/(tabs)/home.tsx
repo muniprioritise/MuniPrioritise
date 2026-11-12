@@ -28,7 +28,7 @@ export default function HomeScreen() {
       setError(null);
       setReports(await getMyReports());
     } catch (err) {
-      console.error("Failed to load reports:", err);
+      console.log("Failed to load reports:", err);
       setError(getApiErrorMessage(err, "Failed to load your reports"));
     } finally {
       setLoading(false);

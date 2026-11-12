@@ -27,7 +27,7 @@ export default function LoginScreen() {
       const user = await login(email.trim(), password);
       router.replace(homeRouteForRole(user.role));
     } catch (error) {
-      console.error("Login failed:", error);
+      console.log("Login failed:", error);
       Alert.alert(
         "Login failed",
         getApiErrorMessage(error, "Could not log you in. Please try again.")

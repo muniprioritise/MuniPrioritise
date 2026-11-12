@@ -73,7 +73,7 @@ export default function JobDetailScreen() {
       setLoading(true);
       await action();
     } catch (error) {
-      console.error(error);
+      console.log(error);
 
       Alert.alert("Update failed", getApiErrorMessage(error, "The job could not be updated."));
     } finally {
