@@ -550,14 +550,17 @@ app.get('/api/jobs', verifyToken, requireRole(['worker', 'supervisor']), async (
         pendingReports.map(r => [r.id, r])
       );
 
-      const persistedJobs = [];
-      for (const a of algoResult.assignments) {
-        // A supervisor override is final. The WHERE skips overridden rows, so
-        // RETURNING is empty and the stored row is read instead.
-        const upserted = await pool.query(
+      // One batched upsert instead of a query per assignment. A supervisor
+      // override is final: the WHERE skips overridden rows, and the SELECT
+      // below reads back whatever is stored for every report.
+      const assignments = algoResult.assignments;
+      if (assignments.length) {
+        await pool.query(
           `INSERT INTO job_assignments
              (report_id, worker_id, algorithm_used, priority_score, efficiency_score, equity_score)
-           VALUES ($1, $2, $3, $4, $5, $6)
+           SELECT report_id, worker_id, $3, priority_score, efficiency_score, equity_score
+           FROM unnest($1::uuid[], $2::uuid[], $4::float8[], $5::float8[], $6::float8[])
+             AS t(report_id, worker_id, priority_score, efficiency_score, equity_score)
            ON CONFLICT (report_id) DO UPDATE SET
              worker_id = EXCLUDED.worker_id,
              algorithm_used = EXCLUDED.algorithm_used,
@@ -565,23 +568,26 @@ app.get('/api/jobs', verifyToken, requireRole(['worker', 'supervisor']), async (
              efficiency_score = EXCLUDED.efficiency_score,
              equity_score = EXCLUDED.equity_score,
              assigned_at = NOW()
-           WHERE job_assignments.override_by IS NULL
-           RETURNING *`,
+           WHERE job_assignments.override_by IS NULL`,
           [
-            a.report_id,
-            a.worker_id,
+            assignments.map(a => a.report_id),
+            assignments.map(a => a.worker_id ?? null),
             algoResult.algorithm,
-            a.score,
-            a.efficiency_score ?? null,
-            a.equity_score ?? null
+            assignments.map(a => a.score),
+            assignments.map(a => a.efficiency_score ?? null),
+            assignments.map(a => a.equity_score ?? null)
           ]
         );
-        let job = upserted.rows[0];
-        if (!job) {
-          const existing = await pool.query('SELECT * FROM job_assignments WHERE report_id = $1', [a.report_id]);
-          job = existing.rows[0];
-        }
-        persistedJobs.push({
+      }
+      const storedResult = await pool.query(
+        'SELECT * FROM job_assignments WHERE report_id = ANY($1::uuid[])',
+        [assignments.map(a => a.report_id)]
+      );
+      const storedByReport = Object.fromEntries(storedResult.rows.map(j => [j.report_id, j]));
+
+      const persistedJobs = assignments.map(a => {
+        const job = storedByReport[a.report_id];
+        return {
           id: job.id,
           report_id: job.report_id,
           worker_id: job.worker_id,
@@ -591,8 +597,8 @@ app.get('/api/jobs', verifyToken, requireRole(['worker', 'supervisor']), async (
           efficiency_score: job.efficiency_score,
           equity_score: job.equity_score,
           report: reportsById[job.report_id]
-        });
-      }
+        };
+      });
 
       return res.status(200).json({
         algorithm: algoResult.algorithm,

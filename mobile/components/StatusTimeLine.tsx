@@ -1,5 +1,8 @@
 import { StyleSheet, Text, View } from "react-native";
+
+import { theme } from "@/constants/theme";
 import type { ReportStatusEvent } from "@/types/report";
+import { formatDateTime } from "@/utils/format";
 
 const STATUS_LABELS: Record<string, string> = {
   submitted: "Submitted",
@@ -21,8 +24,10 @@ export default function StatusTimeline({ events }: { events: ReportStatusEvent[]
               {index < events.length - 1 && <View style={styles.line} />}
             </View>
             <View style={styles.content}>
-              <Text style={styles.label}>{STATUS_LABELS[event.status] ?? event.status}</Text>
-              <Text style={styles.timestamp}>{new Date(event.timestamp).toLocaleString()}</Text>
+              <Text style={[styles.label, isLast && styles.labelActive]}>
+                {STATUS_LABELS[event.status] ?? event.status}
+              </Text>
+              <Text style={styles.timestamp}>{formatDateTime(event.timestamp)}</Text>
               {event.note ? <Text style={styles.note}>{event.note}</Text> : null}
             </View>
           </View>
@@ -35,11 +40,12 @@ export default function StatusTimeline({ events }: { events: ReportStatusEvent[]
 const styles = StyleSheet.create({
   row: { flexDirection: "row" },
   markerColumn: { width: 24, alignItems: "center" },
-  dot: { width: 10, height: 10, borderRadius: 2, backgroundColor: "#C7C7C7", marginTop: 4 },
-  dotActive: { backgroundColor: "#2563eb" },
-  line: { flex: 1, width: 2, backgroundColor: "#E0E0E0", marginVertical: 2 },
-  content: { flex: 1, paddingBottom: 20, paddingLeft: 12 },
-  label: { fontSize: 15, fontWeight: "600", color: "#1A1A1A" },
-  timestamp: { fontSize: 12, color: "#8A8A8A", marginTop: 2 },
-  note: { fontSize: 13, color: "#3A3A3A", marginTop: 4 },
+  dot: { width: 12, height: 12, borderRadius: 6, backgroundColor: theme.colors.stroke, marginTop: 4 },
+  dotActive: { backgroundColor: theme.colors.brand, borderWidth: 3, borderColor: theme.colors.brandSoft, width: 18, height: 18, borderRadius: 9, marginTop: 1 },
+  line: { flex: 1, width: 2, backgroundColor: theme.colors.stroke, marginVertical: 2 },
+  content: { flex: 1, paddingBottom: theme.spacing.xl, paddingLeft: theme.spacing.md },
+  label: { fontSize: theme.font.body, fontWeight: "600", color: theme.colors.muted },
+  labelActive: { color: theme.colors.text, fontWeight: "700" },
+  timestamp: { fontSize: theme.font.caption, color: theme.colors.muted, marginTop: 2 },
+  note: { fontSize: theme.font.small, color: theme.colors.text, marginTop: theme.spacing.xs },
 });

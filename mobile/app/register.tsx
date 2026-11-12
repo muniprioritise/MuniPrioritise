@@ -1,15 +1,11 @@
 import { useState } from "react";
-import {
-  ActivityIndicator,
-  Alert,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import { Link, router } from "expo-router";
+import { Alert, StyleSheet, Text, View } from "react-native";
+import { router } from "expo-router";
 
+import Button from "@/components/Button";
+import Screen from "@/components/Screen";
+import TextField from "@/components/TextField";
+import { theme } from "@/constants/theme";
 import { useAuth } from "@/contexts/AuthContext";
 import { getApiErrorMessage } from "@/services/apiError";
 import { homeRouteForRole } from "@/utils/roleRoutes";
@@ -53,68 +49,65 @@ export default function RegisterScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Create account</Text>
+    <Screen scroll background={theme.colors.brand} edges={["top", "left", "right"]}>
+      <View style={styles.hero}>
+        <Text style={styles.appName}>MuniPrioritise</Text>
+        <Text style={styles.tagline}>Create your resident account</Text>
+      </View>
 
-      <Text style={styles.label}>Full name</Text>
-      <TextInput style={styles.input} value={name} onChangeText={setName} />
+      <View style={styles.sheet}>
+        <Text style={styles.title}>Get started</Text>
 
-      <Text style={styles.label}>Email</Text>
-      <TextInput
-        style={styles.input}
-        value={email}
-        onChangeText={setEmail}
-        autoCapitalize="none"
-        autoCorrect={false}
-        keyboardType="email-address"
-      />
+        <TextField
+          label="Full name"
+          placeholder="Your name"
+          value={name}
+          onChangeText={setName}
+          autoComplete="name"
+        />
 
-      <Text style={styles.label}>Password</Text>
-      <TextInput
-        style={styles.input}
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-      />
+        <TextField
+          label="Email"
+          placeholder="you@example.com"
+          value={email}
+          onChangeText={setEmail}
+          autoCapitalize="none"
+          autoCorrect={false}
+          keyboardType="email-address"
+          autoComplete="email"
+        />
 
-      <TouchableOpacity
-        style={styles.button}
-        onPress={handleRegister}
-        disabled={submitting}
-      >
-        {submitting ? (
-          <ActivityIndicator color="#fff" />
-        ) : (
-          <Text style={styles.buttonText}>Register</Text>
-        )}
-      </TouchableOpacity>
+        <TextField
+          label="Password"
+          placeholder={`At least ${MIN_PASSWORD_LENGTH} characters`}
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+          autoComplete="new-password"
+        />
 
-      <Link href="/login" style={styles.link}>
-        <Text>Already have an account? Log in</Text>
-      </Link>
-    </View>
+        <Button title="Create account" onPress={handleRegister} loading={submitting} style={styles.primary} />
+
+        <Text style={styles.divider}>Already registered?</Text>
+        <Button title="Log in" variant="secondary" onPress={() => router.replace("/login")} />
+      </View>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: "center", padding: 24 },
-  title: { fontSize: 24, fontWeight: "700", marginBottom: 24 },
-  label: { fontSize: 13, fontWeight: "600", marginBottom: 6, color: "#3A3A3A" },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 4,
-    padding: 12,
-    marginBottom: 16,
+  hero: { alignItems: "center", paddingTop: theme.spacing.xl, paddingBottom: theme.spacing.xl },
+  appName: { fontSize: theme.font.title, fontWeight: "800", color: theme.colors.onBrand },
+  tagline: { fontSize: theme.font.small, color: theme.colors.brandSoft, marginTop: theme.spacing.xs },
+  sheet: {
+    flex: 1,
+    backgroundColor: theme.colors.background,
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+    padding: theme.spacing.xl,
+    paddingTop: theme.spacing.xxl,
   },
-  button: {
-    backgroundColor: "#2563eb",
-    padding: 14,
-    borderRadius: 4,
-    alignItems: "center",
-    marginTop: 8,
-  },
-  buttonText: { color: "#fff", fontWeight: "600", fontSize: 16 },
-  link: { marginTop: 20, alignSelf: "center" },
+  title: { fontSize: theme.font.title, fontWeight: "800", color: theme.colors.text, marginBottom: theme.spacing.xl },
+  primary: { marginTop: theme.spacing.sm },
+  divider: { textAlign: "center", color: theme.colors.muted, fontSize: theme.font.small, marginVertical: theme.spacing.lg },
 });
-

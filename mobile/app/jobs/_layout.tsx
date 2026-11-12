@@ -1,8 +1,17 @@
 import { Stack } from "expo-router";
 
+import { theme } from "@/constants/theme";
+
 export default function JobsLayout() {
   return (
-    <Stack>
+    <Stack
+      screenOptions={{
+        headerShadowVisible: false,
+        headerTintColor: theme.colors.brand,
+        headerTitleStyle: { fontWeight: "700", color: theme.colors.text },
+        contentStyle: { backgroundColor: theme.colors.background },
+      }}
+    >
       <Stack.Screen
         name="index"
         options={{
@@ -14,13 +23,6 @@ export default function JobsLayout() {
         name="job/[id]"
         options={{
           title: "Job Detail",
-        }}
-      />
-
-      <Stack.Screen
-        name="status/[id]"
-        options={{
-          title: "Update Status",
         }}
       />
 

@@ -1,16 +1,23 @@
-import {
-  Linking,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { useState, type ComponentProps } from "react";
+import { Alert, Linking, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { router, useLocalSearchParams } from "expo-router";
 
-import {
-  router,
-  useLocalSearchParams,
-} from "expo-router";
+import Button from "@/components/Button";
+import Card from "@/components/Card";
+import CategoryIcon from "@/components/CategoryIcon";
+import JobStatusPill from "@/components/JobStatusPill";
+import ProgressSteps from "@/components/ProgressSteps";
+import Screen, { CONTENT_EDGES } from "@/components/Screen";
+import { jobSeverityStyle } from "@/constants/severity";
+import { theme } from "@/constants/theme";
+import { getApiErrorMessage } from "@/services/apiError";
+import { acceptJob, updateReportStatus } from "@/services/jobsService";
+
+const { colors, spacing } = theme;
+
+type StepName = "pending" | "assigned" | "en_route" | "in_progress";
+type IconName = ComponentProps<typeof Ionicons>["name"];
 
 export default function JobDetailScreen() {
   const params = useLocalSearchParams<{
@@ -28,19 +35,27 @@ export default function JobDetailScreen() {
     priorityScore: string;
   }>();
 
+  const [status, setStatus] = useState(params.status);
+
+  // The backend marks a job in_progress when it is accepted, so a job that is
+  // no longer pending has already been accepted.
+  const [currentStep, setCurrentStep] = useState<StepName>(
+    params.status === "assigned" || params.status === "in_progress" ? "assigned" : "pending"
+  );
+
+  const [loading, setLoading] = useState(false);
+
   const latitude = Number(params.latitude);
   const longitude = Number(params.longitude);
 
-  const hasCoordinates =
-    Number.isFinite(latitude) &&
-    Number.isFinite(longitude);
+  const hasCoordinates = Number.isFinite(latitude) && Number.isFinite(longitude);
+  const severity = jobSeverityStyle(params.severity);
+  const finished = status === "resolved" || status === "escalated";
 
   const openGoogleMaps = async () => {
     if (!hasCoordinates) return;
 
-    const url =
-      `https://www.google.com/maps/dir/?api=1` +
-      `&destination=${latitude},${longitude}`;
+    const url = `https://www.google.com/maps/dir/?api=1` + `&destination=${latitude},${longitude}`;
 
     await Linking.openURL(url);
   };
@@ -48,286 +63,216 @@ export default function JobDetailScreen() {
   const openWaze = async () => {
     if (!hasCoordinates) return;
 
-    const url =
-      `https://waze.com/ul?ll=${latitude},${longitude}` +
-      `&navigate=yes`;
+    const url = `https://waze.com/ul?ll=${latitude},${longitude}` + `&navigate=yes`;
 
     await Linking.openURL(url);
   };
 
-  const goToStatus = () => {
+  const runAction = async (action: () => Promise<void>) => {
+    try {
+      setLoading(true);
+      await action();
+    } catch (error) {
+      console.error(error);
+
+      Alert.alert("Update failed", getApiErrorMessage(error, "The job could not be updated."));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAccept = () => {
+    runAction(async () => {
+      await acceptJob(params.jobId);
+
+      setStatus("in_progress");
+      setCurrentStep("assigned");
+    });
+  };
+
+  const handleEnRoute = () => {
+    setCurrentStep("en_route");
+  };
+
+  const handleInProgress = () => {
+    runAction(async () => {
+      await updateReportStatus(params.id, "in_progress", "Worker started job");
+
+      setCurrentStep("in_progress");
+    });
+  };
+
+  const handleResolved = () => {
     router.push({
-      pathname: "/jobs/status/[id]",
+      pathname: "/jobs/evidence/[id]",
+
       params: {
         id: params.id,
         jobId: params.jobId,
-        status: params.status,
       },
     });
   };
 
+  const handleEscalate = () => {
+    router.push({
+      pathname: "/jobs/escalation/[id]",
+
+      params: {
+        id: params.id,
+        jobId: params.jobId,
+      },
+    });
+  };
+
+  const steps = [
+    { title: "Accept", complete: currentStep !== "pending" },
+    { title: "En route", complete: currentStep === "en_route" || currentStep === "in_progress" },
+    { title: "Working", complete: currentStep === "in_progress" },
+    { title: "Resolve", complete: false },
+  ];
+
+  // One clear next action for the current step.
+  const nextAction: Record<StepName, { title: string; icon: IconName; onPress: () => void }> = {
+    pending: { title: "Accept Job", icon: "checkmark-circle-outline", onPress: handleAccept },
+    assigned: { title: "Mark En Route", icon: "car-outline", onPress: handleEnRoute },
+    en_route: { title: "Start Work", icon: "construct-outline", onPress: handleInProgress },
+    in_progress: { title: "Resolve Job", icon: "flag-outline", onPress: handleResolved },
+  };
+  const action = nextAction[currentStep];
+
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.content}
-    >
-      <View style={styles.header}>
-        <View>
-          <Text style={styles.category}>
-            {params.category}
-          </Text>
+    <Screen edges={CONTENT_EDGES}>
+      <ScrollView style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+        <View style={styles.header}>
+          <View style={styles.iconWrap}>
+            <CategoryIcon category={params.category ?? ""} size={28} color={colors.brand} />
+          </View>
 
-          <Text style={styles.ward}>
-            {params.ward}
-          </Text>
+          <View style={styles.headerText}>
+            <Text style={styles.category}>{params.category}</Text>
+            <Text style={styles.ward}>{params.ward}</Text>
+          </View>
+
+          <View style={[styles.severityBadge, { backgroundColor: severity.background }]}>
+            <Text style={[styles.severityText, { color: severity.color }]}>{severity.label.toUpperCase()}</Text>
+          </View>
         </View>
 
-        <View style={styles.severityBadge}>
-          <Text style={styles.severityText}>
-            {params.severity?.toUpperCase()}
-          </Text>
-        </View>
-      </View>
+        <Card style={styles.section}>
+          <View style={styles.progressHeader}>
+            <Text style={styles.sectionTitle}>Progress</Text>
+            <JobStatusPill status={status} />
+          </View>
+          <ProgressSteps steps={steps} />
+        </Card>
 
-      {params.priorityScore ? (
-        <View style={styles.priorityCard}>
-          <Text style={styles.priorityLabel}>
-            Priority Score
-          </Text>
+        {params.priorityScore ? (
+          <View style={styles.priorityCard}>
+            <Text style={styles.priorityLabel}>Priority score</Text>
+            <Text style={styles.priorityValue}>{Math.round(Number(params.priorityScore) * 100)}%</Text>
+          </View>
+        ) : null}
 
-          <Text style={styles.priorityValue}>
-            {Math.round(
-              Number(params.priorityScore) * 100
-            )}
-            %
-          </Text>
-        </View>
-      ) : null}
+        <Card style={styles.section}>
+          <Text style={styles.sectionTitle}>Report</Text>
+          <Text style={styles.description}>{params.description}</Text>
+        </Card>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>
-          Report
-        </Text>
+        <Card style={styles.section}>
+          <Text style={styles.sectionTitle}>Location</Text>
 
-        <Text style={styles.description}>
-          {params.description}
-        </Text>
-      </View>
+          <View style={styles.addressRow}>
+            <Ionicons name="location-outline" size={20} color={colors.brand} />
+            <Text style={styles.address}>{params.address}</Text>
+          </View>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>
-          Location
-        </Text>
-
-        <Text style={styles.address}>
-          {params.address}
-        </Text>
-
-        {hasCoordinates && (
-          <Text style={styles.coordinates}>
-            {latitude.toFixed(5)},{" "}
-            {longitude.toFixed(5)}
-          </Text>
-        )}
-
-        <View style={styles.mapButtons}>
-          <TouchableOpacity
-            style={styles.mapButton}
-            onPress={openGoogleMaps}
-            disabled={!hasCoordinates}
-          >
-            <Text style={styles.mapButtonText}>
-              Google Maps
+          {hasCoordinates && (
+            <Text style={styles.coordinates}>
+              {latitude.toFixed(5)}, {longitude.toFixed(5)}
             </Text>
-          </TouchableOpacity>
+          )}
 
-          <TouchableOpacity
-            style={styles.mapButtonSecondary}
-            onPress={openWaze}
-            disabled={!hasCoordinates}
-          >
-            <Text
-              style={styles.mapButtonSecondaryText}
-            >
-              Waze
-            </Text>
-          </TouchableOpacity>
+          <View style={styles.mapButtons}>
+            <Button
+              title="Google Maps"
+              icon="navigate"
+              onPress={openGoogleMaps}
+              disabled={!hasCoordinates}
+              style={styles.mapButton}
+            />
+            <Button
+              title="Waze"
+              icon="navigate-outline"
+              variant="secondary"
+              onPress={openWaze}
+              disabled={!hasCoordinates}
+              style={styles.mapButton}
+            />
+          </View>
+        </Card>
+      </ScrollView>
+
+      {finished ? null : (
+        <View style={styles.footer}>
+          <Button title="Escalate" variant="danger" onPress={handleEscalate} style={styles.escalate} />
+          <Button title={action.title} icon={action.icon} onPress={action.onPress} loading={loading} style={styles.primary} />
         </View>
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>
-          Status
-        </Text>
-
-        <Text style={styles.status}>
-          {params.status
-            ?.replace("_", " ")
-            .toUpperCase()}
-        </Text>
-      </View>
-
-      <TouchableOpacity
-        style={styles.primaryButton}
-        onPress={goToStatus}
-      >
-        <Text style={styles.primaryButtonText}>
-          Update Job Status
-        </Text>
-      </TouchableOpacity>
-    </ScrollView>
+      )}
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#F5F6F8",
+  scroll: { flex: 1 },
+  content: { padding: spacing.lg, paddingBottom: spacing.xl },
+  header: { flexDirection: "row", alignItems: "center", marginBottom: spacing.lg },
+  iconWrap: {
+    width: 52,
+    height: 52,
+    borderRadius: theme.radius.md,
+    backgroundColor: colors.brandSoft,
+    alignItems: "center",
+    justifyContent: "center",
   },
-
-  content: {
-    padding: 18,
-    paddingBottom: 40,
-  },
-
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    marginBottom: 16,
-  },
-
-  category: {
-    fontSize: 26,
-    fontWeight: "700",
-    color: "#1A1A1A",
-  },
-
-  ward: {
-    marginTop: 4,
-    fontSize: 14,
-    color: "#6B6B6B",
-  },
-
-  severityBadge: {
-    backgroundColor: "#FBDADA",
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
-  },
-
-  severityText: {
-    color: "#A61212",
-    fontSize: 12,
-    fontWeight: "700",
-  },
-
+  headerText: { flex: 1, marginLeft: spacing.md },
+  category: { fontSize: theme.font.title, fontWeight: "800", color: colors.text },
+  ward: { marginTop: 2, fontSize: theme.font.small, color: colors.muted },
+  severityBadge: { paddingHorizontal: spacing.md, paddingVertical: 6, borderRadius: theme.radius.pill },
+  severityText: { fontSize: theme.font.caption, fontWeight: "800", letterSpacing: 0.4 },
+  progressHeader: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: spacing.lg },
   priorityCard: {
-    backgroundColor: "#EAF2FB",
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
+    backgroundColor: colors.brandSoft,
+    borderRadius: theme.radius.lg,
+    padding: spacing.lg,
+    marginBottom: spacing.lg,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
   },
-
-  priorityLabel: {
-    fontSize: 14,
-    color: "#3A6EA5",
-    fontWeight: "600",
-  },
-
-  priorityValue: {
-    fontSize: 22,
-    color: "#3A6EA5",
-    fontWeight: "700",
-  },
-
-  section: {
-    backgroundColor: "#FFFFFF",
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 14,
-  },
-
+  priorityLabel: { fontSize: theme.font.small, color: colors.brand, fontWeight: "600" },
+  priorityValue: { fontSize: 26, color: colors.brand, fontWeight: "800" },
+  section: { marginBottom: spacing.lg },
   sectionTitle: {
-    fontSize: 13,
+    fontSize: theme.font.caption,
     fontWeight: "700",
-    color: "#6B6B6B",
+    color: colors.muted,
     textTransform: "uppercase",
-    marginBottom: 10,
+    letterSpacing: 0.5,
   },
-
-  description: {
-    fontSize: 15,
-    lineHeight: 22,
-    color: "#282828",
-  },
-
-  address: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: "#282828",
-  },
-
-  coordinates: {
-    marginTop: 5,
-    fontSize: 13,
-    color: "#777777",
-  },
-
-  mapButtons: {
+  description: { marginTop: spacing.md, fontSize: theme.font.body, lineHeight: 24, color: colors.text },
+  addressRow: { flexDirection: "row", alignItems: "center", gap: spacing.sm, marginTop: spacing.md },
+  address: { flex: 1, fontSize: theme.font.body, fontWeight: "600", color: colors.text },
+  coordinates: { marginTop: spacing.sm, fontSize: theme.font.caption, color: colors.muted },
+  mapButtons: { flexDirection: "row", marginTop: spacing.lg, gap: spacing.md },
+  mapButton: { flex: 1, paddingHorizontal: spacing.sm },
+  footer: {
     flexDirection: "row",
-    marginTop: 16,
-    gap: 10,
+    gap: spacing.md,
+    padding: spacing.lg,
+    backgroundColor: colors.surface,
+    borderTopWidth: 1,
+    borderTopColor: colors.stroke,
   },
-
-  mapButton: {
-    flex: 1,
-    backgroundColor: "#3A6EA5",
-    borderRadius: 8,
-    padding: 12,
-    alignItems: "center",
-  },
-
-  mapButtonText: {
-    color: "#FFFFFF",
-    fontWeight: "600",
-  },
-
-  mapButtonSecondary: {
-    flex: 1,
-    backgroundColor: "#FFFFFF",
-    borderWidth: 1,
-    borderColor: "#3A6EA5",
-    borderRadius: 8,
-    padding: 12,
-    alignItems: "center",
-  },
-
-  mapButtonSecondaryText: {
-    color: "#3A6EA5",
-    fontWeight: "600",
-  },
-
-  status: {
-    fontSize: 15,
-    fontWeight: "700",
-    color: "#3A6EA5",
-  },
-
-  primaryButton: {
-    backgroundColor: "#16A34A",
-    padding: 16,
-    borderRadius: 10,
-    alignItems: "center",
-    marginTop: 4,
-  },
-
-  primaryButtonText: {
-    color: "#FFFFFF",
-    fontSize: 16,
-    fontWeight: "700",
-  },
+  escalate: { flex: 1, paddingHorizontal: spacing.sm },
+  primary: { flex: 2, paddingHorizontal: spacing.sm },
 });

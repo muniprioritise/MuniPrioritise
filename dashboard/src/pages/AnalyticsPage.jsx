@@ -12,6 +12,7 @@ import {
   YAxis,
 } from 'recharts';
 import { useAuth } from '../context/AuthContext.jsx';
+import { ErrorState, LoadingState } from '../components/PageState.jsx';
 import { fetchAnalytics } from '../services/dashboardApi.js';
 
 function AnalyticsPage() {
@@ -49,11 +50,11 @@ function AnalyticsPage() {
   }, [token]);
 
   if (isLoading) {
-    return <p className="panel-message">Loading analytics...</p>;
+    return <LoadingState label="Loading analytics..." />;
   }
 
   if (error) {
-    return <p className="panel-message panel-error">{error}</p>;
+    return <ErrorState message={error} />;
   }
 
   if (!analytics) {

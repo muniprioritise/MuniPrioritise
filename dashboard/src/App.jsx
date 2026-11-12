@@ -5,11 +5,11 @@ import DashboardLayout from './components/DashboardLayout.jsx';
 import LoginPage from './pages/LoginPage.jsx';
 import OverviewPage from './pages/OverviewPage.jsx';
 import RequestMapPage from './pages/RequestMapPage.jsx';
-import RequestTablePage from './pages/RequestTablePage.jsx';
+import RequestsPage from './pages/RequestsPage.jsx';
 import PrioritisationOverridePage from './pages/PrioritisationOverridePage.jsx';
 import AnalyticsPage from './pages/AnalyticsPage.jsx';
-import ReportsPage from './pages/ReportsPage.jsx';
 import AlgorithmComparisonPage from './pages/AlgorithmComparisonPage.jsx';
+import SimulationPage from './pages/SimulationPage.jsx';
 
 function App() {
   return (
@@ -28,11 +28,13 @@ function App() {
             <Route index element={<Navigate to="overview" replace />} />
             <Route path="overview" element={<OverviewPage />} />
             <Route path="request-map" element={<RequestMapPage />} />
-            <Route path="request-table" element={<RequestTablePage />} />
+            <Route path="requests" element={<RequestsPage />} />
+            <Route path="request-table" element={<Navigate to="/requests" replace />} />
+            <Route path="reports" element={<Navigate to="/requests" replace />} />
             <Route path="prioritisation-override" element={<PrioritisationOverridePage />} />
             <Route path="analytics" element={<AnalyticsPage />} />
-            <Route path="reports" element={<ReportsPage />} />
             <Route path="benchmarks" element={<AlgorithmComparisonPage />} />
+            <Route path="simulation" element={<SimulationPage />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

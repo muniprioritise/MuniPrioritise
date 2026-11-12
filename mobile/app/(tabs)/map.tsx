@@ -4,6 +4,7 @@ import * as Location from "expo-location";
 import { useFocusEffect } from "expo-router";
 import MapView, { Marker } from "react-native-maps";
 
+import { theme } from "@/constants/theme";
 import { getApiErrorMessage } from "@/services/apiError";
 import { getNearbyReports } from "@/services/reportsService";
 import type { Report } from "@/types/report";
@@ -89,7 +90,7 @@ export default function MapScreen() {
   if (Platform.OS === "web") {
     return (
       <View style={styles.centered}>
-        <Text>Map is only available on Android/iOS.</Text>
+        <Text style={styles.messageText}>Map is only available on Android/iOS.</Text>
       </View>
     );
   }
@@ -97,7 +98,7 @@ export default function MapScreen() {
   if (locating) {
     return (
       <View style={styles.centered}>
-        <ActivityIndicator size="large" />
+        <ActivityIndicator size="large" color={theme.colors.brand} />
       </View>
     );
   }
@@ -144,17 +145,19 @@ export default function MapScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   map: { flex: 1 },
-  centered: { flex: 1, justifyContent: "center", alignItems: "center", padding: 24 },
-  errorText: { fontSize: 14, color: "#A61212", textAlign: "center" },
+  centered: { flex: 1, justifyContent: "center", alignItems: "center", padding: theme.spacing.xl, backgroundColor: theme.colors.background },
+  messageText: { fontSize: theme.font.body, color: theme.colors.text, textAlign: "center" },
+  errorText: { fontSize: theme.font.small, color: theme.colors.danger, textAlign: "center" },
   banner: {
     position: "absolute",
-    top: 12,
-    left: 12,
-    right: 12,
-    backgroundColor: "#fff",
+    top: theme.spacing.xl,
+    left: theme.spacing.lg,
+    right: theme.spacing.lg,
+    backgroundColor: theme.colors.surface,
     borderWidth: 1,
-    borderColor: "#EAEAEA",
-    borderRadius: 4,
-    padding: 12,
+    borderColor: theme.colors.stroke,
+    borderRadius: theme.radius.md,
+    padding: theme.spacing.md,
+    ...theme.shadow.card,
   },
 });

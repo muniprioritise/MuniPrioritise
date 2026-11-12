@@ -1,20 +1,17 @@
 import { router, useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
-import {
-  ActivityIndicator,
-  FlatList,
-  RefreshControl,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { ActivityIndicator, FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 
+import Button from "@/components/Button";
 import JobCard from "@/components/JobCard";
+import Screen from "@/components/Screen";
+import { theme } from "@/constants/theme";
 import { getJobs } from "@/services/jobsService";
 import { logout } from "@/services/authService";
 import type { Job } from "@/types/job";
+
+const { colors, spacing } = theme;
 
 export default function JobsScreen() {
   const [jobs, setJobs] = useState<Job[]>([]);
@@ -31,11 +28,7 @@ export default function JobsScreen() {
     } catch (err) {
       console.error("Failed to load jobs:", err);
 
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Failed to load jobs"
-      );
+      setError(err instanceof Error ? err.message : "Failed to load jobs");
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -76,242 +69,123 @@ export default function JobsScreen() {
         address: job.address,
         ward: job.ward,
 
-        latitude:
-          job.latitude !== null
-            ? String(job.latitude)
-            : "",
+        latitude: job.latitude !== null ? String(job.latitude) : "",
 
-        longitude:
-          job.longitude !== null
-            ? String(job.longitude)
-            : "",
+        longitude: job.longitude !== null ? String(job.longitude) : "",
 
         submittedAt: job.submittedAt,
 
-        priorityScore:
-          job.priorityScore !== undefined
-            ? String(job.priorityScore)
-            : "",
+        priorityScore: job.priorityScore !== undefined ? String(job.priorityScore) : "",
       },
     });
   };
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.centered}>
-        <ActivityIndicator
-          size="large"
-          color="#3A6EA5"
-        />
-
-        <Text style={styles.loadingText}>
-          Loading jobs...
-        </Text>
-      </SafeAreaView>
+      <Screen>
+        <View style={styles.centered}>
+          <ActivityIndicator size="large" color={colors.brand} />
+          <Text style={styles.loadingText}>Loading jobs...</Text>
+        </View>
+      </Screen>
     );
   }
 
   if (error) {
     return (
-      <SafeAreaView style={styles.centered}>
-        <Text style={styles.errorTitle}>
-          Unable to load jobs
-        </Text>
-
-        <Text style={styles.errorText}>
-          {error}
-        </Text>
-
-        <TouchableOpacity
-          style={styles.retryButton}
-          onPress={loadJobs}
-          activeOpacity={0.8}
-        >
-          <Text style={styles.retryButtonText}>
-            Retry
-          </Text>
-        </TouchableOpacity>
-      </SafeAreaView>
+      <Screen>
+        <View style={styles.centered}>
+          <Ionicons name="alert-circle-outline" size={44} color={colors.danger} />
+          <Text style={styles.errorTitle}>Unable to load jobs</Text>
+          <Text style={styles.errorText}>{error}</Text>
+          <Button title="Retry" onPress={loadJobs} />
+        </View>
+      </Screen>
     );
   }
 
   return (
-    <SafeAreaView
-      style={styles.container}
-      edges={["top", "left", "right"]}
-    >
+    <Screen>
       <View style={styles.header}>
         <View style={styles.headerTextGroup}>
-          <Text style={styles.title}>
-            Worker Jobs
-          </Text>
-
+          <Text style={styles.title}>Your jobs</Text>
           <Text style={styles.subtitle}>
-            {jobs.length} job
-            {jobs.length === 1 ? "" : "s"} in your queue
+            {jobs.length} job{jobs.length === 1 ? "" : "s"} in your queue
           </Text>
         </View>
 
-        <TouchableOpacity
-          style={styles.logoutButton}
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Log out"
           onPress={handleLogout}
-          activeOpacity={0.8}
+          style={({ pressed }) => [styles.logoutButton, pressed && styles.pressed]}
         >
-          <Text style={styles.logoutButtonText}>
-            Log Out
-          </Text>
-        </TouchableOpacity>
+          <Ionicons name="log-out-outline" size={20} color={colors.danger} />
+          <Text style={styles.logoutButtonText}>Log out</Text>
+        </Pressable>
       </View>
 
       <FlatList
         data={jobs}
         keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <JobCard
-            job={item}
-            onPress={() => handleJobPress(item)}
-          />
-        )}
-        contentContainerStyle={[
-          styles.listContent,
-          jobs.length === 0 && styles.emptyListContent,
-        ]}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={handleRefresh}
-          />
-        }
+        renderItem={({ item }) => <JobCard job={item} onPress={() => handleJobPress(item)} />}
+        contentContainerStyle={[styles.listContent, jobs.length === 0 && styles.emptyListContent]}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} tintColor={colors.brand} />}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
-            <Text style={styles.emptyTitle}>
-              No jobs available
-            </Text>
-
-            <Text style={styles.emptyText}>
-              There are currently no assigned jobs
-              in your queue.
-            </Text>
+            <View style={styles.emptyIcon}>
+              <Ionicons name="checkmark-done" size={36} color={colors.brand} />
+            </View>
+            <Text style={styles.emptyTitle}>No jobs available</Text>
+            <Text style={styles.emptyText}>There are currently no assigned jobs in your queue.</Text>
           </View>
         }
       />
-    </SafeAreaView>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#F5F6F8",
-  },
-
-  centered: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 24,
-    backgroundColor: "#F5F6F8",
-  },
-
+  centered: { flex: 1, justifyContent: "center", alignItems: "center", padding: spacing.xl, gap: spacing.md },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "flex-start",
-    paddingHorizontal: 16,
-    paddingTop: 16,
-    paddingBottom: 10,
-  },
-
-  headerTextGroup: {
-    flexShrink: 1,
-  },
-
-  title: {
-    fontSize: 24,
-    fontWeight: "700",
-    color: "#1A1A1A",
-  },
-
-  subtitle: {
-    fontSize: 13,
-    color: "#6B6B6B",
-    marginTop: 4,
-  },
-
-  logoutButton: {
-    borderWidth: 1,
-    borderColor: "#A61212",
-    borderRadius: 8,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    marginTop: 2,
-  },
-
-  logoutButtonText: {
-    color: "#A61212",
-    fontSize: 13,
-    fontWeight: "700",
-  },
-
-  listContent: {
-    paddingTop: 4,
-    paddingBottom: 24,
-  },
-
-  emptyListContent: {
-    flexGrow: 1,
-  },
-
-  loadingText: {
-    marginTop: 12,
-    fontSize: 14,
-    color: "#6B6B6B",
-  },
-
-  errorTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#1A1A1A",
-    marginBottom: 8,
-  },
-
-  errorText: {
-    fontSize: 14,
-    color: "#A61212",
-    textAlign: "center",
-    marginBottom: 16,
-  },
-
-  retryButton: {
-    backgroundColor: "#3A6EA5",
-    paddingHorizontal: 22,
-    paddingVertical: 12,
-    borderRadius: 8,
-  },
-
-  retryButtonText: {
-    color: "#FFFFFF",
-    fontSize: 14,
-    fontWeight: "700",
-  },
-
-  emptyContainer: {
-    flex: 1,
-    justifyContent: "center",
     alignItems: "center",
-    paddingHorizontal: 30,
+    paddingHorizontal: spacing.xl,
+    paddingTop: spacing.lg,
+    paddingBottom: spacing.md,
   },
-
-  emptyTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#1A1A1A",
-    marginBottom: 6,
+  headerTextGroup: { flexShrink: 1 },
+  title: { fontSize: theme.font.title, fontWeight: "800", color: colors.text },
+  subtitle: { fontSize: theme.font.small, color: colors.muted, marginTop: 2 },
+  logoutButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    minHeight: theme.hit,
+    borderWidth: 1.5,
+    borderColor: colors.danger,
+    borderRadius: theme.radius.md,
+    paddingHorizontal: spacing.md,
+    backgroundColor: colors.surface,
   },
-
-  emptyText: {
-    fontSize: 14,
-    color: "#6B6B6B",
-    textAlign: "center",
+  logoutButtonText: { color: colors.danger, fontSize: theme.font.small, fontWeight: "700" },
+  pressed: { opacity: 0.85 },
+  listContent: { paddingHorizontal: spacing.xl, paddingTop: spacing.xs, paddingBottom: spacing.xxl },
+  emptyListContent: { flexGrow: 1 },
+  loadingText: { fontSize: theme.font.small, color: colors.muted },
+  errorTitle: { fontSize: theme.font.heading, fontWeight: "700", color: colors.text },
+  errorText: { fontSize: theme.font.small, color: colors.danger, textAlign: "center", marginBottom: spacing.sm },
+  emptyContainer: { flex: 1, justifyContent: "center", alignItems: "center", paddingHorizontal: spacing.xxl },
+  emptyIcon: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    backgroundColor: colors.brandSoft,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: spacing.lg,
   },
+  emptyTitle: { fontSize: theme.font.heading, fontWeight: "700", color: colors.text, marginBottom: spacing.xs },
+  emptyText: { fontSize: theme.font.small, color: colors.muted, textAlign: "center", lineHeight: 20 },
 });

@@ -1,42 +1,29 @@
-import {
-  Alert,
-  Image,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
-
-import {
-  router,
-  useLocalSearchParams,
-} from "expo-router";
-
+import { useState } from "react";
+import { Alert, Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { router, useLocalSearchParams } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
 
-import { useState } from "react";
-
+import Button from "@/components/Button";
+import Screen, { CONTENT_EDGES } from "@/components/Screen";
+import TextField from "@/components/TextField";
+import { theme } from "@/constants/theme";
 import { resolveJob } from "@/services/jobsService";
 
+const { colors, spacing } = theme;
 const MAX_PHOTOS = 5;
 
 export default function EvidenceScreen() {
-  const params =
-    useLocalSearchParams<{
-      id: string;
-      jobId: string;
-    }>();
+  const params = useLocalSearchParams<{
+    id: string;
+    jobId: string;
+  }>();
 
-  const [imageUris, setImageUris] =
-    useState<string[]>([]);
+  const [imageUris, setImageUris] = useState<string[]>([]);
 
-  const [notes, setNotes] =
-    useState("");
+  const [notes, setNotes] = useState("");
 
-  const [submitting, setSubmitting] =
-    useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const addImages = (uris: string[]) => {
     setImageUris((current) => {
@@ -46,220 +33,127 @@ export default function EvidenceScreen() {
   };
 
   const removeImage = (uri: string) => {
-    setImageUris((current) =>
-      current.filter((existing) => existing !== uri)
-    );
+    setImageUris((current) => current.filter((existing) => existing !== uri));
   };
 
   const pickImage = async () => {
     if (imageUris.length >= MAX_PHOTOS) {
-      Alert.alert(
-        "Limit reached",
-        `You can attach up to ${MAX_PHOTOS} photos.`
-      );
+      Alert.alert("Limit reached", `You can attach up to ${MAX_PHOTOS} photos.`);
 
       return;
     }
 
-    const permission =
-      await ImagePicker.requestMediaLibraryPermissionsAsync();
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
-    if (
-      !permission.granted
-    ) {
-      Alert.alert(
-        "Permission required",
-        "Photo access is required to upload evidence."
-      );
+    if (!permission.granted) {
+      Alert.alert("Permission required", "Photo access is required to upload evidence.");
 
       return;
     }
 
-    const result =
-      await ImagePicker.launchImageLibraryAsync(
-        {
-          mediaTypes:
-            ["images"],
-          quality: 0.8,
-          allowsMultipleSelection: true,
-          selectionLimit:
-            MAX_PHOTOS - imageUris.length,
-        }
-      );
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images"],
+      quality: 0.8,
+      allowsMultipleSelection: true,
+      selectionLimit: MAX_PHOTOS - imageUris.length,
+    });
 
-    if (
-      !result.canceled
-    ) {
-      addImages(
-        result.assets.map((asset) => asset.uri)
-      );
+    if (!result.canceled) {
+      addImages(result.assets.map((asset) => asset.uri));
     }
   };
 
   const takePhoto = async () => {
     if (imageUris.length >= MAX_PHOTOS) {
-      Alert.alert(
-        "Limit reached",
-        `You can attach up to ${MAX_PHOTOS} photos.`
-      );
+      Alert.alert("Limit reached", `You can attach up to ${MAX_PHOTOS} photos.`);
 
       return;
     }
 
-    const permission =
-      await ImagePicker.requestCameraPermissionsAsync();
+    const permission = await ImagePicker.requestCameraPermissionsAsync();
 
-    if (
-      !permission.granted
-    ) {
-      Alert.alert(
-        "Permission required",
-        "Camera access is required."
-      );
+    if (!permission.granted) {
+      Alert.alert("Permission required", "Camera access is required.");
 
       return;
     }
 
-    const result =
-      await ImagePicker.launchCameraAsync(
-        {
-          quality: 0.8,
-        }
-      );
+    const result = await ImagePicker.launchCameraAsync({
+      quality: 0.8,
+    });
 
-    if (
-      !result.canceled
-    ) {
+    if (!result.canceled) {
       addImages([result.assets[0].uri]);
     }
   };
 
-  const submitEvidence =
-    async () => {
-      if (imageUris.length === 0) {
-        Alert.alert(
-          "Photo required",
-          "Please provide at least one photo of completion evidence."
-        );
+  const submitEvidence = async () => {
+    if (imageUris.length === 0) {
+      Alert.alert("Photo required", "Please provide at least one photo of completion evidence.");
 
-        return;
-      }
+      return;
+    }
 
-      if (!notes.trim()) {
-        Alert.alert(
-          "Notes required",
-          "Please provide completion notes."
-        );
+    if (!notes.trim()) {
+      Alert.alert("Notes required", "Please provide completion notes.");
 
-        return;
-      }
+      return;
+    }
 
-      try {
-        setSubmitting(true);
+    try {
+      setSubmitting(true);
 
-        await resolveJob(
-          params.jobId,
-          imageUris,
-          notes.trim()
-        );
+      await resolveJob(params.jobId, imageUris, notes.trim());
 
-        Alert.alert(
-          "Job resolved",
-          "Evidence uploaded successfully.",
-          [
-            {
-              text: "Done",
+      Alert.alert("Job resolved", "Evidence uploaded successfully.", [
+        {
+          text: "Done",
 
-              onPress: () =>
-                router.replace(
-                  "/jobs"
-                ),
-            },
-          ]
-        );
-      } catch (error) {
-        console.error(
-          error
-        );
+          onPress: () => router.replace("/jobs"),
+        },
+      ]);
+    } catch (error) {
+      console.error(error);
 
-        Alert.alert(
-          "Upload failed",
-          "Could not submit completion evidence."
-        );
-      } finally {
-        setSubmitting(false);
-      }
-    };
+      Alert.alert("Upload failed", "Could not submit completion evidence.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
-    <ScrollView
-      style={
-        styles.container
-      }
-      contentContainerStyle={
-        styles.content
-      }
-    >
-      <Text
-        style={styles.title}
-      >
-        Completion Evidence
-      </Text>
+    <Screen scroll edges={CONTENT_EDGES} contentContainerStyle={styles.content}>
+      <Text style={styles.title}>Completion evidence</Text>
 
-      <Text
-        style={
-          styles.subtitle
-        }
-      >
-        Add up to {MAX_PHOTOS} photos and notes
-        before resolving the job.
-      </Text>
+      <Text style={styles.subtitle}>Add up to {MAX_PHOTOS} photos and notes before resolving the job.</Text>
 
       {imageUris.length > 0 ? (
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
           style={styles.photoRow}
-          contentContainerStyle={
-            styles.photoRowContent
-          }
+          contentContainerStyle={styles.photoRowContent}
         >
           {imageUris.map((uri) => (
-            <View
-              key={uri}
-              style={styles.photoWrapper}
-            >
-              <Image
-                source={{ uri }}
-                style={styles.photo}
-              />
+            <View key={uri} style={styles.photoWrapper}>
+              <Image source={{ uri }} style={styles.photo} />
 
-              <TouchableOpacity
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="Remove photo"
                 style={styles.removeButton}
+                hitSlop={8}
                 onPress={() => removeImage(uri)}
               >
-                <Text
-                  style={styles.removeButtonText}
-                >
-                  ×
-                </Text>
-              </TouchableOpacity>
+                <Ionicons name="close-circle" size={28} color={colors.danger} />
+              </Pressable>
             </View>
           ))}
         </ScrollView>
       ) : (
-        <View
-          style={
-            styles.placeholder
-          }
-        >
-          <Text
-            style={
-              styles.placeholderText
-            }
-          >
-            No photos selected
-          </Text>
+        <View style={styles.placeholder}>
+          <Ionicons name="images-outline" size={36} color={colors.muted} />
+          <Text style={styles.placeholderText}>No photos selected</Text>
         </View>
       )}
 
@@ -267,225 +161,56 @@ export default function EvidenceScreen() {
         {imageUris.length} / {MAX_PHOTOS} photos
       </Text>
 
-      <View
-        style={
-          styles.buttonRow
-        }
-      >
-        <TouchableOpacity
-          style={
-            styles.secondaryButton
-          }
-          onPress={
-            takePhoto
-          }
-        >
-          <Text
-            style={
-              styles.secondaryText
-            }
-          >
-            Take Photo
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={
-            styles.secondaryButton
-          }
-          onPress={
-            pickImage
-          }
-        >
-          <Text
-            style={
-              styles.secondaryText
-            }
-          >
-            Gallery
-          </Text>
-        </TouchableOpacity>
+      <View style={styles.buttonRow}>
+        <Button title="Take Photo" icon="camera-outline" variant="secondary" onPress={takePhoto} style={styles.buttonHalf} />
+        <Button title="Gallery" icon="image-outline" variant="secondary" onPress={pickImage} style={styles.buttonHalf} />
       </View>
 
-      <Text
-        style={styles.label}
-      >
-        Completion Notes
-      </Text>
-
-      <TextInput
-        style={
-          styles.input
-        }
-        multiline
-        numberOfLines={5}
+      <TextField
+        label="Completion notes"
         placeholder="Describe the work completed..."
         value={notes}
-        onChangeText={
-          setNotes
-        }
+        onChangeText={setNotes}
+        multiline
+        numberOfLines={5}
+        style={styles.notes}
       />
 
-      <TouchableOpacity
-        style={
-          styles.submitButton
-        }
-        disabled={
-          submitting
-        }
-        onPress={
-          submitEvidence
-        }
-      >
-        <Text
-          style={
-            styles.submitText
-          }
-        >
-          {submitting
-            ? "Submitting..."
-            : "Submit & Resolve"}
-        </Text>
-      </TouchableOpacity>
-    </ScrollView>
+      <Button title="Submit & Resolve" icon="checkmark-done" onPress={submitEvidence} loading={submitting} />
+    </Screen>
   );
 }
 
-const styles =
-  StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor:
-        "#F5F6F8",
-    },
-
-    content: {
-      padding: 18,
-      paddingBottom: 40,
-    },
-
-    title: {
-      fontSize: 26,
-      fontWeight: "700",
-    },
-
-    subtitle: {
-      color: "#6B6B6B",
-      marginTop: 5,
-      marginBottom: 20,
-    },
-
-    photoRow: {
-      marginBottom: 6,
-    },
-
-    photoRowContent: {
-      gap: 10,
-      paddingRight: 4,
-    },
-
-    photoWrapper: {
-      position: "relative",
-    },
-
-    photo: {
-      width: 140,
-      height: 140,
-      borderRadius: 12,
-    },
-
-    removeButton: {
-      position: "absolute",
-      top: 6,
-      right: 6,
-      width: 24,
-      height: 24,
-      borderRadius: 12,
-      backgroundColor: "rgba(0,0,0,0.6)",
-      alignItems: "center",
-      justifyContent: "center",
-    },
-
-    removeButtonText: {
-      color: "#FFFFFF",
-      fontSize: 16,
-      lineHeight: 16,
-      fontWeight: "700",
-    },
-
-    placeholder: {
-      height: 220,
-      backgroundColor:
-        "#E5E7EB",
-      borderRadius: 12,
-      justifyContent:
-        "center",
-      alignItems: "center",
-      marginBottom: 6,
-    },
-
-    placeholderText: {
-      color: "#6B7280",
-    },
-
-    photoCount: {
-      fontSize: 12,
-      color: "#6B6B6B",
-      marginBottom: 14,
-    },
-
-    buttonRow: {
-      flexDirection: "row",
-      gap: 10,
-      marginBottom: 20,
-    },
-
-    secondaryButton: {
-      flex: 1,
-      padding: 14,
-      borderWidth: 1,
-      borderColor:
-        "#3A6EA5",
-      borderRadius: 10,
-      alignItems: "center",
-    },
-
-    secondaryText: {
-      color: "#3A6EA5",
-      fontWeight: "700",
-    },
-
-    label: {
-      fontSize: 15,
-      fontWeight: "600",
-      marginBottom: 8,
-    },
-
-    input: {
-      backgroundColor:
-        "#FFFFFF",
-      borderWidth: 1,
-      borderColor:
-        "#D1D5DB",
-      borderRadius: 10,
-      padding: 14,
-      minHeight: 120,
-      textAlignVertical:
-        "top",
-    },
-
-    submitButton: {
-      marginTop: 20,
-      backgroundColor:
-        "#16A34A",
-      padding: 16,
-      borderRadius: 10,
-      alignItems: "center",
-    },
-
-    submitText: {
-      color: "#FFFFFF",
-      fontWeight: "700",
-      fontSize: 16,
-    },
-  });
+const styles = StyleSheet.create({
+  content: { padding: spacing.xl, paddingBottom: spacing.xxl * 2 },
+  title: { fontSize: theme.font.title, fontWeight: "800", color: colors.text },
+  subtitle: { fontSize: theme.font.small, color: colors.muted, marginTop: 2, marginBottom: spacing.xl, lineHeight: 20 },
+  photoRow: { marginBottom: spacing.sm },
+  photoRowContent: { paddingTop: spacing.sm, paddingRight: spacing.sm, gap: spacing.md },
+  photoWrapper: { position: "relative" },
+  photo: { width: 140, height: 140, borderRadius: theme.radius.md },
+  removeButton: {
+    position: "absolute",
+    top: -8,
+    right: -8,
+    backgroundColor: colors.surface,
+    borderRadius: 14,
+  },
+  placeholder: {
+    height: 140,
+    borderRadius: theme.radius.md,
+    borderWidth: 1.5,
+    borderStyle: "dashed",
+    borderColor: colors.stroke,
+    backgroundColor: colors.surface,
+    alignItems: "center",
+    justifyContent: "center",
+    gap: spacing.sm,
+    marginBottom: spacing.sm,
+  },
+  placeholderText: { fontSize: theme.font.small, color: colors.muted },
+  photoCount: { fontSize: theme.font.caption, color: colors.muted, marginBottom: spacing.md },
+  buttonRow: { flexDirection: "row", gap: spacing.md, marginBottom: spacing.xl },
+  buttonHalf: { flex: 1, paddingHorizontal: spacing.sm },
+  notes: { minHeight: 120, paddingTop: spacing.md, textAlignVertical: "top" },
+});
