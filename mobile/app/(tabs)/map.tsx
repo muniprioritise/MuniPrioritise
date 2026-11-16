@@ -5,6 +5,7 @@ import { useFocusEffect } from "expo-router";
 import MapView, { Marker } from "react-native-maps";
 
 import { theme } from "@/constants/theme";
+import { usePreferences } from "@/hooks/usePreferences";
 import { getApiErrorMessage } from "@/services/apiError";
 import { getNearbyReports } from "@/services/reportsService";
 import type { Report } from "@/types/report";
@@ -15,6 +16,7 @@ interface Coords {
 }
 
 export default function MapScreen() {
+  const { preferences } = usePreferences();
   const [coords, setCoords] = useState<Coords | null>(null);
   const [reports, setReports] = useState<Report[]>([]);
   const [locating, setLocating] = useState(true);
@@ -122,6 +124,7 @@ export default function MapScreen() {
           longitudeDelta: 0.05,
         }}
         showsUserLocation
+        mapType={preferences.mapStyle}
       >
         {reports.map((report) => (
           <Marker

@@ -33,6 +33,17 @@ export default function ProfileScreen() {
 
         <Pressable
           accessibilityRole="button"
+          accessibilityLabel="Settings"
+          style={({ pressed }) => [styles.row, styles.rowGap, pressed && styles.rowPressed]}
+          onPress={() => router.push("/settings")}
+        >
+          <Ionicons name="settings-outline" size={22} color={colors.brand} />
+          <Text style={styles.rowText}>Settings</Text>
+          <Ionicons name="chevron-forward" size={20} color={colors.muted} />
+        </Pressable>
+
+        <Pressable
+          accessibilityRole="button"
           accessibilityLabel="Notifications"
           style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}
           onPress={() => router.push("/notifications")}
@@ -75,6 +86,7 @@ const styles = StyleSheet.create({
     borderColor: colors.stroke,
     paddingHorizontal: spacing.lg,
   },
+  rowGap: { marginBottom: spacing.md },
   rowPressed: { opacity: 0.85 },
   rowText: { flex: 1, fontSize: theme.font.body, fontWeight: "600", color: colors.text },
   logout: { marginTop: spacing.xl },
