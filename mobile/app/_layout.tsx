@@ -42,6 +42,10 @@ export default function RootLayout() {
             name="notifications"
             options={{ headerShown: true, title: "Notifications" }}
           />
+          <Stack.Screen
+            name="settings"
+            options={{ headerShown: true, title: "Settings" }}
+          />
         </Stack>
       </ThemeProvider>
     </AuthProvider>

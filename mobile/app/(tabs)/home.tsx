@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { ActivityIndicator, FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useFocusEffect } from "expo-router";
@@ -11,13 +11,33 @@ import StatusBadge from "@/components/StatusBadge";
 import { severityLevel } from "@/constants/severity";
 import { theme } from "@/constants/theme";
 import { getApiErrorMessage } from "@/services/apiError";
+import { usePreferences } from "@/hooks/usePreferences";
 import { getMyReports } from "@/services/reportsService";
 import type { Report } from "@/types/report";
 import { formatDate } from "@/utils/format";
+import type { ReportOrder } from "@/utils/preferences";
 
 const { colors, spacing } = theme;
 
+// Returns a sorted copy, so the loaded list itself is never changed.
+function sortReports(reports: Report[], order: ReportOrder): Report[] {
+  const sorted = [...reports];
+
+  if (order === "oldest") {
+    return sorted.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+  }
+
+  if (order === "severity") {
+    return sorted.sort(
+      (a, b) => b.severity - a.severity || new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+  }
+
+  return sorted.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+}
+
 export default function HomeScreen() {
+  const { preferences } = usePreferences();
   const [reports, setReports] = useState<Report[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -42,6 +62,11 @@ export default function HomeScreen() {
     useCallback(() => {
       loadReports();
     }, [loadReports])
+  );
+
+  const sortedReports = useMemo(
+    () => sortReports(reports, preferences.reportOrder),
+    [reports, preferences.reportOrder]
   );
 
   const handleRefresh = () => {
@@ -87,7 +112,7 @@ export default function HomeScreen() {
       ) : null}
 
       <FlatList
-        data={reports}
+        data={sortedReports}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.listContent}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} tintColor={colors.brand} />}
@@ -108,9 +133,11 @@ export default function HomeScreen() {
               <StatusBadge status={item.status} />
             </View>
 
-            <Text style={styles.description} numberOfLines={2}>
-              {item.description}
-            </Text>
+            {preferences.compactCards ? null : (
+              <Text style={styles.description} numberOfLines={2}>
+                {item.description}
+              </Text>
+            )}
 
             <View style={styles.severityRow}>
               <Ionicons name="speedometer-outline" size={16} color={severityLevel(item.severity).color} />
